@@ -1,0 +1,15 @@
+require("dotenv").config();
+const express = require("express");
+const cors = require("cors");
+const app = express();
+app.use(cors());
+app.use(express.json());
+app.use("/users", require("./routes/users"));
+app.use("/livestock", require("./routes/livestock"));
+app.use("/market", require("./routes/market"));
+app.use("/finance", require("./routes/finance"));
+app.use("/weather", require("./routes/weather"));
+app.use("/ai", require("./routes/ai"));
+app.use("/alerts", require("./routes/alerts"));
+app.get("/", (req, res) => { res.json({ message: "Malchin Super App", version: "1.0" }); });
+app.listen(5000, () => { console.log("Malchin backend running on port 5000"); });

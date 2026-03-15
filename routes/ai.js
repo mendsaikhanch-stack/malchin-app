@@ -1,0 +1,5 @@
+const express = require("express");
+const router = express.Router();
+router.post("/ask", (req, res) => { const q = (req.body.question || "").toLowerCase(); let a = "Asuultaa todorkhoilno uu."; if (q.includes("tura")) a = "Mal turaah: Tejeeel nemelt ogoh, maliin emcheer uzuulekh."; else if (q.includes("tol")) a = "Tollolt: Dulaan khashaa beldekh, tejeeel nemelt ogoh."; else if (q.includes("nooluur")) a = "Nooluur: 4-r sard samnakh. Une 85000-95000/kg."; else if (q.includes("zud")) a = "Zud: Ovs khadakh, otriih belcheer, daatgald khamragdakh."; res.json({ question: req.body.question, answer: a }); });
+router.get("/tips", (req, res) => { const t = ["Malaa khashaand bairlgaarai.", "Tolloltiin uliral oirtoj baina.", "Nooluurai khansh 10% osson."]; res.json({ tip: t[Math.floor(Math.random() * t.length)] }); });
+module.exports = router;

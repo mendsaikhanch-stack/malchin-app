@@ -1,0 +1,12 @@
+﻿const express = require("express");
+const router = express.Router();
+const livestock = [];
+const events = [];
+let nextId = 1;
+let eventId = 1;
+router.get("/:user_id", (req, res) => { res.json(livestock.filter(l => l.user_id == req.params.user_id)); });
+router.post("/add", (req, res) => { const { user_id, animal_type, total_count } = req.body; const existing = livestock.find(l => l.user_id == user_id && l.animal_type == animal_type); if (existing) { existing.total_count = total_count; existing.updated_at = new Date(); return res.json(existing); } const item = { id: nextId++, user_id, animal_type, total_count, updated_at: new Date() }; livestock.push(item); res.status(201).json(item); });
+router.post("/event", (req, res) => { const { user_id, animal_type, event_type, quantity, note } = req.body; const event = { id: eventId++, user_id, animal_type, event_type, quantity, note, event_date: new Date() }; events.push(event); const animal = livestock.find(l => l.user_id == user_id && l.animal_type == animal_type); if (animal) { if (event_type === "birth" || event_type === "purchased") animal.total_count += quantity; if (event_type === "death" || event_type === "sold") animal.total_count = Math.max(0, animal.total_count - quantity); } res.status(201).json(event); });
+router.get("/events/:user_id", (req, res) => { res.json(events.filter(e => e.user_id == req.params.user_id)); });
+router.get("/stats/:user_id", (req, res) => { const userLivestock = livestock.filter(l => l.user_id == req.params.user_id); const total = userLivestock.reduce((s, l) => s + l.total_count, 0); res.json({ livestock: userLivestock, total_animals: total }); });
+module.exports = router;
