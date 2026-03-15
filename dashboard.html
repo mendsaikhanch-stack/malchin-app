@@ -58,7 +58,7 @@ body { background: #f5f0e8; color: #333; }
 </div>
 </div>
 <script>
-const API = "http://localhost:5000";
+const API = "";
 async function load() {
 try { const r = await fetch(API+"/livestock/stats/1"); const d = await r.json(); document.getElementById("livestock-stats").innerHTML = d.livestock.map(l => "<div class=stat-item><div class=stat-num>"+l.total_count+"</div><div class=stat-label>"+l.animal_type+"</div></div>").join("") + "<div class=stat-item><div class=stat-num style=color:#e65100>"+d.total_animals+"</div><div class=stat-label>NIIT</div></div>"; } catch(e) { document.getElementById("livestock-stats").innerHTML = "Server ajilagui baina"; }
 try { const r = await fetch(API+"/weather/Arkhangai"); const d = await r.json(); document.getElementById("weather-info").innerHTML = "<div class=weather-temp>"+d.temp+"C</div><p>"+d.condition+" | Salkhi: "+d.wind+"m/s</p><p>Zud ersdel: "+d.dzud_risk+"</p>"; } catch(e) {}

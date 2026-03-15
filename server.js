@@ -1,6 +1,7 @@
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
+const path = require("path");
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -13,5 +14,6 @@ app.use("/ai", require("./routes/ai"));
 app.use("/alerts", require("./routes/alerts"));
 app.use("/transport", require("./routes/transport"));
 app.use("/map", require("./routes/map"));
-app.get("/", (req, res) => { res.json({ message: "Malchin Super App", version: "2.0", endpoints: ["/users", "/livestock", "/market", "/finance", "/weather", "/ai", "/alerts", "/transport", "/map"] }); });
-app.listen(5000, () => { console.log("Malchin backend v2.0 running on port 5000"); });
+app.get("/dashboard", (req, res) => { res.sendFile(path.join(__dirname, "dashboard.html")); });
+app.get("/", (req, res) => { res.json({ message: "Malchin Super App", version: "2.0" }); });
+app.listen(5000, "0.0.0.0", () => { console.log("Malchin backend v2.0 running on port 5000"); });
