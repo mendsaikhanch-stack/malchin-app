@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -11,6 +11,8 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { AppColors } from '@/constants/theme';
 import { userApi } from '@/services/api';
+import { clearCache, getCacheSize } from '@/services/offline';
+import { useNetwork } from '@/hooks/use-network';
 
 const aimagList = [
   'Төв', 'Увс', 'Ховд', 'Баян-Өлгий', 'Завхан', 'Архангай',
@@ -18,6 +20,7 @@ const aimagList = [
 ];
 
 export default function ProfileScreen() {
+  const isConnected = useNetwork();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState<any>(null);
   const [phone, setPhone] = useState('');
@@ -214,11 +217,43 @@ export default function ProfileScreen() {
           </TouchableOpacity>
         </View>
 
+        {/* Оффлайн удирдлага */}
+        <View style={[styles.menuSection, { marginTop: 16 }]}>
+          <View style={styles.menuItem}>
+            <Text style={styles.menuIcon}>{'\uD83D\uDCE1'}</Text>
+            <Text style={styles.menuText}>Оффлайн горим</Text>
+            <Text style={{ fontSize: 12, color: isConnected ? '#43A047' : '#E53935', fontWeight: '600' }}>
+              {isConnected ? '\u2705 Онлайн' : '\uD83D\uDFE0 Оффлайн'}
+            </Text>
+          </View>
+          <TouchableOpacity style={styles.menuItem} onPress={async () => {
+            const size = await getCacheSize();
+            Alert.alert('Хадгалсан мэдээлэл', `${size.count} мэдээлэл хадгалагдсан`);
+          }}>
+            <Text style={styles.menuIcon}>{'\uD83D\uDCBE'}</Text>
+            <Text style={styles.menuText}>Хадгалсан мэдээлэл</Text>
+            <Text style={styles.menuArrow}>{'\u203A'}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.menuItem} onPress={async () => {
+            Alert.alert('Cache цэвэрлэх', 'Бүх хадгалсан мэдээлэл устгах уу?', [
+              { text: 'Болих' },
+              { text: 'Тийм', style: 'destructive', onPress: async () => {
+                await clearCache();
+                Alert.alert('Амжилттай', 'Cache цэвэрлэгдлээ');
+              }},
+            ]);
+          }}>
+            <Text style={styles.menuIcon}>{'\uD83D\uDDD1\uFE0F'}</Text>
+            <Text style={styles.menuText}>Cache цэвэрлэх</Text>
+            <Text style={styles.menuArrow}>{'\u203A'}</Text>
+          </TouchableOpacity>
+        </View>
+
         <TouchableOpacity style={styles.logoutBtn} onPress={handleLogout}>
           <Text style={styles.logoutText}>Гарах</Text>
         </TouchableOpacity>
 
-        <Text style={styles.version}>МАЛЧИН v2.0</Text>
+        <Text style={styles.version}>МАЛЧИН v3.0</Text>
 
         <View style={{ height: 100 }} />
       </ScrollView>

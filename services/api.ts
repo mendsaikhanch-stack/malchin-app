@@ -1,3 +1,5 @@
+import { cachedFetch, cacheSet } from './offline';
+
 const API_BASE = 'http://localhost:5000';
 
 async function request<T>(endpoint: string, options?: RequestInit): Promise<T> {
@@ -7,6 +9,16 @@ async function request<T>(endpoint: string, options?: RequestInit): Promise<T> {
   });
   if (!res.ok) throw new Error(`API error: ${res.status}`);
   return res.json();
+}
+
+// Оффлайн cache-тэй GET request
+async function cachedRequest<T>(endpoint: string, category?: string): Promise<T> {
+  const result = await cachedFetch<T>(
+    endpoint,
+    () => request<T>(endpoint),
+    category
+  );
+  return result.data;
 }
 
 // Users
@@ -20,9 +32,9 @@ export const userApi = {
 // Livestock
 export const livestockApi = {
   getByUser: (userId: number) =>
-    request<any>(`/livestock/${userId}`),
+    cachedRequest<any>(`/livestock/${userId}`, 'livestock'),
   getStats: (userId: number) =>
-    request<any>(`/livestock/stats/${userId}`),
+    cachedRequest<any>(`/livestock/stats/${userId}`, 'livestock'),
   add: (data: { user_id: number; animal_type: string; total_count: number }) =>
     request<any>('/livestock/add', { method: 'POST', body: JSON.stringify(data) }),
   addEvent: (data: { user_id: number; animal_type: string; event_type: string; quantity: number; note?: string }) =>
@@ -34,9 +46,9 @@ export const livestockApi = {
 // Weather
 export const weatherApi = {
   getByAimag: (aimag: string) =>
-    request<any>(`/weather/${encodeURIComponent(aimag)}`),
+    cachedRequest<any>(`/weather/${encodeURIComponent(aimag)}`, 'weather'),
   getAll: () =>
-    request<any>('/weather'),
+    cachedRequest<any>('/weather', 'weather'),
 };
 
 // AI Advisor
@@ -53,7 +65,7 @@ export const aiApi = {
 
 // Diseases
 export const diseaseApi = {
-  getByAnimal: (animalType: string) => request<any>(`/diseases/${animalType}`),
+  getByAnimal: (animalType: string) => cachedRequest<any>(`/diseases/${animalType}`, 'diseases'),
   match: (data: { animal_type?: string; symptoms: string }) =>
     request<any>('/diseases/match', { method: 'POST', body: JSON.stringify(data) }),
 };
@@ -79,7 +91,7 @@ export const marketApi = {
 // Alerts
 export const alertsApi = {
   getAll: (region?: string) =>
-    request<any>(`/alerts${region ? `?region=${encodeURIComponent(region)}` : ''}`),
+    cachedRequest<any>(`/alerts${region ? `?region=${encodeURIComponent(region)}` : ''}`, 'alerts'),
 };
 
 // Transport
@@ -106,17 +118,17 @@ export const mapApi = {
 // News & Programs
 export const newsApi = {
   getAll: (category?: string) =>
-    request<any>(`/news${category ? `?category=${category}` : ''}`),
+    cachedRequest<any>(`/news${category ? `?category=${category}` : ''}`, 'news'),
   getPrograms: (category?: string) =>
-    request<any>(`/news/programs${category ? `?category=${category}` : ''}`),
-  getIntlPrices: () => request<any>('/news/intl-prices'),
-  getDashboard: () => request<any>('/news/dashboard'),
+    cachedRequest<any>(`/news/programs${category ? `?category=${category}` : ''}`, 'news'),
+  getIntlPrices: () => cachedRequest<any>('/news/intl-prices', 'prices'),
+  getDashboard: () => cachedRequest<any>('/news/dashboard', 'news'),
 };
 
 // Banks
 export const bankApi = {
-  getRates: () => request<any>('/banks/rates'),
-  getBest: () => request<any>('/banks/best'),
+  getRates: () => cachedRequest<any>('/banks/rates', 'banks'),
+  getBest: () => cachedRequest<any>('/banks/best', 'banks'),
 };
 
 // Stats
@@ -130,10 +142,10 @@ export const knowledgeApi = {
     const params = new URLSearchParams();
     if (category) params.set('category', category);
     if (animalType) params.set('animal_type', animalType);
-    return request<any>(`/knowledge?${params}`);
+    return cachedRequest<any>(`/knowledge?${params}`, 'knowledge');
   },
-  getDailyTip: () => request<any>('/knowledge/daily-tip'),
-  search: (q: string) => request<any>(`/knowledge/search?q=${encodeURIComponent(q)}`),
+  getDailyTip: () => cachedRequest<any>('/knowledge/daily-tip', 'knowledge'),
+  search: (q: string) => cachedRequest<any>(`/knowledge/search?q=${encodeURIComponent(q)}`, 'knowledge'),
 };
 
 // Ads
@@ -142,7 +154,7 @@ export const adsApi = {
     const params = new URLSearchParams();
     if (placement) params.set('placement', placement);
     if (limit) params.set('limit', String(limit));
-    return request<any>(`/ads?${params}`);
+    return cachedRequest<any>(`/ads?${params}`, 'ads');
   },
   click: (id: number) =>
     request<any>(`/ads/${id}/click`, { method: 'POST' }),
@@ -151,16 +163,16 @@ export const adsApi = {
 // Shinjikh
 export const shinjikhApi = {
   getAll: (category?: string) =>
-    request<any>(`/shinjikh${category ? `?category=${category}` : ''}`),
-  search: (q: string) => request<any>(`/shinjikh/search?q=${encodeURIComponent(q)}`),
+    cachedRequest<any>(`/shinjikh${category ? `?category=${category}` : ''}`, 'shinjikh'),
+  search: (q: string) => cachedRequest<any>(`/shinjikh/search?q=${encodeURIComponent(q)}`, 'shinjikh'),
 };
 
 // Fun facts
 export const funFactsApi = {
   getAll: (category?: string) =>
-    request<any>(`/funfacts${category ? `?category=${category}` : ''}`),
-  getDaily: () => request<any>('/funfacts/daily'),
-  getRandom: () => request<any>('/funfacts/random'),
+    cachedRequest<any>(`/funfacts${category ? `?category=${category}` : ''}`, 'funfacts'),
+  getDaily: () => cachedRequest<any>('/funfacts/daily', 'funfacts'),
+  getRandom: () => cachedRequest<any>('/funfacts/random', 'funfacts'),
 };
 
 // Prices
