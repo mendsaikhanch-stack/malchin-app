@@ -148,6 +148,34 @@ export const knowledgeApi = {
   search: (q: string) => cachedRequest<any>(`/knowledge/search?q=${encodeURIComponent(q)}`, 'knowledge'),
 };
 
+// Reminders
+export const reminderApi = {
+  getByUser: (userId: number, upcoming?: boolean) =>
+    cachedRequest<any>(`/reminders/${userId}${upcoming ? '?upcoming=1' : ''}`, 'default'),
+  create: (data: any) =>
+    request<any>('/reminders/create', { method: 'POST', body: JSON.stringify(data) }),
+  complete: (id: number) =>
+    request<any>(`/reminders/${id}/complete`, { method: 'PUT' }),
+  delete: (id: number) =>
+    request<any>(`/reminders/${id}`, { method: 'DELETE' }),
+  getVaccineSchedule: (animalType?: string) =>
+    cachedRequest<any>(`/reminders/vaccines/schedule${animalType ? `?animal_type=${animalType}` : ''}`, 'default'),
+};
+
+// Registry
+export const registryApi = {
+  getChips: (userId: number) => cachedRequest<any>(`/registry/chips/${userId}`, 'default'),
+  registerChip: (data: any) => request<any>('/registry/chips/register', { method: 'POST', body: JSON.stringify(data) }),
+  lookupChip: (chipId: string) => request<any>(`/registry/chips/lookup/${chipId}`),
+  getWells: (userId: number) => cachedRequest<any>(`/registry/wells/${userId}`, 'default'),
+  registerWell: (data: any) => request<any>('/registry/wells/register', { method: 'POST', body: JSON.stringify(data) }),
+  getLands: (userId: number) => cachedRequest<any>(`/registry/land/${userId}`, 'default'),
+  registerLand: (data: any) => request<any>('/registry/land/register', { method: 'POST', body: JSON.stringify(data) }),
+  getGuides: (category?: string) => cachedRequest<any>(`/registry/guides${category ? `?category=${category}` : ''}`, 'knowledge'),
+  getGuide: (id: number) => cachedRequest<any>(`/registry/guides/${id}`, 'knowledge'),
+  getSummary: (userId: number) => request<any>(`/registry/summary/${userId}`),
+};
+
 // Ads
 export const adsApi = {
   get: (placement?: string, limit?: number) => {

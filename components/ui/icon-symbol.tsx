@@ -29,6 +29,7 @@ const MAPPING = {
   'stethoscope': 'medical-services',
   'lightbulb.fill': 'lightbulb',
   'eye.fill': 'visibility',
+  'gearshape.fill': 'settings',
 } as IconMapping;
 
 /**

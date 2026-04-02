@@ -17,11 +17,11 @@ const tabs: TabConfig[] = [
   { name: 'index', title: 'Нүүр', icon: 'house.fill' },
   { name: 'market', title: 'Зах зээл', icon: 'storefront.fill' },
   { name: 'news', title: 'Мэдээ', icon: 'newspaper.fill' },
-  { name: 'shinjikh', title: 'Шинжих', icon: 'eye.fill' },
+  { name: 'manage', title: 'Удирдлага', icon: 'gearshape.fill' },
   { name: 'profile', title: 'Профайл', icon: 'person.fill' },
 ];
 
-const hiddenTabs = ['explore', 'weather', 'ai-advisor', 'livestock', 'finance', 'diagnose', 'knowledge', 'funfacts'];
+const hiddenTabs = ['explore', 'weather', 'ai-advisor', 'livestock', 'finance', 'diagnose', 'knowledge', 'funfacts', 'shinjikh'];
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
