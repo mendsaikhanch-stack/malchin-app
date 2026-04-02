@@ -23,6 +23,8 @@ app.use("/diseases", require("./routes/diseases"));
 app.use("/funfacts", require("./routes/funfacts"));
 app.use("/shinjikh", require("./routes/shinjikh"));
 app.use("/ads", require("./routes/ads"));
+app.use("/reminders", require("./routes/reminders"));
+app.use("/registry", require("./routes/registry"));
 app.get("/dashboard", (req, res) => { res.sendFile(path.join(__dirname, "dashboard.html")); });
 app.get("/", (req, res) => { res.json({ message: "Malchin Super App", version: "3.0" }); });
 app.listen(5000, "0.0.0.0", () => {
