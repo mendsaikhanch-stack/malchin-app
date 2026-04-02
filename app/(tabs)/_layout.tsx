@@ -1,10 +1,27 @@
 import { Tabs } from 'expo-router';
 import React from 'react';
+import { Platform } from 'react-native';
 
 import { HapticTab } from '@/components/haptic-tab';
-import { IconSymbol } from '@/components/ui/icon-symbol';
+import { IconSymbol, IconSymbolName } from '@/components/ui/icon-symbol';
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+
+type TabConfig = {
+  name: string;
+  title: string;
+  icon: IconSymbolName;
+};
+
+const tabs: TabConfig[] = [
+  { name: 'index', title: 'Нүүр', icon: 'house.fill' },
+  { name: 'market', title: 'Зах зээл', icon: 'storefront.fill' },
+  { name: 'news', title: 'Мэдээ', icon: 'newspaper.fill' },
+  { name: 'shinjikh', title: 'Шинжих', icon: 'eye.fill' },
+  { name: 'profile', title: 'Профайл', icon: 'person.fill' },
+];
+
+const hiddenTabs = ['explore', 'weather', 'ai-advisor', 'livestock', 'finance', 'diagnose', 'knowledge', 'funfacts'];
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
@@ -13,23 +30,29 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
+        tabBarInactiveTintColor: Colors[colorScheme ?? 'light'].tabIconDefault,
         headerShown: false,
         tabBarButton: HapticTab,
+        tabBarStyle: Platform.select({
+          ios: { position: 'absolute' },
+          default: { elevation: 8 },
+        }),
       }}>
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="explore"
-        options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
-        }}
-      />
+      {tabs.map((tab) => (
+        <Tabs.Screen
+          key={tab.name}
+          name={tab.name}
+          options={{
+            title: tab.title,
+            tabBarIcon: ({ color }) => (
+              <IconSymbol size={24} name={tab.icon} color={color} />
+            ),
+          }}
+        />
+      ))}
+      {hiddenTabs.map((name) => (
+        <Tabs.Screen key={name} name={name} options={{ href: null }} />
+      ))}
     </Tabs>
   );
 }

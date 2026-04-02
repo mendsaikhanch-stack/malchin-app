@@ -1,41 +1,56 @@
-/**
- * Below are the colors that are used in the app. The colors are defined in the light and dark mode.
- * There are many other ways to style your app. For example, [Nativewind](https://www.nativewind.dev/), [Tamagui](https://tamagui.dev/), [unistyles](https://reactnativeunistyles.vercel.app), etc.
- */
-
 import { Platform } from 'react-native';
 
-const tintColorLight = '#0a7ea4';
-const tintColorDark = '#fff';
+// Малчин апп брэнд өнгөнүүд
+export const AppColors = {
+  primary: '#2D7D3F',      // Ногоон - бэлчээр
+  primaryLight: '#4CAF50',
+  primaryDark: '#1B5E20',
+  secondary: '#FF8F00',    // Шар - нар, алт
+  secondaryLight: '#FFB74D',
+  accent: '#5C6BC0',       // Цэнхэр - тэнгэр
+  danger: '#E53935',
+  warning: '#FF8F00',
+  success: '#43A047',
+  white: '#FFFFFF',
+  black: '#1A1A1A',
+  gray: '#9E9E9E',
+  grayLight: '#F5F5F5',
+  grayMedium: '#E0E0E0',
+  grayDark: '#616161',
+  cardBg: '#FFFFFF',
+  borderColor: '#E8E8E8',
+};
 
 export const Colors = {
   light: {
-    text: '#11181C',
-    background: '#fff',
-    tint: tintColorLight,
+    text: '#1A1A1A',
+    textSecondary: '#616161',
+    background: '#F8F9FA',
+    cardBg: '#FFFFFF',
+    tint: AppColors.primary,
     icon: '#687076',
-    tabIconDefault: '#687076',
-    tabIconSelected: tintColorLight,
+    tabIconDefault: '#9E9E9E',
+    tabIconSelected: AppColors.primary,
+    border: '#E8E8E8',
   },
   dark: {
     text: '#ECEDEE',
-    background: '#151718',
-    tint: tintColorDark,
+    textSecondary: '#9BA1A6',
+    background: '#121212',
+    cardBg: '#1E1E1E',
+    tint: AppColors.primaryLight,
     icon: '#9BA1A6',
     tabIconDefault: '#9BA1A6',
-    tabIconSelected: tintColorDark,
+    tabIconSelected: AppColors.primaryLight,
+    border: '#333333',
   },
 };
 
 export const Fonts = Platform.select({
   ios: {
-    /** iOS `UIFontDescriptorSystemDesignDefault` */
     sans: 'system-ui',
-    /** iOS `UIFontDescriptorSystemDesignSerif` */
     serif: 'ui-serif',
-    /** iOS `UIFontDescriptorSystemDesignRounded` */
     rounded: 'ui-rounded',
-    /** iOS `UIFontDescriptorSystemDesignMonospaced` */
     mono: 'ui-monospace',
   },
   default: {
