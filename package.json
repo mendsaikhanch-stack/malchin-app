@@ -12,12 +12,15 @@
   "type": "commonjs",
   "dependencies": {
     "@anthropic-ai/sdk": "^0.78.0",
+    "@react-native-async-storage/async-storage": "^3.0.2",
     "axios": "^1.13.6",
     "better-sqlite3": "^12.8.0",
     "cors": "^2.8.6",
     "dotenv": "^17.3.1",
+    "expo-network": "^55.0.9",
     "express": "^5.2.1",
     "openai": "^6.29.0",
-    "pg": "^8.20.0"
+    "pg": "^8.20.0",
+    "puppeteer": "^24.40.0"
   }
 }

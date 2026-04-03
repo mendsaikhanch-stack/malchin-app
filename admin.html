@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>МАЛЧИН - Админ панель</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f2f5; color: #333; }
+
+/* Login */
+.login-page { display: flex; justify-content: center; align-items: center; min-height: 100vh; background: linear-gradient(135deg, #2d5016 0%, #4a7c28 100%); }
+.login-box { background: white; padding: 40px; border-radius: 16px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); width: 380px; text-align: center; }
+.login-box h1 { color: #2d5016; font-size: 28px; margin-bottom: 8px; }
+.login-box p { color: #888; margin-bottom: 24px; }
+.login-box input { width: 100%; padding: 14px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 15px; margin-bottom: 16px; outline: none; transition: border 0.2s; }
+.login-box input:focus { border-color: #4a7c28; }
+.login-error { color: #e53935; font-size: 13px; margin-bottom: 12px; display: none; }
+
+/* Layout */
+.app { display: none; }
+.sidebar { position: fixed; left: 0; top: 0; bottom: 0; width: 240px; background: #1a3a0a; color: white; overflow-y: auto; z-index: 100; }
+.sidebar-header { padding: 20px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
+.sidebar-header h2 { font-size: 20px; }
+.sidebar-header small { color: #8bc34a; font-size: 12px; }
+.nav-item { padding: 12px 20px; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: background 0.2s; font-size: 14px; border-left: 3px solid transparent; }
+.nav-item:hover { background: rgba(255,255,255,0.08); }
+.nav-item.active { background: rgba(255,255,255,0.12); border-left-color: #8bc34a; }
+.nav-item .icon { font-size: 18px; width: 24px; text-align: center; }
+.nav-section { padding: 12px 20px 6px; font-size: 11px; text-transform: uppercase; color: #689f38; letter-spacing: 1px; margin-top: 8px; }
+.logout-btn { position: absolute; bottom: 0; left: 0; right: 0; padding: 14px; text-align: center; background: rgba(0,0,0,0.2); cursor: pointer; color: #ccc; font-size: 13px; }
+.logout-btn:hover { background: rgba(0,0,0,0.4); color: white; }
+
+.main { margin-left: 240px; padding: 24px; min-height: 100vh; }
+.page-title { font-size: 22px; font-weight: 600; margin-bottom: 20px; color: #1a3a0a; }
+
+/* Stats Grid */
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
+.stat-card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+.stat-card .label { font-size: 13px; color: #888; margin-bottom: 4px; }
+.stat-card .value { font-size: 28px; font-weight: 700; color: #2d5016; }
+.stat-card .sub { font-size: 12px; color: #aaa; margin-top: 4px; }
+
+/* Table */
+.table-wrap { background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); overflow: hidden; }
+.table-toolbar { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-bottom: 1px solid #eee; flex-wrap: wrap; gap: 10px; }
+.table-toolbar h3 { font-size: 16px; color: #333; }
+.search-input { padding: 8px 14px; border: 1px solid #ddd; border-radius: 8px; font-size: 13px; width: 220px; outline: none; }
+.search-input:focus { border-color: #4a7c28; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+thead { background: #f8f9fa; }
+th { padding: 12px 16px; text-align: left; font-weight: 600; color: #555; border-bottom: 2px solid #eee; white-space: nowrap; }
+td { padding: 10px 16px; border-bottom: 1px solid #f0f0f0; }
+tr:hover { background: #f9fdf6; }
+.badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+.badge-green { background: #e8f5e9; color: #2e7d32; }
+.badge-red { background: #ffebee; color: #c62828; }
+.badge-orange { background: #fff3e0; color: #e65100; }
+.badge-yellow { background: #fffde7; color: #f9a825; }
+.badge-gray { background: #f5f5f5; color: #666; }
+
+/* Buttons */
+.btn { padding: 8px 16px; border: none; border-radius: 8px; font-size: 13px; cursor: pointer; font-weight: 500; transition: all 0.2s; }
+.btn-primary { background: #2d5016; color: white; }
+.btn-primary:hover { background: #1a3a0a; }
+.btn-danger { background: #ffebee; color: #c62828; }
+.btn-danger:hover { background: #ffcdd2; }
+.btn-edit { background: #e3f2fd; color: #1565c0; }
+.btn-edit:hover { background: #bbdefb; }
+.btn-sm { padding: 5px 10px; font-size: 12px; }
+.btn-group { display: flex; gap: 6px; }
+
+/* Modal */
+.modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: flex-start; padding-top: 60px; }
+.modal-overlay.show { display: flex; }
+.modal { background: white; border-radius: 14px; width: 560px; max-width: 95vw; max-height: 85vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+.modal-header { display: flex; justify-content: space-between; align-items: center; padding: 18px 24px; border-bottom: 1px solid #eee; }
+.modal-header h3 { font-size: 17px; }
+.modal-close { background: none; border: none; font-size: 22px; cursor: pointer; color: #999; padding: 4px; }
+.modal-close:hover { color: #333; }
+.modal-body { padding: 24px; }
+.modal-footer { padding: 16px 24px; border-top: 1px solid #eee; display: flex; justify-content: flex-end; gap: 10px; }
+
+/* Form */
+.form-group { margin-bottom: 16px; }
+.form-group label { display: block; font-size: 13px; font-weight: 600; color: #555; margin-bottom: 6px; }
+.form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px 14px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; outline: none; font-family: inherit; }
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: #4a7c28; }
+.form-group textarea { min-height: 80px; resize: vertical; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+/* Section visibility */
+.section { display: none; }
+.section.active { display: block; }
+
+/* Empty state */
+.empty-state { text-align: center; padding: 40px; color: #999; }
+.empty-state .icon { font-size: 48px; margin-bottom: 12px; }
+
+/* Toast */
+.toast { position: fixed; bottom: 24px; right: 24px; background: #2d5016; color: white; padding: 14px 24px; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); z-index: 2000; font-size: 14px; transform: translateY(100px); opacity: 0; transition: all 0.3s; }
+.toast.show { transform: translateY(0); opacity: 1; }
+.toast.error { background: #c62828; }
+
+@media (max-width: 768px) {
+  .sidebar { width: 60px; }
+  .sidebar-header h2, .sidebar-header small, .nav-item span, .nav-section { display: none; }
+  .nav-item { justify-content: center; padding: 14px; }
+  .main { margin-left: 60px; padding: 16px; }
+  .form-row { grid-template-columns: 1fr; }
+  .table-wrap { overflow-x: auto; }
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN PAGE -->
+<div class="login-page" id="loginPage">
+  <div class="login-box">
+    <h1>МАЛЧИН</h1>
+    <p>Админ панель нэвтрэх</p>
+    <div class="login-error" id="loginError">Нууц үг буруу байна</div>
+    <input type="password" id="loginPass" placeholder="Нууц үг оруулна уу..." onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="btn btn-primary" style="width:100%;padding:14px;font-size:16px" onclick="doLogin()">Нэвтрэх</button>
+  </div>
+</div>
+
+<!-- APP -->
+<div class="app" id="app">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <h2>МАЛЧИН</h2>
+      <small>Админ панель v1.0</small>
+    </div>
+    <div class="nav-item active" onclick="showSection('dashboard')"><span class="icon">📊</span><span>Хянах самбар</span></div>
+    <div class="nav-section">Удирдлага</div>
+    <div class="nav-item" onclick="showSection('users')"><span class="icon">👤</span><span>Хэрэглэгчид</span></div>
+    <div class="nav-item" onclick="showSection('alerts')"><span class="icon">⚠️</span><span>Анхааруулга</span></div>
+    <div class="nav-item" onclick="showSection('news')"><span class="icon">📰</span><span>Мэдээ</span></div>
+    <div class="nav-item" onclick="showSection('market')"><span class="icon">🛒</span><span>Зах зээлийн зар</span></div>
+    <div class="nav-item" onclick="showSection('ads')"><span class="icon">📢</span><span>Сурталчилгаа</span></div>
+    <div class="nav-item" onclick="showSection('drivers')"><span class="icon">🚚</span><span>Жолоочид</span></div>
+    <div class="nav-item" onclick="showSection('programs')"><span class="icon">🏦</span><span>Хөтөлбөр/Зээл</span></div>
+    <div class="nav-section">Ханш & Үнэ</div>
+    <div class="nav-item" onclick="showSection('prices')"><span class="icon">💰</span><span>Захын ханш</span></div>
+    <div class="nav-item" onclick="showSection('rawprices')"><span class="icon">🧶</span><span>Түүхий эдийн ханш</span></div>
+    <div class="nav-section">Тайлан</div>
+    <div class="nav-item" onclick="showSection('livestock')"><span class="icon">🐑</span><span>Малын тоо</span></div>
+    <div class="nav-item" onclick="showSection('finance')"><span class="icon">💵</span><span>Санхүүгийн бүртгэл</span></div>
+    <div class="logout-btn" onclick="doLogout()">Гарах</div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main">
+
+    <!-- DASHBOARD -->
+    <div class="section active" id="sec-dashboard">
+      <h2 class="page-title">Хянах самбар</h2>
+      <div class="stats-grid" id="dashStats"></div>
+    </div>
+
+    <!-- USERS -->
+    <div class="section" id="sec-users">
+      <h2 class="page-title">Хэрэглэгчид</h2>
+      <div class="table-wrap">
+        <div class="table-toolbar">
+          <h3 id="users-count">Хэрэглэгчид</h3>
+          <input class="search-input" placeholder="Хайх..." oninput="filterTable('users-table', this.value)">
+        </div>
+        <table id="users-table"><thead><tr><th>ID</th><th>Нэр</th><th>Утас</th><th>Аймаг</th><th>Сум</th><th>Баг</th><th>Бүртгэсэн</th><th>Үйлдэл</th></tr></thead><tbody></tbody></table>
+      </div>
+    </div>
+
+    <!-- ALERTS -->
+    <div class="section" id="sec-alerts">
+      <h2 class="page-title">Анхааруулга</h2>
+      <div class="table-wrap">
+        <div class="table-toolbar">
+          <h3 id="alerts-count">Анхааруулга</h3>
+          <div style="display:flex;gap:10px">
+            <input class="search-input" placeholder="Хайх..." oninput="filterTable('alerts-table', this.value)">
+            <button class="btn btn-primary" onclick="openModal('alert')">+ Нэмэх</button>
+          </div>
+        </div>
+        <table id="alerts-table"><thead><tr><th>ID</th><th>Бүс</th><th>Төрөл</th><th>Гарчиг</th><th>Тайлбар</th><th>Зэрэг</th><th>Огноо</th><th>Үйлдэл</th></tr></thead><tbody></tbody></table>
+      </div>
+    </div>
+
+    <!-- NEWS -->
+    <div class="section" id="sec-news">
+      <h2 class="page-title">Мэдээ</h2>
+      <div class="table-wrap">
+        <div class="table-toolbar">
+          <h3 id="news-count">Мэдээ</h3>
+          <div style="display:flex;gap:10px">
+            <input class="search-input" placeholder="Хайх..." oninput="filterTable('news-table', this.value)">
+            <button class="btn btn-primary" onclick="openModal('news')">+ Нэмэх</button>
+          </div>
+        </div>
+        <table id="news-table"><thead><tr><th>ID</th><th>Ангилал</th><th>Гарчиг</th><th>Эх сурвалж</th><th>Бүс</th><th>Яаралтай</th><th>Огноо</th><th>Үйлдэл</th></tr></thead><tbody></tbody></table>
+      </div>
+    </div>
+
+    <!-- MARKET -->
+    <div class="section" id="sec-market">
+      <h2 class="page-title">Зах зээлийн зарууд</h2>
+      <div class="table-wrap">
+        <div class="table-toolbar">
+          <h3 id="market-count">Зарууд</h3>
+          <input class="search-input" placeholder="Хайх..." oninput="filterTable('market-table', this.value)">
+        </div>
+        <table id="market-table"><thead><tr><th>ID</th><th>Нийтлэгч</th><th>Гарчиг</th><th>Ангилал</th><th>Мал</th><th>Тоо</th><th>Үнэ</th><th>Байршил</th><th>Төлөв</th><th>Үйлдэл</th></tr></thead><tbody></tbody></table>
+      </div>
+    </div>
+
+    <!-- ADS -->
+    <div class="section" id="sec-ads">
+      <h2 class="page-title">Сурталчилгаа</h2>
+      <div class="table-wrap">
+        <div class="table-toolbar">
+          <h3 id="ads-count">Зарууд</h3>
+          <div style="display:flex;gap:10px">
+            <input class="search-input" placeholder="Хайх..." oninput="filterTable('ads-table', this.value)">
+            <button class="btn btn-primary" onclick="openModal('ad')">+ Нэмэх</button>
+          </div>
+        </div>
+        <table id="ads-table"><thead><tr><th>ID</th><th>Гарчиг</th><th>Зарлагч</th><th>Байршил</th><th>Идэвхтэй</th><th>Impressions</th><th>Clicks</th><th>CTR</th><th>Үйлдэл</th></tr></thead><tbody></tbody></table>
+      </div>
+    </div>
+
+    <!-- DRIVERS -->
+    <div class="section" id="sec-drivers">
+      <h2 class="page-title">Тээврийн жолоочид</h2>
+      <div class="table-wrap">
+        <div class="table-toolbar">
+          <h3 id="drivers-count">Жолоочид</h3>
+          <div style="display:flex;gap:10px">
+            <input class="search-input" placeholder="Хайх..." oninput="filterTable('drivers-table', this.value)">
+            <button class="btn btn-primary" onclick="openModal('driver')">+ Нэмэх</button>
+          </div>
+        </div>
+        <table id="drivers-table"><thead><tr><th>ID</th><th>Нэр</th><th>Утас</th><th>Машины төрөл</th><th>Багтаамж</th><th>Бүс</th><th>Үнэлгээ</th><th>Үйлдэл</th></tr></thead><tbody></tbody></table>
+      </div>
+    </div>
+
+    <!-- PROGRAMS -->
+    <div class="section" id="sec-programs">
+      <h2 class="page-title">Хөтөлбөр & Зээл</h2>
+      <div class="table-wrap">
+        <div class="table-toolbar">
+          <h3 id="programs-count">Хөтөлбөр</h3>
+          <div style="display:flex;gap:10px">
+            <input class="search-input" placeholder="Хайх..." oninput="filterTable('programs-table', this.value)">
+            <button class="btn btn-primary" onclick="openModal('program')">+ Нэмэх</button>
+          </div>
+        </div>
+        <table id="programs-table"><thead><tr><th>ID</th><th>Ангилал</th><th>Гарчиг</th><th>Байгууллага</th><th>Дүн</th><th>Хугацаа</th><th>Бүс</th><th>Төлөв</th><th>Үйлдэл</th></tr></thead><tbody></tbody></table>
+      </div>
+    </div>
+
+    <!-- MARKET PRICES -->
+    <div class="section" id="sec-prices">
+      <h2 class="page-title">Захын ханш</h2>
+      <div class="table-wrap">
+        <div class="table-toolbar">
+          <h3 id="prices-count">Ханшууд</h3>
+          <div style="display:flex;gap:10px">
+            <input class="search-input" placeholder="Хайх..." oninput="filterTable('prices-table', this.value)">
+            <button class="btn btn-primary" onclick="openModal('price')">+ Нэмэх</button>
+          </div>
+        </div>
+        <table id="prices-table"><thead><tr><th>ID</th><th>Зах</th><th>Аймаг</th><th>Төрөл</th><th>Бараа</th><th>Нэгж</th><th>Бөөний</th><th>Жижиглэн</th><th>Өмнөх</th><th>Үйлдэл</th></tr></thead><tbody></tbody></table>
+      </div>
+    </div>
+
+    <!-- RAW MATERIAL PRICES -->
+    <div class="section" id="sec-rawprices">
+      <h2 class="page-title">Түүхий эдийн ханш</h2>
+      <div class="table-wrap">
+        <div class="table-toolbar">
+          <h3 id="rawprices-count">Ханшууд</h3>
+          <div style="display:flex;gap:10px">
+            <input class="search-input" placeholder="Хайх..." oninput="filterTable('rawprices-table', this.value)">
+            <button class="btn btn-primary" onclick="openModal('rawprice')">+ Нэмэх</button>
+          </div>
+        </div>
+        <table id="rawprices-table"><thead><tr><th>ID</th><th>Төрөл</th><th>Нэр</th><th>Зэрэг</th><th>Нэгж</th><th>Үнэ</th><th>Өмнөх</th><th>Худалдан авагч</th><th>Байршил</th><th>Үйлдэл</th></tr></thead><tbody></tbody></table>
+      </div>
+    </div>
+
+    <!-- LIVESTOCK -->
+    <div class="section" id="sec-livestock">
+      <h2 class="page-title">Малын тоо толгой</h2>
+      <div class="table-wrap">
+        <div class="table-toolbar">
+          <h3 id="livestock-count">Бүртгэл</h3>
+          <input class="search-input" placeholder="Хайх..." oninput="filterTable('livestock-table', this.value)">
+        </div>
+        <table id="livestock-table"><thead><tr><th>ID</th><th>Малчин</th><th>Малын төрөл</th><th>Тоо</th><th>Шинэчилсэн</th></tr></thead><tbody></tbody></table>
+      </div>
+    </div>
+
+    <!-- FINANCE -->
+    <div class="section" id="sec-finance">
+      <h2 class="page-title">Санхүүгийн бүртгэл</h2>
+      <div class="table-wrap">
+        <div class="table-toolbar">
+          <h3 id="finance-count">Бүртгэл</h3>
+          <input class="search-input" placeholder="Хайх..." oninput="filterTable('finance-table', this.value)">
+        </div>
+        <table id="finance-table"><thead><tr><th>ID</th><th>Малчин</th><th>Төрөл</th><th>Ангилал</th><th>Дүн</th><th>Тэмдэглэл</th><th>Огноо</th></tr></thead><tbody></tbody></table>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modalTitle">Нэмэх</h3>
+      <button class="modal-close" onclick="closeModal()">&times;</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal()" style="background:#eee;color:#333">Болих</button>
+      <button class="btn btn-primary" id="modalSaveBtn" onclick="saveModal()">Хадгалах</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+const API = window.location.origin + "/admin";
+let token = localStorage.getItem("admin_token") || "";
+let currentSection = "dashboard";
+let modalMode = null; // { type, action, id }
+const animalMN = { sheep:"Хонь", goat:"Ямаа", cattle:"Үхэр", horse:"Морь", camel:"Тэмээ" };
+
+// ============ AUTH ============
+function doLogin() {
+  const pass = document.getElementById("loginPass").value;
+  if (!pass) { document.getElementById("loginError").style.display = "block"; return; }
+  fetch(API + "/login", { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify({password: pass}) })
+    .then(r => {
+      if (!r.ok) throw new Error("wrong");
+      return r.json();
+    }).then(d => {
+      if (d.ok) { token = d.token; localStorage.setItem("admin_token", token); showApp(); }
+      else { document.getElementById("loginError").style.display = "block"; }
+    }).catch(() => { document.getElementById("loginError").style.display = "block"; });
+}
+
+function doLogout() { token = ""; localStorage.removeItem("admin_token"); location.reload(); }
+
+function showApp() {
+  document.getElementById("loginPage").style.display = "none";
+  document.getElementById("app").style.display = "block";
+  loadDashboard();
+}
+
+// Verify saved token by testing stats endpoint
+if (token) {
+  fetch(API + "/stats").then(r => {
+    if (r.ok) showApp();
+    else { token = ""; localStorage.removeItem("admin_token"); }
+  }).catch(() => { token = ""; localStorage.removeItem("admin_token"); });
+}
+
+// ============ NAVIGATION ============
+function showSection(name) {
+  currentSection = name;
+  document.querySelectorAll(".section").forEach(s => s.classList.remove("active"));
+  document.getElementById("sec-" + name).classList.add("active");
+  document.querySelectorAll(".nav-item").forEach(n => n.classList.remove("active"));
+  event.currentTarget.classList.add("active");
+  loadSection(name);
+}
+
+function loadSection(name) {
+  const loaders = { dashboard: loadDashboard, users: loadUsers, alerts: loadAlerts, news: loadNews, market: loadMarket, ads: loadAds, drivers: loadDrivers, programs: loadPrograms, prices: loadPrices, rawprices: loadRawPrices, livestock: loadLivestock, finance: loadFinance };
+  if (loaders[name]) loaders[name]();
+}
+
+// ============ API HELPERS ============
+async function api(path, method = "GET", body = null) {
+  const opts = { method, headers: { "Content-Type": "application/json" } };
+  if (body) opts.body = JSON.stringify(body);
+  const r = await fetch(API + path, opts);
+  if (r.status === 401) { doLogout(); return null; }
+  return r.json();
+}
+
+function fmt(n) { return Number(n || 0).toLocaleString() + "₮"; }
+function fmtNum(n) { return Number(n || 0).toLocaleString(); }
+function shortDate(d) { if (!d) return "-"; return d.substring(0, 10); }
+
+function toast(msg, isError = false) {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.className = "toast show" + (isError ? " error" : "");
+  setTimeout(() => t.className = "toast", 3000);
+}
+
+function filterTable(tableId, query) {
+  const rows = document.querySelectorAll("#" + tableId + " tbody tr");
+  const q = query.toLowerCase();
+  rows.forEach(r => { r.style.display = r.textContent.toLowerCase().includes(q) ? "" : "none"; });
+}
+
+// ============ DASHBOARD ============
+async function loadDashboard() {
+  const d = await api("/stats");
+  if (!d) return;
+  document.getElementById("dashStats").innerHTML = [
+    statCard("👤", "Хэрэглэгчид", d.users),
+    statCard("🐑", "Нийт мал", fmtNum(d.livestock)),
+    statCard("🛒", "Идэвхтэй зар", d.marketListings),
+    statCard("⚠️", "Анхааруулга", d.alerts),
+    statCard("📰", "Мэдээ", d.news),
+    statCard("📢", "Идэвхтэй зар", d.ads),
+    statCard("🚚", "Жолоочид", d.drivers),
+    statCard("🏦", "Хөтөлбөр", d.programs),
+    statCard("👁", "Нийт impression", fmtNum(d.totalImpressions)),
+    statCard("🖱", "Нийт click", fmtNum(d.totalClicks)),
+  ].join("");
+}
+
+function statCard(icon, label, value) {
+  return `<div class="stat-card"><div class="label">${icon} ${label}</div><div class="value">${value}</div></div>`;
+}
+
+// ============ USERS ============
+async function loadUsers() {
+  const data = await api("/users");
+  if (!data) return;
+  document.getElementById("users-count").textContent = `Хэрэглэгчид (${data.length})`;
+  document.querySelector("#users-table tbody").innerHTML = data.map(u => `<tr>
+    <td>${u.id}</td><td>${u.name}</td><td>${u.phone}</td><td>${u.aimag}</td><td>${u.sum}</td><td>${u.bag}</td><td>${shortDate(u.created_at)}</td>
+    <td class="btn-group"><button class="btn btn-edit btn-sm" onclick='editUser(${JSON.stringify(u)})'>Засах</button><button class="btn btn-danger btn-sm" onclick="deleteItem('users',${u.id})">Устгах</button></td>
+  </tr>`).join("") || '<tr><td colspan="8" class="empty-state">Хэрэглэгч байхгүй</td></tr>';
+}
+
+function editUser(u) {
+  modalMode = { type: "user", action: "edit", id: u.id };
+  document.getElementById("modalTitle").textContent = "Хэрэглэгч засах";
+  document.getElementById("modalBody").innerHTML = `
+    <div class="form-row"><div class="form-group"><label>Нэр</label><input id="f-name" value="${u.name}"></div><div class="form-group"><label>Утас</label><input id="f-phone" value="${u.phone}"></div></div>
+    <div class="form-row"><div class="form-group"><label>Аймаг</label><input id="f-aimag" value="${u.aimag||''}"></div><div class="form-group"><label>Сум</label><input id="f-sum" value="${u.sum||''}"></div></div>
+    <div class="form-group"><label>Баг</label><input id="f-bag" value="${u.bag||''}"></div>`;
+  document.getElementById("modalOverlay").classList.add("show");
+}
+
+// ============ ALERTS ============
+async function loadAlerts() {
+  const data = await api("/alerts");
+  if (!data) return;
+  document.getElementById("alerts-count").textContent = `Анхааруулга (${data.length})`;
+  const sevBadge = s => `<span class="badge badge-${s==='red'?'red':s==='orange'?'orange':'yellow'}">${s}</span>`;
+  document.querySelector("#alerts-table tbody").innerHTML = data.map(a => `<tr>
+    <td>${a.id}</td><td>${a.region}</td><td>${a.type}</td><td>${a.title}</td><td>${(a.description||'').substring(0,40)}</td><td>${sevBadge(a.severity)}</td><td>${shortDate(a.created_at)}</td>
+    <td class="btn-group"><button class="btn btn-edit btn-sm" onclick='editAlert(${JSON.stringify(a)})'>Засах</button><button class="btn btn-danger btn-sm" onclick="deleteItem('alerts',${a.id})">Устгах</button></td>
+  </tr>`).join("");
+}
+
+function editAlert(a) {
+  modalMode = { type: "alert", action: "edit", id: a.id };
+  document.getElementById("modalTitle").textContent = "Анхааруулга засах";
+  showAlertForm(a);
+  document.getElementById("modalOverlay").classList.add("show");
+}
+
+function showAlertForm(a = {}) {
+  document.getElementById("modalBody").innerHTML = `
+    <div class="form-row"><div class="form-group"><label>Бүс нутаг</label><input id="f-region" value="${a.region||''}"></div><div class="form-group"><label>Төрөл</label><select id="f-type"><option ${a.type==='wolf'?'selected':''} value="wolf">Чоно</option><option ${a.type==='dzud'?'selected':''} value="dzud">Зуд</option><option ${a.type==='disease'?'selected':''} value="disease">Өвчин</option><option ${a.type==='flood'?'selected':''} value="flood">Үер</option><option ${a.type==='fire'?'selected':''} value="fire">Түймэр</option><option ${a.type==='other'?'selected':''} value="other">Бусад</option></select></div></div>
+    <div class="form-group"><label>Гарчиг</label><input id="f-title" value="${a.title||''}"></div>
+    <div class="form-group"><label>Тайлбар</label><textarea id="f-description">${a.description||''}</textarea></div>
+    <div class="form-group"><label>Зэрэг</label><select id="f-severity"><option ${a.severity==='yellow'?'selected':''} value="yellow">Шар (yellow)</option><option ${a.severity==='orange'?'selected':''} value="orange">Улбар шар (orange)</option><option ${a.severity==='red'?'selected':''} value="red">Улаан (red)</option></select></div>`;
+}
+
+// ============ NEWS ============
+async function loadNews() {
+  const data = await api("/news");
+  if (!data) return;
+  document.getElementById("news-count").textContent = `Мэдээ (${data.length})`;
+  document.querySelector("#news-table tbody").innerHTML = data.map(n => `<tr>
+    <td>${n.id}</td><td>${n.category}</td><td>${n.title.substring(0,40)}</td><td>${n.source}</td><td>${n.region||'-'}</td><td>${n.is_urgent?'<span class="badge badge-red">Тийм</span>':'<span class="badge badge-gray">Үгүй</span>'}</td><td>${shortDate(n.published_at)}</td>
+    <td class="btn-group"><button class="btn btn-edit btn-sm" onclick='editNews(${JSON.stringify(n).replace(/'/g,"&#39;")})'>Засах</button><button class="btn btn-danger btn-sm" onclick="deleteItem('news',${n.id})">Устгах</button></td>
+  </tr>`).join("");
+}
+
+function editNews(n) {
+  modalMode = { type: "news", action: "edit", id: n.id };
+  document.getElementById("modalTitle").textContent = "Мэдээ засах";
+  showNewsForm(n);
+  document.getElementById("modalOverlay").classList.add("show");
+}
+
+function showNewsForm(n = {}) {
+  document.getElementById("modalBody").innerHTML = `
+    <div class="form-row"><div class="form-group"><label>Ангилал</label><select id="f-category"><option ${n.category==='livestock'?'selected':''} value="livestock">Мал аж ахуй</option><option ${n.category==='weather'?'selected':''} value="weather">Цаг агаар</option><option ${n.category==='policy'?'selected':''} value="policy">Бодлого</option><option ${n.category==='market'?'selected':''} value="market">Зах зээл</option><option ${n.category==='health'?'selected':''} value="health">Эрүүл мэнд</option><option ${n.category==='technology'?'selected':''} value="technology">Технологи</option><option ${n.category==='other'?'selected':''} value="other">Бусад</option></select></div><div class="form-group"><label>Бүс</label><input id="f-region" value="${n.region||''}"></div></div>
+    <div class="form-group"><label>Гарчиг</label><input id="f-title" value="${n.title||''}"></div>
+    <div class="form-group"><label>Товчлол</label><textarea id="f-summary">${n.summary||''}</textarea></div>
+    <div class="form-group"><label>Дэлгэрэнгүй</label><textarea id="f-body" style="min-height:120px">${n.body||''}</textarea></div>
+    <div class="form-row"><div class="form-group"><label>Эх сурвалж</label><input id="f-source" value="${n.source||''}"></div><div class="form-group"><label>Эх сурвалж URL</label><input id="f-source_url" value="${n.source_url||''}"></div></div>
+    <div class="form-row"><div class="form-group"><label>Зураг URL</label><input id="f-image_url" value="${n.image_url||''}"></div><div class="form-group"><label>Яаралтай</label><select id="f-is_urgent"><option ${n.is_urgent?'':'selected'} value="0">Үгүй</option><option ${n.is_urgent?'selected':''} value="1">Тийм</option></select></div></div>
+    <div class="form-group"><label>Шошго</label><input id="f-tags" value="${n.tags||''}"></div>`;
+}
+
+// ============ MARKET ============
+async function loadMarket() {
+  const data = await api("/market");
+  if (!data) return;
+  document.getElementById("market-count").textContent = `Зарууд (${data.length})`;
+  const statusBadge = s => `<span class="badge badge-${s==='active'?'green':s==='sold'?'orange':'gray'}">${s}</span>`;
+  document.querySelector("#market-table tbody").innerHTML = data.map(m => `<tr>
+    <td>${m.id}</td><td>${m.user_name||m.user_id}</td><td>${m.title}</td><td>${m.category}</td><td>${animalMN[m.animal_type]||m.animal_type||'-'}</td><td>${m.quantity}</td><td>${fmt(m.price)}</td><td>${m.location}</td><td>${statusBadge(m.status)}</td>
+    <td class="btn-group"><button class="btn btn-edit btn-sm" onclick='editMarket(${JSON.stringify(m).replace(/'/g,"&#39;")})'>Засах</button><button class="btn btn-danger btn-sm" onclick="deleteItem('market',${m.id})">Устгах</button></td>
+  </tr>`).join("");
+}
+
+function editMarket(m) {
+  modalMode = { type: "market", action: "edit", id: m.id };
+  document.getElementById("modalTitle").textContent = "Зар засах";
+  document.getElementById("modalBody").innerHTML = `
+    <div class="form-group"><label>Гарчиг</label><input id="f-title" value="${m.title}"></div>
+    <div class="form-group"><label>Тайлбар</label><textarea id="f-description">${m.description||''}</textarea></div>
+    <div class="form-row"><div class="form-group"><label>Ангилал</label><input id="f-category" value="${m.category||''}"></div><div class="form-group"><label>Малын төрөл</label><input id="f-animal_type" value="${m.animal_type||''}"></div></div>
+    <div class="form-row"><div class="form-group"><label>Тоо</label><input type="number" id="f-quantity" value="${m.quantity||0}"></div><div class="form-group"><label>Үнэ</label><input type="number" id="f-price" value="${m.price||0}"></div></div>
+    <div class="form-row"><div class="form-group"><label>Байршил</label><input id="f-location" value="${m.location||''}"></div><div class="form-group"><label>Төлөв</label><select id="f-status"><option ${m.status==='active'?'selected':''} value="active">Идэвхтэй</option><option ${m.status==='sold'?'selected':''} value="sold">Зарагдсан</option><option ${m.status==='expired'?'selected':''} value="expired">Хугацаа дууссан</option></select></div></div>`;
+  document.getElementById("modalOverlay").classList.add("show");
+}
+
+// ============ ADS ============
+async function loadAds() {
+  const data = await api("/ads");
+  if (!data) return;
+  document.getElementById("ads-count").textContent = `Сурталчилгаа (${data.length})`;
+  document.querySelector("#ads-table tbody").innerHTML = data.map(a => {
+    const ctr = a.impressions > 0 ? (a.clicks * 100 / a.impressions).toFixed(1) + "%" : "0%";
+    return `<tr>
+    <td>${a.id}</td><td>${a.title}</td><td>${a.advertiser}</td><td>${a.placement}</td><td>${a.is_active?'<span class="badge badge-green">Тийм</span>':'<span class="badge badge-gray">Үгүй</span>'}</td><td>${fmtNum(a.impressions)}</td><td>${fmtNum(a.clicks)}</td><td>${ctr}</td>
+    <td class="btn-group"><button class="btn btn-edit btn-sm" onclick='editAd(${JSON.stringify(a).replace(/'/g,"&#39;")})'>Засах</button><button class="btn btn-danger btn-sm" onclick="deleteItem('ads',${a.id})">Устгах</button></td>
+  </tr>`;}).join("");
+}
+
+function editAd(a) {
+  modalMode = { type: "ad", action: "edit", id: a.id };
+  document.getElementById("modalTitle").textContent = "Зар засах";
+  showAdForm(a);
+  document.getElementById("modalOverlay").classList.add("show");
+}
+
+function showAdForm(a = {}) {
+  document.getElementById("modalBody").innerHTML = `
+    <div class="form-group"><label>Гарчиг</label><input id="f-title" value="${a.title||''}"></div>
+    <div class="form-group"><label>Тайлбар</label><textarea id="f-description">${a.description||''}</textarea></div>
+    <div class="form-row"><div class="form-group"><label>Зарлагч</label><input id="f-advertiser" value="${a.advertiser||''}"></div><div class="form-group"><label>Байршил</label><select id="f-placement"><option ${a.placement==='home'?'selected':''} value="home">Нүүр</option><option ${a.placement==='market'?'selected':''} value="market">Зах зээл</option><option ${a.placement==='weather'?'selected':''} value="weather">Цаг агаар</option><option ${a.placement==='all'?'selected':''} value="all">Бүгд</option></select></div></div>
+    <div class="form-row"><div class="form-group"><label>Зураг URL</label><input id="f-image_url" value="${a.image_url||''}"></div><div class="form-group"><label>Холбоос URL</label><input id="f-link_url" value="${a.link_url||''}"></div></div>
+    <div class="form-row"><div class="form-group"><label>Ангилал</label><input id="f-category" value="${a.category||'general'}"></div><div class="form-group"><label>Эрэмбэ</label><input type="number" id="f-priority" value="${a.priority||0}"></div></div>
+    <div class="form-row"><div class="form-group"><label>Идэвхтэй</label><select id="f-is_active"><option ${a.is_active!==0?'selected':''} value="1">Тийм</option><option ${a.is_active===0?'selected':''} value="0">Үгүй</option></select></div><div class="form-group"><label>Дуусах огноо</label><input type="date" id="f-end_date" value="${a.end_date||''}"></div></div>`;
+}
+
+// ============ DRIVERS ============
+async function loadDrivers() {
+  const data = await api("/drivers");
+  if (!data) return;
+  document.getElementById("drivers-count").textContent = `Жолоочид (${data.length})`;
+  document.querySelector("#drivers-table tbody").innerHTML = data.map(d => `<tr>
+    <td>${d.id}</td><td>${d.name}</td><td>${d.phone}</td><td>${d.truck_type}</td><td>${d.capacity}</td><td>${d.region}</td><td>${d.rating}</td>
+    <td class="btn-group"><button class="btn btn-edit btn-sm" onclick='editDriver(${JSON.stringify(d).replace(/'/g,"&#39;")})'>Засах</button><button class="btn btn-danger btn-sm" onclick="deleteItem('drivers',${d.id})">Устгах</button></td>
+  </tr>`).join("");
+}
+
+function editDriver(d) {
+  modalMode = { type: "driver", action: "edit", id: d.id };
+  document.getElementById("modalTitle").textContent = "Жолооч засах";
+  showDriverForm(d);
+  document.getElementById("modalOverlay").classList.add("show");
+}
+
+function showDriverForm(d = {}) {
+  document.getElementById("modalBody").innerHTML = `
+    <div class="form-row"><div class="form-group"><label>Нэр</label><input id="f-name" value="${d.name||''}"></div><div class="form-group"><label>Утас</label><input id="f-phone" value="${d.phone||''}"></div></div>
+    <div class="form-row"><div class="form-group"><label>Машины төрөл</label><input id="f-truck_type" value="${d.truck_type||''}"></div><div class="form-group"><label>Багтаамж</label><input id="f-capacity" value="${d.capacity||''}"></div></div>
+    <div class="form-row"><div class="form-group"><label>Бүс нутаг</label><input id="f-region" value="${d.region||''}"></div><div class="form-group"><label>Үнэлгээ</label><input type="number" step="0.1" id="f-rating" value="${d.rating||0}"></div></div>`;
+}
+
+// ============ PROGRAMS ============
+async function loadPrograms() {
+  const data = await api("/programs");
+  if (!data) return;
+  document.getElementById("programs-count").textContent = `Хөтөлбөр (${data.length})`;
+  const statusBadge = s => `<span class="badge badge-${s==='active'?'green':'gray'}">${s}</span>`;
+  document.querySelector("#programs-table tbody").innerHTML = data.map(p => `<tr>
+    <td>${p.id}</td><td>${p.category}</td><td>${p.title.substring(0,35)}</td><td>${p.organization}</td><td>${p.amount}</td><td>${shortDate(p.deadline)}</td><td>${p.region||'-'}</td><td>${statusBadge(p.status)}</td>
+    <td class="btn-group"><button class="btn btn-edit btn-sm" onclick='editProgram(${JSON.stringify(p).replace(/'/g,"&#39;")})'>Засах</button><button class="btn btn-danger btn-sm" onclick="deleteItem('programs',${p.id})">Устгах</button></td>
+  </tr>`).join("");
+}
+
+function editProgram(p) {
+  modalMode = { type: "program", action: "edit", id: p.id };
+  document.getElementById("modalTitle").textContent = "Хөтөлбөр засах";
+  showProgramForm(p);
+  document.getElementById("modalOverlay").classList.add("show");
+}
+
+function showProgramForm(p = {}) {
+  document.getElementById("modalBody").innerHTML = `
+    <div class="form-row"><div class="form-group"><label>Ангилал</label><select id="f-category"><option ${p.category==='loan'?'selected':''} value="loan">Зээл</option><option ${p.category==='grant'?'selected':''} value="grant">Тэтгэлэг</option><option ${p.category==='subsidy'?'selected':''} value="subsidy">Татаас</option><option ${p.category==='training'?'selected':''} value="training">Сургалт</option><option ${p.category==='insurance'?'selected':''} value="insurance">Даатгал</option></select></div><div class="form-group"><label>Байгууллага</label><input id="f-organization" value="${p.organization||''}"></div></div>
+    <div class="form-group"><label>Гарчиг</label><input id="f-title" value="${p.title||''}"></div>
+    <div class="form-group"><label>Тайлбар</label><textarea id="f-description">${p.description||''}</textarea></div>
+    <div class="form-row"><div class="form-group"><label>Шалгуур</label><input id="f-eligibility" value="${p.eligibility||''}"></div><div class="form-group"><label>Дүн</label><input id="f-amount" value="${p.amount||''}"></div></div>
+    <div class="form-row"><div class="form-group"><label>Хугацаа</label><input type="date" id="f-deadline" value="${p.deadline||''}"></div><div class="form-group"><label>Холбоо барих</label><input id="f-contact" value="${p.contact||''}"></div></div>
+    <div class="form-row"><div class="form-group"><label>Бүс</label><input id="f-region" value="${p.region||''}"></div><div class="form-group"><label>Төлөв</label><select id="f-status"><option ${p.status==='active'?'selected':''} value="active">Идэвхтэй</option><option ${p.status==='ended'?'selected':''} value="ended">Дууссан</option></select></div></div>`;
+}
+
+// ============ MARKET PRICES ============
+async function loadPrices() {
+  const data = await api("/market-prices");
+  if (!data) return;
+  document.getElementById("prices-count").textContent = `Ханшууд (${data.length})`;
+  document.querySelector("#prices-table tbody").innerHTML = data.map(p => `<tr>
+    <td>${p.id}</td><td>${p.market_name}</td><td>${p.aimag}</td><td>${p.item_type}</td><td>${p.item_name}</td><td>${p.unit}</td><td>${fmt(p.wholesale_price)}</td><td>${fmt(p.retail_price)}</td><td>${fmt(p.prev_price)}</td>
+    <td class="btn-group"><button class="btn btn-edit btn-sm" onclick='editPrice(${JSON.stringify(p).replace(/'/g,"&#39;")})'>Засах</button><button class="btn btn-danger btn-sm" onclick="deleteItem('market-prices',${p.id},'prices')">Устгах</button></td>
+  </tr>`).join("");
+}
+
+function editPrice(p) {
+  modalMode = { type: "price", action: "edit", id: p.id };
+  document.getElementById("modalTitle").textContent = "Ханш засах";
+  showPriceForm(p);
+  document.getElementById("modalOverlay").classList.add("show");
+}
+
+function showPriceForm(p = {}) {
+  document.getElementById("modalBody").innerHTML = `
+    <div class="form-row"><div class="form-group"><label>Захын нэр</label><input id="f-market_name" value="${p.market_name||''}"></div><div class="form-group"><label>Аймаг</label><input id="f-aimag" value="${p.aimag||''}"></div></div>
+    <div class="form-row"><div class="form-group"><label>Байршил</label><input id="f-location" value="${p.location||''}"></div><div class="form-group"><label>Төрөл</label><select id="f-item_type"><option ${p.item_type==='livestock'?'selected':''} value="livestock">Мах</option><option ${p.item_type==='live'?'selected':''} value="live">Амьд мал</option><option ${p.item_type==='dairy'?'selected':''} value="dairy">Сүү, цагаан идээ</option></select></div></div>
+    <div class="form-row"><div class="form-group"><label>Бараа нэр</label><input id="f-item_name" value="${p.item_name||''}"></div><div class="form-group"><label>Нэгж</label><input id="f-unit" value="${p.unit||''}"></div></div>
+    <div class="form-row"><div class="form-group"><label>Бөөний үнэ</label><input type="number" id="f-wholesale_price" value="${p.wholesale_price||0}"></div><div class="form-group"><label>Жижиглэн үнэ</label><input type="number" id="f-retail_price" value="${p.retail_price||0}"></div></div>
+    <div class="form-row"><div class="form-group"><label>Өмнөх үнэ</label><input type="number" id="f-prev_price" value="${p.prev_price||0}"></div><div class="form-group"><label>Нийлүүлэлт</label><select id="f-supply"><option ${p.supply==='low'?'selected':''} value="low">Бага</option><option ${p.supply==='normal'?'selected':''} value="normal">Хэвийн</option><option ${p.supply==='high'?'selected':''} value="high">Их</option></select></div></div>
+    <div class="form-group"><label>Эрэлт</label><select id="f-demand"><option ${p.demand==='low'?'selected':''} value="low">Бага</option><option ${p.demand==='normal'?'selected':''} value="normal">Хэвийн</option><option ${p.demand==='high'?'selected':''} value="high">Их</option></select></div>`;
+}
+
+// ============ RAW MATERIAL PRICES ============
+async function loadRawPrices() {
+  const data = await api("/raw-prices");
+  if (!data) return;
+  document.getElementById("rawprices-count").textContent = `Түүхий эд (${data.length})`;
+  document.querySelector("#rawprices-table tbody").innerHTML = data.map(r => `<tr>
+    <td>${r.id}</td><td>${r.material_type}</td><td>${r.material_name}</td><td>${r.grade}</td><td>${r.unit}</td><td>${fmt(r.price)}</td><td>${fmt(r.prev_price)}</td><td>${r.buyer}</td><td>${r.location}</td>
+    <td class="btn-group"><button class="btn btn-edit btn-sm" onclick='editRawPrice(${JSON.stringify(r).replace(/'/g,"&#39;")})'>Засах</button><button class="btn btn-danger btn-sm" onclick="deleteItem('raw-prices',${r.id},'rawprices')">Устгах</button></td>
+  </tr>`).join("");
+}
+
+function editRawPrice(r) {
+  modalMode = { type: "rawprice", action: "edit", id: r.id };
+  document.getElementById("modalTitle").textContent = "Түүхий эд засах";
+  showRawPriceForm(r);
+  document.getElementById("modalOverlay").classList.add("show");
+}
+
+function showRawPriceForm(r = {}) {
+  document.getElementById("modalBody").innerHTML = `
+    <div class="form-row"><div class="form-group"><label>Төрөл</label><select id="f-material_type"><option ${r.material_type==='cashmere'?'selected':''} value="cashmere">Ноолуур</option><option ${r.material_type==='wool'?'selected':''} value="wool">Ноос</option><option ${r.material_type==='hide'?'selected':''} value="hide">Арьс шир</option><option ${r.material_type==='other'?'selected':''} value="other">Бусад</option></select></div><div class="form-group"><label>Нэр</label><input id="f-material_name" value="${r.material_name||''}"></div></div>
+    <div class="form-row"><div class="form-group"><label>Зэрэг</label><input id="f-grade" value="${r.grade||''}"></div><div class="form-group"><label>Нэгж</label><input id="f-unit" value="${r.unit||'кг'}"></div></div>
+    <div class="form-row"><div class="form-group"><label>Үнэ</label><input type="number" id="f-price" value="${r.price||0}"></div><div class="form-group"><label>Өмнөх үнэ</label><input type="number" id="f-prev_price" value="${r.prev_price||0}"></div></div>
+    <div class="form-row"><div class="form-group"><label>Худалдан авагч</label><input id="f-buyer" value="${r.buyer||''}"></div><div class="form-group"><label>Байршил</label><input id="f-location" value="${r.location||''}"></div></div>
+    <div class="form-row"><div class="form-group"><label>Нийлүүлэлт</label><select id="f-supply"><option ${r.supply==='low'?'selected':''} value="low">Бага</option><option ${r.supply==='normal'?'selected':''} value="normal">Хэвийн</option><option ${r.supply==='high'?'selected':''} value="high">Их</option></select></div><div class="form-group"><label>Эрэлт</label><select id="f-demand"><option ${r.demand==='low'?'selected':''} value="low">Бага</option><option ${r.demand==='normal'?'selected':''} value="normal">Хэвийн</option><option ${r.demand==='high'?'selected':''} value="high">Их</option></select></div></div>`;
+}
+
+// ============ LIVESTOCK (read-only) ============
+async function loadLivestock() {
+  const data = await api("/livestock");
+  if (!data) return;
+  document.getElementById("livestock-count").textContent = `Бүртгэл (${data.length})`;
+  document.querySelector("#livestock-table tbody").innerHTML = data.map(l => `<tr>
+    <td>${l.id}</td><td>${l.user_name||l.user_id}</td><td>${animalMN[l.animal_type]||l.animal_type}</td><td>${fmtNum(l.total_count)}</td><td>${shortDate(l.updated_at)}</td>
+  </tr>`).join("");
+}
+
+// ============ FINANCE (read-only) ============
+async function loadFinance() {
+  const data = await api("/finance");
+  if (!data) return;
+  document.getElementById("finance-count").textContent = `Бүртгэл (${data.length})`;
+  document.querySelector("#finance-table tbody").innerHTML = data.map(f => `<tr>
+    <td>${f.id}</td><td>${f.user_name||f.user_id}</td><td><span class="badge badge-${f.type==='income'?'green':'red'}">${f.type==='income'?'Орлого':'Зардал'}</span></td><td>${f.category}</td><td>${fmt(f.amount)}</td><td>${f.note||'-'}</td><td>${shortDate(f.record_date)}</td>
+  </tr>`).join("");
+}
+
+// ============ MODAL SYSTEM ============
+function openModal(type) {
+  modalMode = { type, action: "create" };
+  const titles = { alert:"Анхааруулга нэмэх", news:"Мэдээ нэмэх", ad:"Сурталчилгаа нэмэх", driver:"Жолооч нэмэх", program:"Хөтөлбөр нэмэх", price:"Ханш нэмэх", rawprice:"Түүхий эд нэмэх" };
+  document.getElementById("modalTitle").textContent = titles[type] || "Нэмэх";
+  const formShowers = { alert: showAlertForm, news: showNewsForm, ad: showAdForm, driver: showDriverForm, program: showProgramForm, price: showPriceForm, rawprice: showRawPriceForm };
+  if (formShowers[type]) formShowers[type]();
+  document.getElementById("modalOverlay").classList.add("show");
+}
+
+function closeModal() { document.getElementById("modalOverlay").classList.remove("show"); modalMode = null; }
+
+function getFormData(fields) {
+  const data = {};
+  fields.forEach(f => {
+    const el = document.getElementById("f-" + f);
+    if (el) data[f] = el.type === "number" ? Number(el.value) : el.value;
+  });
+  return data;
+}
+
+async function saveModal() {
+  if (!modalMode) return;
+  const { type, action, id } = modalMode;
+  let endpoint, method, data, section;
+
+  switch (type) {
+    case "alert":
+      data = getFormData(["region","type","title","description","severity"]);
+      endpoint = action === "create" ? "/alerts" : `/alerts/${id}`;
+      method = action === "create" ? "POST" : "PUT";
+      section = "alerts";
+      break;
+    case "news":
+      data = getFormData(["category","title","summary","body","source","source_url","image_url","region","tags","is_urgent"]);
+      data.is_urgent = Number(data.is_urgent);
+      endpoint = action === "create" ? "/news" : `/news/${id}`;
+      method = action === "create" ? "POST" : "PUT";
+      section = "news";
+      break;
+    case "market":
+      data = getFormData(["title","description","category","animal_type","quantity","price","location","status"]);
+      endpoint = `/market/${id}`;
+      method = "PUT";
+      section = "market";
+      break;
+    case "user":
+      data = getFormData(["name","phone","aimag","sum","bag"]);
+      endpoint = `/users/${id}`;
+      method = "PUT";
+      section = "users";
+      break;
+    case "ad":
+      data = getFormData(["title","description","image_url","link_url","advertiser","placement","category","priority","is_active","end_date"]);
+      data.is_active = Number(data.is_active);
+      data.priority = Number(data.priority);
+      endpoint = action === "create" ? "/ads" : `/ads/${id}`;
+      method = action === "create" ? "POST" : "PUT";
+      section = "ads";
+      break;
+    case "driver":
+      data = getFormData(["name","phone","truck_type","capacity","region","rating"]);
+      data.rating = Number(data.rating);
+      endpoint = action === "create" ? "/drivers" : `/drivers/${id}`;
+      method = action === "create" ? "POST" : "PUT";
+      section = "drivers";
+      break;
+    case "program":
+      data = getFormData(["category","title","description","organization","eligibility","amount","deadline","contact","region","status"]);
+      endpoint = action === "create" ? "/programs" : `/programs/${id}`;
+      method = action === "create" ? "POST" : "PUT";
+      section = "programs";
+      break;
+    case "price":
+      data = getFormData(["market_name","aimag","location","item_type","item_name","unit","wholesale_price","retail_price","prev_price","supply","demand"]);
+      endpoint = action === "create" ? "/market-prices" : `/market-prices/${id}`;
+      method = action === "create" ? "POST" : "PUT";
+      section = "prices";
+      break;
+    case "rawprice":
+      data = getFormData(["material_type","material_name","grade","unit","price","prev_price","buyer","location","supply","demand"]);
+      endpoint = action === "create" ? "/raw-prices" : `/raw-prices/${id}`;
+      method = action === "create" ? "POST" : "PUT";
+      section = "rawprices";
+      break;
+  }
+
+  const result = await api(endpoint, method, data);
+  if (result && !result.error) {
+    toast(action === "create" ? "Амжилттай нэмлээ" : "Амжилттай хадгаллаа");
+    closeModal();
+    loadSection(section);
+  } else {
+    toast(result?.error || "Алдаа гарлаа", true);
+  }
+}
+
+async function deleteItem(endpoint, id, section) {
+  if (!confirm("Устгахдаа итгэлтэй байна уу?")) return;
+  const result = await api(`/${endpoint}/${id}`, "DELETE");
+  if (result?.ok) {
+    toast("Амжилттай устгалаа");
+    loadSection(section || endpoint);
+  } else {
+    toast("Устгахад алдаа гарлаа", true);
+  }
+}
+</script>
+</body>
+</html>
