@@ -21,7 +21,7 @@ const tabs: TabConfig[] = [
   { name: 'profile', title: 'Профайл', icon: 'person.fill' },
 ];
 
-const hiddenTabs = ['explore', 'weather', 'ai-advisor', 'livestock', 'finance', 'diagnose', 'knowledge', 'funfacts', 'shinjikh'];
+const hiddenTabs = ['explore', 'weather', 'ai-advisor', 'livestock', 'finance', 'diagnose', 'knowledge', 'funfacts', 'shinjikh', 'pasture', 'breeding', 'health'];
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();

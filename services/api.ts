@@ -1,10 +1,27 @@
 import { cachedFetch, cacheSet } from './offline';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const API_BASE = 'http://localhost:5000';
 
+let _token: string | null = null;
+
+export async function setToken(token: string | null) {
+  _token = token;
+  if (token) await AsyncStorage.setItem('@malchin_token', token);
+  else await AsyncStorage.removeItem('@malchin_token');
+}
+
+export async function getToken(): Promise<string | null> {
+  if (!_token) _token = await AsyncStorage.getItem('@malchin_token');
+  return _token;
+}
+
 async function request<T>(endpoint: string, options?: RequestInit): Promise<T> {
+  const token = await getToken();
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+  if (token) headers['Authorization'] = `Bearer ${token}`;
   const res = await fetch(`${API_BASE}${endpoint}`, {
-    headers: { 'Content-Type': 'application/json' },
+    headers,
     ...options,
   });
   if (!res.ok) throw new Error(`API error: ${res.status}`);
@@ -201,6 +218,163 @@ export const funFactsApi = {
     cachedRequest<any>(`/funfacts${category ? `?category=${category}` : ''}`, 'funfacts'),
   getDaily: () => cachedRequest<any>('/funfacts/daily', 'funfacts'),
   getRandom: () => cachedRequest<any>('/funfacts/random', 'funfacts'),
+};
+
+// Animals (individual animal registry)
+export const animalsApi = {
+  getAll: (filters?: { type?: string; status?: string; gender?: string; search?: string }) => {
+    const params = new URLSearchParams();
+    if (filters?.type) params.set('type', filters.type);
+    if (filters?.status) params.set('status', filters.status);
+    if (filters?.gender) params.set('gender', filters.gender);
+    if (filters?.search) params.set('search', filters.search);
+    return request<any>(`/animals?${params}`);
+  },
+  getStats: () => request<any>('/animals/stats'),
+  getById: (id: number) => request<any>(`/animals/${id}`),
+  create: (data: any) =>
+    request<any>('/animals', { method: 'POST', body: JSON.stringify(data) }),
+  createBatch: (animals: any[]) =>
+    request<any>('/animals/batch', { method: 'POST', body: JSON.stringify({ animals }) }),
+  update: (id: number, data: any) =>
+    request<any>(`/animals/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+  delete: (id: number) =>
+    request<any>(`/animals/${id}`, { method: 'DELETE' }),
+  lookup: (tag: string) => request<any>(`/animals/lookup/${encodeURIComponent(tag)}`),
+};
+
+// Breeding & Birth
+export const breedingApi = {
+  getAll: (filters?: { status?: string; animal_type?: string }) => {
+    const params = new URLSearchParams();
+    if (filters?.status) params.set('status', filters.status);
+    if (filters?.animal_type) params.set('animal_type', filters.animal_type);
+    return request<any>(`/breeding?${params}`);
+  },
+  getById: (id: number) => request<any>(`/breeding/${id}`),
+  getCalendar: () => request<any>('/breeding/calendar'),
+  getStats: () => request<any>('/breeding/stats'),
+  create: (data: { female_id: number; breeding_date: string; male_id?: number; breeding_method?: string; expected_due_date?: string; notes?: string }) =>
+    request<any>('/breeding', { method: 'POST', body: JSON.stringify(data) }),
+  update: (id: number, data: any) =>
+    request<any>(`/breeding/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+  updateStatus: (id: number, status: string) =>
+    request<any>(`/breeding/${id}/status`, { method: 'PUT', body: JSON.stringify({ status }) }),
+  delete: (id: number) =>
+    request<any>(`/breeding/${id}`, { method: 'DELETE' }),
+  // Births
+  getBirths: () => request<any>('/breeding/births'),
+  getBirthById: (id: number) => request<any>(`/breeding/births/${id}`),
+  createBirth: (data: { mother_id: number; birth_date: string; father_id?: number; breeding_id?: number; offspring_count?: number; alive_count?: number; difficulty?: string; notes?: string }) =>
+    request<any>('/breeding/births', { method: 'POST', body: JSON.stringify(data) }),
+  updateBirth: (id: number, data: any) =>
+    request<any>(`/breeding/births/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+  deleteBirth: (id: number) =>
+    request<any>(`/breeding/births/${id}`, { method: 'DELETE' }),
+};
+
+// Health & Vaccination
+export const healthApi = {
+  getAll: (filters?: { animal_id?: number; record_type?: string; severity?: string; status?: string }) => {
+    const params = new URLSearchParams();
+    if (filters?.animal_id) params.set('animal_id', String(filters.animal_id));
+    if (filters?.record_type) params.set('record_type', filters.record_type);
+    if (filters?.severity) params.set('severity', filters.severity);
+    if (filters?.status) params.set('status', filters.status);
+    return request<any>(`/health?${params}`);
+  },
+  getByAnimal: (animalId: number) => request<any>(`/health/animal/${animalId}`),
+  getById: (id: number) => request<any>(`/health/${id}`),
+  getStats: () => request<any>('/health/stats'),
+  create: (data: { animal_id: number; record_type: string; title: string; record_date: string; diagnosis?: string; treatment?: string; medication?: string; dosage?: string; vet_name?: string; cost?: number; severity?: string; next_checkup?: string }) =>
+    request<any>('/health', { method: 'POST', body: JSON.stringify(data) }),
+  update: (id: number, data: any) =>
+    request<any>(`/health/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+  delete: (id: number) =>
+    request<any>(`/health/${id}`, { method: 'DELETE' }),
+  // Vaccinations
+  getVaccinations: (filters?: { animal_type?: string; vaccine_name?: string }) => {
+    const params = new URLSearchParams();
+    if (filters?.animal_type) params.set('animal_type', filters.animal_type);
+    if (filters?.vaccine_name) params.set('vaccine_name', filters.vaccine_name);
+    return request<any>(`/health/vaccinations?${params}`);
+  },
+  getVaccinationsByAnimal: (animalId: number) => request<any>(`/health/vaccinations/animal/${animalId}`),
+  getVaccinationsDue: () => request<any>('/health/vaccinations/due'),
+  createVaccination: (data: { vaccine_name: string; vaccination_date: string; animal_id?: number; animal_type?: string; animal_count?: number; disease?: string; batch_number?: string; administered_by?: string; next_due_date?: string; cost?: number; notes?: string }) =>
+    request<any>('/health/vaccinations', { method: 'POST', body: JSON.stringify(data) }),
+  updateVaccination: (id: number, data: any) =>
+    request<any>(`/health/vaccinations/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+  deleteVaccination: (id: number) =>
+    request<any>(`/health/vaccinations/${id}`, { method: 'DELETE' }),
+};
+
+// Pastures, Grazing & Migration
+export const pastureApi = {
+  getAll: (type?: string) =>
+    request<any>(`/pastures${type ? `?type=${type}` : ''}`),
+  getById: (id: number) => request<any>(`/pastures/${id}`),
+  getStats: () => request<any>('/pastures/stats'),
+  create: (data: { name: string; type?: string; lat?: number; lng?: number; area?: number; grass_quality?: string; water_source?: string; capacity?: number; aimag?: string; sum?: string; notes?: string }) =>
+    request<any>('/pastures', { method: 'POST', body: JSON.stringify(data) }),
+  update: (id: number, data: any) =>
+    request<any>(`/pastures/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+  delete: (id: number) =>
+    request<any>(`/pastures/${id}`, { method: 'DELETE' }),
+  // Grazing
+  getGrazing: (filters?: { pasture_id?: number; active?: boolean }) => {
+    const params = new URLSearchParams();
+    if (filters?.pasture_id) params.set('pasture_id', String(filters.pasture_id));
+    if (filters?.active) params.set('active', '1');
+    return request<any>(`/pastures/grazing?${params}`);
+  },
+  getCurrentGrazing: () => request<any>('/pastures/grazing/current'),
+  startGrazing: (data: { pasture_id: number; start_date: string; animal_count?: number; grass_condition_start?: string; notes?: string }) =>
+    request<any>('/pastures/grazing', { method: 'POST', body: JSON.stringify(data) }),
+  updateGrazing: (id: number, data: any) =>
+    request<any>(`/pastures/grazing/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+  endGrazing: (id: number, data: { end_date: string; grass_condition_end?: string }) =>
+    request<any>(`/pastures/grazing/${id}/end`, { method: 'PUT', body: JSON.stringify(data) }),
+  deleteGrazing: (id: number) =>
+    request<any>(`/pastures/grazing/${id}`, { method: 'DELETE' }),
+  // Migrations
+  getMigrations: (year?: number) =>
+    request<any>(`/pastures/migrations${year ? `?year=${year}` : ''}`),
+  createMigration: (data: { migration_date: string; from_pasture_id?: number; to_pasture_id?: number; from_location?: string; to_location?: string; animal_count?: number; distance_km?: number; duration_hours?: number; reason?: string; transport_method?: string; cost?: number; notes?: string }) =>
+    request<any>('/pastures/migrations', { method: 'POST', body: JSON.stringify(data) }),
+  updateMigration: (id: number, data: any) =>
+    request<any>(`/pastures/migrations/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+  deleteMigration: (id: number) =>
+    request<any>(`/pastures/migrations/${id}`, { method: 'DELETE' }),
+};
+
+// Offline Sync
+export const syncApi = {
+  push: (data: { device_id: string; changes: Array<{ table_name: string; action: string; record_id: number; data: string; created_at: string }> }) =>
+    request<any>('/sync/push', { method: 'POST', body: JSON.stringify(data) }),
+  pull: (since: string, deviceId: string) =>
+    request<any>(`/sync/pull?since=${encodeURIComponent(since)}&device_id=${encodeURIComponent(deviceId)}`),
+  getStatus: () => request<any>('/sync/status'),
+  resolve: (conflicts: Array<{ sync_id: number; resolution: 'keep_server' | 'keep_client'; client_data?: any }>) =>
+    request<any>('/sync/resolve', { method: 'POST', body: JSON.stringify({ conflicts }) }),
+};
+
+// Households (multi-user family farm)
+export const householdApi = {
+  create: (data: { name: string; aimag?: string; sum?: string; bag?: string }) =>
+    request<any>('/households/create', { method: 'POST', body: JSON.stringify(data) }),
+  getMy: () => request<any>('/households/my'),
+  join: (data: { invite_code: string; role?: string }) =>
+    request<any>('/households/join', { method: 'POST', body: JSON.stringify(data) }),
+  update: (data: { name?: string; aimag?: string; sum?: string; bag?: string }) =>
+    request<any>('/households', { method: 'PUT', body: JSON.stringify(data) }),
+  changeMemberRole: (userId: number, role: string) =>
+    request<any>(`/households/members/${userId}/role`, { method: 'PUT', body: JSON.stringify({ role }) }),
+  removeMember: (userId: number) =>
+    request<any>(`/households/members/${userId}`, { method: 'DELETE' }),
+  regenerateInviteCode: () => request<any>('/households/invite-code'),
+  leave: () => request<any>('/households/leave', { method: 'DELETE' }),
+  getStats: () => request<any>('/households/stats'),
 };
 
 // Prices
