@@ -16,7 +16,207 @@ db.exec(`
     aimag TEXT DEFAULT '',
     sum TEXT DEFAULT '',
     bag TEXT DEFAULT '',
+    household_id INTEGER DEFAULT NULL,
+    role TEXT DEFAULT 'owner',
     created_at TEXT DEFAULT (datetime('now'))
+  );
+
+  -- Өрх / Аж ахуй
+  CREATE TABLE IF NOT EXISTS households (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    owner_id INTEGER NOT NULL,
+    aimag TEXT DEFAULT '',
+    sum TEXT DEFAULT '',
+    bag TEXT DEFAULT '',
+    created_at TEXT DEFAULT (datetime('now')),
+    FOREIGN KEY (owner_id) REFERENCES users(id)
+  );
+
+  -- ========== MODULE 1: МАЛЫН БҮРТГЭЛ ==========
+  -- Нэг бүрчлэн малын бүртгэл
+  CREATE TABLE IF NOT EXISTS animals (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    household_id INTEGER DEFAULT NULL,
+    animal_type TEXT NOT NULL,
+    name TEXT DEFAULT '',
+    breed TEXT DEFAULT '',
+    gender TEXT DEFAULT '',
+    birth_date TEXT DEFAULT '',
+    color TEXT DEFAULT '',
+    weight REAL DEFAULT 0,
+    ear_tag TEXT DEFAULT '',
+    chip_id TEXT DEFAULT '',
+    brand_mark TEXT DEFAULT '',
+    photo_url TEXT DEFAULT '',
+    origin TEXT DEFAULT 'own_birth',
+    origin_detail TEXT DEFAULT '',
+    mother_id INTEGER DEFAULT NULL,
+    father_id INTEGER DEFAULT NULL,
+    status TEXT DEFAULT 'active',
+    notes TEXT DEFAULT '',
+    created_at TEXT DEFAULT (datetime('now')),
+    updated_at TEXT DEFAULT (datetime('now')),
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (mother_id) REFERENCES animals(id),
+    FOREIGN KEY (father_id) REFERENCES animals(id)
+  );
+
+  -- ========== MODULE 2: ТӨЛЛӨЛТ / ҮРЖИЛ ==========
+  -- Хээлтүүлгийн бүртгэл
+  CREATE TABLE IF NOT EXISTS breeding_records (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    female_id INTEGER NOT NULL,
+    male_id INTEGER DEFAULT NULL,
+    breeding_date TEXT NOT NULL,
+    breeding_method TEXT DEFAULT 'natural',
+    expected_due_date TEXT DEFAULT '',
+    status TEXT DEFAULT 'bred',
+    result TEXT DEFAULT '',
+    notes TEXT DEFAULT '',
+    created_at TEXT DEFAULT (datetime('now')),
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (female_id) REFERENCES animals(id),
+    FOREIGN KEY (male_id) REFERENCES animals(id)
+  );
+
+  -- Төллөлтийн бүртгэл
+  CREATE TABLE IF NOT EXISTS birth_records (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    breeding_id INTEGER DEFAULT NULL,
+    mother_id INTEGER NOT NULL,
+    father_id INTEGER DEFAULT NULL,
+    birth_date TEXT NOT NULL,
+    offspring_count INTEGER DEFAULT 1,
+    alive_count INTEGER DEFAULT 1,
+    difficulty TEXT DEFAULT 'normal',
+    notes TEXT DEFAULT '',
+    created_at TEXT DEFAULT (datetime('now')),
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (breeding_id) REFERENCES breeding_records(id),
+    FOREIGN KEY (mother_id) REFERENCES animals(id),
+    FOREIGN KEY (father_id) REFERENCES animals(id)
+  );
+
+  -- ========== MODULE 3: ЭРҮҮЛ МЭНД / ВАКЦИН ==========
+  -- Эрүүл мэндийн бүртгэл (өвчин, эмчилгээ, шинжилгээ)
+  CREATE TABLE IF NOT EXISTS health_records (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    animal_id INTEGER NOT NULL,
+    record_type TEXT NOT NULL,
+    title TEXT NOT NULL,
+    description TEXT DEFAULT '',
+    diagnosis TEXT DEFAULT '',
+    treatment TEXT DEFAULT '',
+    medication TEXT DEFAULT '',
+    dosage TEXT DEFAULT '',
+    vet_name TEXT DEFAULT '',
+    cost REAL DEFAULT 0,
+    record_date TEXT NOT NULL,
+    next_checkup TEXT DEFAULT '',
+    severity TEXT DEFAULT 'low',
+    status TEXT DEFAULT 'treated',
+    created_at TEXT DEFAULT (datetime('now')),
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (animal_id) REFERENCES animals(id)
+  );
+
+  -- Вакцины бүртгэл (бодит хийсэн)
+  CREATE TABLE IF NOT EXISTS vaccination_records (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    animal_id INTEGER DEFAULT NULL,
+    animal_type TEXT DEFAULT '',
+    animal_count INTEGER DEFAULT 1,
+    vaccine_name TEXT NOT NULL,
+    disease TEXT DEFAULT '',
+    batch_number TEXT DEFAULT '',
+    administered_by TEXT DEFAULT '',
+    vaccination_date TEXT NOT NULL,
+    next_due_date TEXT DEFAULT '',
+    cost REAL DEFAULT 0,
+    notes TEXT DEFAULT '',
+    created_at TEXT DEFAULT (datetime('now')),
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (animal_id) REFERENCES animals(id)
+  );
+
+  -- ========== MODULE 4: БЭЛЧЭЭР / НҮҮДЭЛ ==========
+  -- Бэлчээрийн бүртгэл
+  CREATE TABLE IF NOT EXISTS pastures (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    name TEXT NOT NULL,
+    type TEXT DEFAULT 'summer',
+    lat REAL DEFAULT 0,
+    lng REAL DEFAULT 0,
+    area REAL DEFAULT 0,
+    area_unit TEXT DEFAULT 'га',
+    grass_quality TEXT DEFAULT 'good',
+    water_source TEXT DEFAULT '',
+    capacity INTEGER DEFAULT 0,
+    aimag TEXT DEFAULT '',
+    sum TEXT DEFAULT '',
+    notes TEXT DEFAULT '',
+    created_at TEXT DEFAULT (datetime('now')),
+    FOREIGN KEY (user_id) REFERENCES users(id)
+  );
+
+  -- Бэлчээр ашиглалтын түүх
+  CREATE TABLE IF NOT EXISTS grazing_records (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    pasture_id INTEGER NOT NULL,
+    animal_count INTEGER DEFAULT 0,
+    start_date TEXT NOT NULL,
+    end_date TEXT DEFAULT '',
+    grass_condition_start TEXT DEFAULT '',
+    grass_condition_end TEXT DEFAULT '',
+    notes TEXT DEFAULT '',
+    created_at TEXT DEFAULT (datetime('now')),
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (pasture_id) REFERENCES pastures(id)
+  );
+
+  -- Нүүдлийн бүртгэл
+  CREATE TABLE IF NOT EXISTS migrations (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    from_pasture_id INTEGER DEFAULT NULL,
+    to_pasture_id INTEGER DEFAULT NULL,
+    from_location TEXT DEFAULT '',
+    to_location TEXT DEFAULT '',
+    migration_date TEXT NOT NULL,
+    animal_count INTEGER DEFAULT 0,
+    distance_km REAL DEFAULT 0,
+    duration_hours REAL DEFAULT 0,
+    reason TEXT DEFAULT '',
+    transport_method TEXT DEFAULT 'on_foot',
+    cost REAL DEFAULT 0,
+    notes TEXT DEFAULT '',
+    created_at TEXT DEFAULT (datetime('now')),
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (from_pasture_id) REFERENCES pastures(id),
+    FOREIGN KEY (to_pasture_id) REFERENCES pastures(id)
+  );
+
+  -- ========== MODULE 5: ОФФЛАЙН SYNC ==========
+  CREATE TABLE IF NOT EXISTS sync_log (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    table_name TEXT NOT NULL,
+    record_id INTEGER NOT NULL,
+    action TEXT NOT NULL,
+    data TEXT DEFAULT '',
+    synced INTEGER DEFAULT 0,
+    device_id TEXT DEFAULT '',
+    created_at TEXT DEFAULT (datetime('now')),
+    synced_at TEXT DEFAULT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id)
   );
 
   CREATE TABLE IF NOT EXISTS livestock (
@@ -1087,5 +1287,10 @@ if (ffCount.cnt === 0) {
   f.run("stats", "Адуу цагт 70 км/ц", "Монгол адуу хамгийн дээд хурдаараа цагт 65-70 км хурдтай гүйж чаддаг. Наадмын уралдааны морь 25-30 км замыг 30-40 минутад туулдаг.", "🏇", "Наадам", "адуу,хурд,наадам");
   f.run("stats", "Үхэр өдөрт 8 цаг идэж чаддаг", "Үхэр өдөрт 8 цаг хоол идэж, 8 цаг хэвтрэн боловсруулж, 8 цаг амардаг. Өдөрт 70-100 кг ногоон ургамал иддэг.", "🐂", "Dairy Science", "үхэр,хоол,тоо баримт");
 }
+
+// === Migrations ===
+try { db.exec("ALTER TABLE households ADD COLUMN invite_code TEXT DEFAULT ''"); } catch (e) { /* column already exists */ }
+try { db.exec("ALTER TABLE users ADD COLUMN household_id INTEGER DEFAULT NULL"); } catch (e) { /* column already exists */ }
+try { db.exec("ALTER TABLE users ADD COLUMN role TEXT DEFAULT 'owner'"); } catch (e) { /* column already exists */ }
 
 module.exports = db;

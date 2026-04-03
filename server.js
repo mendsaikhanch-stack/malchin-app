@@ -27,8 +27,15 @@ app.use("/reminders", require("./routes/reminders"));
 app.use("/registry", require("./routes/registry"));
 app.use("/admin", require("./routes/admin"));
 app.use("/notifications", require("./routes/notifications"));
+app.use("/animals", require("./routes/animals"));
+app.use("/breeding", require("./routes/breeding"));
+app.use("/health", require("./routes/health"));
+app.use("/pastures", require("./routes/pastures"));
+app.use("/sync", require("./routes/sync"));
+app.use("/households", require("./routes/households"));
 app.get("/dashboard", (req, res) => { res.sendFile(path.join(__dirname, "dashboard.html")); });
 app.get("/admin-panel", (req, res) => { res.sendFile(path.join(__dirname, "admin.html")); });
+app.get("/phone", (req, res) => { res.sendFile(path.join(__dirname, "phone-preview.html")); });
 app.get("/", (req, res) => { res.json({ message: "Malchin Super App", version: "3.0" }); });
 app.listen(5000, "0.0.0.0", () => {
   console.log("Malchin backend v3.0 running on port 5000");
