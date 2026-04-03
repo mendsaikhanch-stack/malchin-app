@@ -26,6 +26,7 @@ app.use("/ads", require("./routes/ads"));
 app.use("/reminders", require("./routes/reminders"));
 app.use("/registry", require("./routes/registry"));
 app.use("/admin", require("./routes/admin"));
+app.use("/notifications", require("./routes/notifications"));
 app.get("/dashboard", (req, res) => { res.sendFile(path.join(__dirname, "dashboard.html")); });
 app.get("/admin-panel", (req, res) => { res.sendFile(path.join(__dirname, "admin.html")); });
 app.get("/", (req, res) => { res.json({ message: "Malchin Super App", version: "3.0" }); });
