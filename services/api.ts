@@ -147,6 +147,19 @@ export const financeApi = {
     request<any>(`/finance/trend${months ? `?months=${months}` : ''}`),
 };
 
+// Insurance & Welfare
+export const insuranceApi = {
+  getAll: () => cachedRequest<any>('/insurance/all', 'insurance'),
+  getTypes: () => cachedRequest<any>('/insurance/types', 'insurance'),
+  getType: (type: string) => cachedRequest<any>(`/insurance/types/${type}`, 'insurance'),
+  getWelfare: (category?: string) =>
+    cachedRequest<any>(`/insurance/welfare${category ? `?category=${category}` : ''}`, 'insurance'),
+  getDocuments: (type?: string) =>
+    cachedRequest<any>(`/insurance/documents${type ? `?type=${type}` : ''}`, 'insurance'),
+  getContacts: () => cachedRequest<any>('/insurance/contacts', 'insurance'),
+  calculate: (income: number) => request<any>(`/insurance/calculate?income=${income}`),
+};
+
 // Market
 export const marketApi = {
   getAll: () =>
