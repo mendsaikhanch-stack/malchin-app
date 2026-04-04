@@ -46,7 +46,7 @@ const quickActionItems = [
   { emoji: '🤰', label: 'Хээлтүүлэг', route: '/breeding' },
   { emoji: '🏥', label: 'Эрүүл мэнд', route: '/health' },
   { emoji: '🌿', label: 'Бэлчээр', route: '/pasture' },
-  { emoji: '🏷️', label: 'Ээмэг хайх', route: '/scanner' },
+  { emoji: '🛡️', label: 'Даатгал', route: '/insurance' },
   { emoji: '👨‍👩‍👧‍👦', label: 'Өрх бүл', route: '/household' },
   { emoji: '📍', label: 'Газрын зураг', route: '/map-view' },
   { emoji: '💰', label: 'Санхүү', route: '/finance' },
@@ -234,6 +234,34 @@ export default function HomeScreen() {
           ) : (
             <Text style={styles.emptyText}>Санхүүгийн мэдээлэл ачааллаж чадсангүй</Text>
           )}
+        </TouchableOpacity>
+
+        {/* Даатгал & Халамж */}
+        <TouchableOpacity style={styles.card} onPress={() => router.push('/(tabs)/insurance')}>
+          <Text style={styles.cardTitle}>🛡️ Даатгал & Халамж</Text>
+          <View style={styles.insuranceGrid}>
+            <View style={styles.insuranceItem}>
+              <Text style={styles.insuranceEmoji}>🏦</Text>
+              <Text style={styles.insuranceLabel}>НД 11.5%</Text>
+            </View>
+            <View style={styles.insuranceItem}>
+              <Text style={styles.insuranceEmoji}>🏥</Text>
+              <Text style={styles.insuranceLabel}>ЭМД</Text>
+            </View>
+            <View style={styles.insuranceItem}>
+              <Text style={styles.insuranceEmoji}>🐑</Text>
+              <Text style={styles.insuranceLabel}>Малын даатгал</Text>
+            </View>
+            <View style={styles.insuranceItem}>
+              <Text style={styles.insuranceEmoji}>🤝</Text>
+              <Text style={styles.insuranceLabel}>Халамж</Text>
+            </View>
+          </View>
+          <View style={styles.insuranceTip}>
+            <Text style={styles.insuranceTipText}>
+              💡 Шимтгэл, тэтгэвэр, малын даатгал, тооцоолуур →
+            </Text>
+          </View>
         </TouchableOpacity>
 
         {/* Шуурхай үйлдэл - 2x3 grid */}

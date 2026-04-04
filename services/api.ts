@@ -1,7 +1,11 @@
 import { cachedFetch, cacheSet } from './offline';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const API_BASE = 'http://localhost:5000';
+// Утас дээр ажиллахын тулд компьютерийн IP хаяг ашиглана
+const DEV_IP = '192.168.0.100';
+const API_BASE = __DEV__
+  ? `http://${DEV_IP}:5000`
+  : 'https://your-production-url.com';
 
 let _token: string | null = null;
 
