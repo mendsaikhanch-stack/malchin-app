@@ -13,6 +13,7 @@ import { useRouter } from 'expo-router';
 import { AppColors } from '@/constants/theme';
 import { livestockApi, weatherApi, alertsApi, aiApi, financeApi } from '@/services/api';
 import { AdBanner, AdBannerLarge } from '@/components/ad-banner';
+import { useLocation } from '@/hooks/use-location';
 
 const animalNames: Record<string, string> = {
   sheep: 'Хонь', goat: 'Ямаа', cattle: 'Үхэр',
@@ -53,6 +54,7 @@ const quickActionItems = [
 
 export default function HomeScreen() {
   const router = useRouter();
+  const { address: myLocation, loading: locLoading } = useLocation();
   const [refreshing, setRefreshing] = useState(false);
   const [loading, setLoading] = useState(true);
   const [livestock, setLivestock] = useState<any[]>([]);
@@ -134,6 +136,9 @@ export default function HomeScreen() {
         <View style={styles.header}>
           <Text style={styles.greeting}>Сайн байна уу!</Text>
           <Text style={styles.appTitle}>МАЛЧИН</Text>
+          {myLocation ? (
+            <Text style={styles.locationText}>📍 {myLocation}</Text>
+          ) : null}
         </View>
 
         {/* Малын тоо */}
@@ -284,6 +289,7 @@ const styles = StyleSheet.create({
   header: { paddingHorizontal: 20, paddingTop: 16, paddingBottom: 8 },
   greeting: { fontSize: 16, color: AppColors.grayDark },
   appTitle: { fontSize: 28, fontWeight: '800', color: AppColors.primary, marginTop: 4 },
+  locationText: { fontSize: 13, color: AppColors.grayDark, marginTop: 4 },
   card: {
     backgroundColor: AppColors.white, marginHorizontal: 16, marginTop: 12,
     borderRadius: 16, padding: 16, shadowColor: '#000',

@@ -7,6 +7,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { AppColors } from '@/constants/theme';
 import { pastureApi } from '@/services/api';
 import { AdBanner } from '@/components/ad-banner';
+import { useLocation } from '@/hooks/use-location';
 
 const tabs = ['Бэлчээр', 'Бэлчээрлэлт', 'Нүүдэл'];
 

@@ -13,6 +13,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { AppColors } from '@/constants/theme';
 import { mapApi, pastureApi } from '@/services/api';
+import { useLocation } from '@/hooks/use-location';
 
 const subTabs = ['Үйлчилгээ', 'Бэлчээр', 'Зах'];
 
@@ -36,6 +37,7 @@ const qualityColor = (q: string) => {
 };
 
 export default function MapViewScreen() {
+  const { location, mongoliaLocation, address, loading: locLoading, refresh: refreshLoc, permissionGranted } = useLocation();
   const [activeTab, setActiveTab] = useState(0);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -444,6 +446,35 @@ export default function MapViewScreen() {
         <Text style={styles.title}>📍 Байршил & Үйлчилгээ</Text>
       </View>
 
+      {/* GPS байршил */}
+      <View style={styles.locationCard}>
+        <View style={styles.locationHeader}>
+          <Text style={styles.locationIcon}>📡</Text>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.locationLabel}>Миний байршил</Text>
+            {locLoading ? (
+              <ActivityIndicator size="small" color="#2d5016" />
+            ) : address ? (
+              <>
+                <Text style={styles.locationAddress}>{address}</Text>
+                {location && (
+                  <Text style={styles.locationCoords}>
+                    {location.lat.toFixed(4)}°N, {location.lng.toFixed(4)}°E
+                  </Text>
+                )}
+              </>
+            ) : (
+              <Text style={styles.locationError}>
+                {permissionGranted ? 'Байршил тодорхойлж чадсангүй' : 'Байршлын зөвшөөрөл шаардлагатай'}
+              </Text>
+            )}
+          </View>
+          <TouchableOpacity onPress={refreshLoc} style={styles.locationRefreshBtn}>
+            <Text style={{ fontSize: 18 }}>🔄</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+
       {/* Sub-tabs */}
       <View style={styles.tabBar}>
         {subTabs.map((tab, i) => (
@@ -494,6 +525,14 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#f5f7f0' },
   header: { paddingHorizontal: 20, paddingTop: 16, paddingBottom: 4 },
   title: { fontSize: 22, fontWeight: '800', color: '#2d5016' },
+  locationCard: { marginHorizontal: 16, marginTop: 10, backgroundColor: '#e8f5e9', borderRadius: 14, padding: 14, borderWidth: 1, borderColor: '#c8e6c9' },
+  locationHeader: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  locationIcon: { fontSize: 28 },
+  locationLabel: { fontSize: 12, color: '#666', marginBottom: 2 },
+  locationAddress: { fontSize: 16, fontWeight: '700', color: '#1B5E20' },
+  locationCoords: { fontSize: 11, color: '#888', marginTop: 2 },
+  locationError: { fontSize: 13, color: '#999', fontStyle: 'italic' },
+  locationRefreshBtn: { padding: 8, borderRadius: 20, backgroundColor: '#fff' },
 
   // Tabs
   tabBar: {
