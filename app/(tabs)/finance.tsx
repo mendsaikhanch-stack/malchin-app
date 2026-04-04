@@ -104,6 +104,7 @@ export default function FinanceScreen() {
 
   // Modal
   const [showModal, setShowModal] = useState(false);
+  const [editingRecord, setEditingRecord] = useState<any>(null);
   const [recordType, setRecordType] = useState<RecordType>('income');
   const [selectedCat, setSelectedCat] = useState('sale');
   const [amount, setAmount] = useState('');
@@ -116,16 +117,19 @@ export default function FinanceScreen() {
   // Report tab
   const [reportYear, setReportYear] = useState<number>(new Date().getFullYear());
 
-  const userId = 1;
+  // Profitability
+  const [profitability, setProfitability] = useState<any>(null);
 
   const loadData = useCallback(async () => {
     try {
-      const [recordsRes, summaryRes] = await Promise.allSettled([
-        financeApi.getByUser(userId),
-        financeApi.getSummary(userId),
+      const [recordsRes, summaryRes, profitRes] = await Promise.allSettled([
+        financeApi.getAll(),
+        financeApi.getSummary(),
+        financeApi.getProfitability(),
       ]);
       if (recordsRes.status === 'fulfilled') setRecords(recordsRes.value || []);
       if (summaryRes.status === 'fulfilled') setSummary(summaryRes.value);
+      if (profitRes.status === 'fulfilled') setProfitability(profitRes.value);
     } catch {
       // silent
     } finally {
@@ -137,24 +141,72 @@ export default function FinanceScreen() {
   useEffect(() => { loadData(); }, [loadData]);
   const onRefresh = () => { setRefreshing(true); loadData(); };
 
-  const handleAdd = async () => {
+  const handleSave = async () => {
     const num = parseInt(amount);
     if (!num || num <= 0) { Alert.alert('Алдаа', 'Дүн оруулна уу'); return; }
     try {
-      await financeApi.add({
-        user_id: userId,
-        type: recordType,
-        category: selectedCat,
-        amount: num,
-        note: note.trim(),
-      });
+      if (editingRecord) {
+        await financeApi.update(editingRecord.id, {
+          type: recordType,
+          category: selectedCat,
+          amount: num,
+          note: note.trim(),
+        });
+      } else {
+        await financeApi.add({
+          type: recordType,
+          category: selectedCat,
+          amount: num,
+          note: note.trim(),
+        });
+      }
       setShowModal(false);
+      setEditingRecord(null);
       setAmount('');
       setNote('');
       loadData();
     } catch {
       Alert.alert('Алдаа', 'Бүртгэхэд алдаа гарлаа');
     }
+  };
+
+  const handleEdit = (rec: any) => {
+    setEditingRecord(rec);
+    setRecordType(rec.type);
+    setSelectedCat(rec.category || (rec.type === 'income' ? 'sale' : 'feed'));
+    setAmount(String(rec.amount));
+    setNote(rec.note || '');
+    setShowModal(true);
+  };
+
+  const handleDelete = (rec: any) => {
+    const cat = getCatInfo(rec.category);
+    Alert.alert(
+      'Устгах',
+      `${cat.emoji} ${cat.label} - ${formatPrice(rec.amount)} бүртгэлийг устгах уу?`,
+      [
+        { text: 'Болих', style: 'cancel' },
+        {
+          text: 'Устгах', style: 'destructive',
+          onPress: async () => {
+            try {
+              await financeApi.delete(rec.id);
+              loadData();
+            } catch {
+              Alert.alert('Алдаа', 'Устгахад алдаа гарлаа');
+            }
+          },
+        },
+      ]
+    );
+  };
+
+  const openAddModal = (type: RecordType) => {
+    setEditingRecord(null);
+    switchType(type);
+    setAmount('');
+    setNote('');
+    setShowModal(true);
   };
 
   const switchType = (type: RecordType) => {
@@ -439,13 +491,13 @@ export default function FinanceScreen() {
       <View style={styles.actions}>
         <TouchableOpacity
           style={[styles.actionBtn, { backgroundColor: BRAND.primaryLight }]}
-          onPress={() => { switchType('income'); setShowModal(true); }}
+          onPress={() => openAddModal('income')}
         >
           <Text style={styles.actionBtnText}>+ Орлого нэмэх</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.actionBtn, { backgroundColor: AppColors.danger }]}
-          onPress={() => { switchType('expense'); setShowModal(true); }}
+          onPress={() => openAddModal('expense')}
         >
           <Text style={styles.actionBtnText}>+ Зардал нэмэх</Text>
         </TouchableOpacity>
@@ -502,6 +554,9 @@ export default function FinanceScreen() {
         <Text style={styles.recordCountText}>
           Нийт: {filteredRecords.length} бүртгэл
         </Text>
+        <Text style={styles.recordHintText}>
+          Засах: товш | Устгах: удаан дар
+        </Text>
       </View>
 
       {/* Records list */}
@@ -517,7 +572,7 @@ export default function FinanceScreen() {
             const isIncome = rec.type === 'income';
             const dateStr = getDateStr(rec);
             return (
-              <View key={rec.id} style={styles.recordItem}>
+              <TouchableOpacity key={rec.id} style={styles.recordItem} onPress={() => handleEdit(rec)} onLongPress={() => handleDelete(rec)}>
                 <View style={[styles.recordEmojiBox, {
                   backgroundColor: isIncome ? '#e8f5e9' : '#ffebee',
                 }]}>
@@ -528,10 +583,20 @@ export default function FinanceScreen() {
                   {rec.note ? <Text style={styles.recordNote} numberOfLines={1}>{rec.note}</Text> : null}
                   <Text style={styles.recordDate}>{dateStr}</Text>
                 </View>
-                <Text style={[styles.recordAmount, { color: isIncome ? BRAND.primary : AppColors.danger }]}>
-                  {isIncome ? '+' : '-'}{formatPrice(rec.amount)}
-                </Text>
-              </View>
+                <View style={styles.recordRight}>
+                  <Text style={[styles.recordAmount, { color: isIncome ? BRAND.primary : AppColors.danger }]}>
+                    {isIncome ? '+' : '-'}{formatPrice(rec.amount)}
+                  </Text>
+                  <View style={styles.recordActions}>
+                    <TouchableOpacity onPress={() => handleEdit(rec)} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+                      <Text style={styles.recordActionEdit}>✏️</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => handleDelete(rec)} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+                      <Text style={styles.recordActionDelete}>🗑️</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </TouchableOpacity>
             );
           })
         )}
@@ -543,7 +608,7 @@ export default function FinanceScreen() {
 
   const renderReport = () => {
     const { monthlyProfit, incomeByCat, expenseByCat, totalInc, totalExp, profit } = reportData;
-    const totalAnimals = 100; // Approximate total head from records context
+    const totalAnimals = profitability?.total_head || 0;
     const perAnimalIncome = totalAnimals > 0 ? Math.round(totalInc / totalAnimals) : 0;
     const perAnimalExpense = totalAnimals > 0 ? Math.round(totalExp / totalAnimals) : 0;
     const perAnimalProfit = totalAnimals > 0 ? Math.round(profit / totalAnimals) : 0;
@@ -682,7 +747,9 @@ export default function FinanceScreen() {
         <View style={styles.sectionCard}>
           <Text style={styles.sectionCardTitle}>🐄 Ашиг шимийн тооцоо</Text>
           <Text style={styles.perAnimalNote}>
-            * Тооцоолол нь нийт {totalAnimals} толгой малд суурилсан ойролцоо утга
+            {totalAnimals > 0
+              ? `* Нийт ${totalAnimals} толгой малын бүртгэлд суурилсан тооцоо`
+              : '* Малын бүртгэл оруулснаар нэг малд ноогдох тооцоо гарна'}
           </Text>
           <View style={styles.perAnimalGrid}>
             <View style={[styles.perAnimalBox, { backgroundColor: '#e8f5e9' }]}>
@@ -738,7 +805,9 @@ export default function FinanceScreen() {
           <View style={styles.modalContent}>
             <View style={styles.modalHandle} />
             <Text style={styles.modalTitle}>
-              {recordType === 'income' ? '📈 Орлого нэмэх' : '📉 Зардал нэмэх'}
+              {editingRecord
+                ? (recordType === 'income' ? '📈 Орлого засах' : '📉 Зардал засах')
+                : (recordType === 'income' ? '📈 Орлого нэмэх' : '📉 Зардал нэмэх')}
             </Text>
 
             {/* Type toggle */}
@@ -798,16 +867,16 @@ export default function FinanceScreen() {
             />
 
             <View style={styles.modalActions}>
-              <TouchableOpacity style={styles.cancelBtn} onPress={() => setShowModal(false)}>
+              <TouchableOpacity style={styles.cancelBtn} onPress={() => { setShowModal(false); setEditingRecord(null); }}>
                 <Text style={styles.cancelBtnText}>Болих</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.saveBtn, {
                   backgroundColor: recordType === 'income' ? BRAND.primaryLight : AppColors.danger,
                 }]}
-                onPress={handleAdd}
+                onPress={handleSave}
               >
-                <Text style={styles.saveBtnText}>✓ Бүртгэх</Text>
+                <Text style={styles.saveBtnText}>{editingRecord ? '✓ Хадгалах' : '✓ Бүртгэх'}</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -950,8 +1019,9 @@ const styles = StyleSheet.create({
   monthChipText: { fontSize: 12, fontWeight: '600', color: AppColors.grayDark },
   monthChipTextActive: { color: AppColors.white },
 
-  recordCountRow: { paddingHorizontal: 20, marginBottom: 8 },
+  recordCountRow: { paddingHorizontal: 20, marginBottom: 8, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   recordCountText: { fontSize: 12, color: AppColors.gray, fontWeight: '500' },
+  recordHintText: { fontSize: 10, color: AppColors.gray, fontStyle: 'italic' },
 
   section: { paddingHorizontal: 16 },
   emptyBox: { alignItems: 'center', paddingVertical: 40 },
@@ -984,7 +1054,11 @@ const styles = StyleSheet.create({
   recordCat: { fontSize: 14, fontWeight: '600', color: AppColors.black },
   recordNote: { fontSize: 12, color: AppColors.grayDark, marginTop: 2 },
   recordDate: { fontSize: 11, color: AppColors.gray, marginTop: 2 },
+  recordRight: { alignItems: 'flex-end', gap: 4 },
   recordAmount: { fontSize: 15, fontWeight: '800' },
+  recordActions: { flexDirection: 'row', gap: 8, marginTop: 2 },
+  recordActionEdit: { fontSize: 14 },
+  recordActionDelete: { fontSize: 14 },
 
   // ─── Report ───
   yearSelector: { paddingHorizontal: 16, marginBottom: 12 },

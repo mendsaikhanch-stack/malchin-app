@@ -76,8 +76,8 @@ export default function ManageScreen() {
         setGuides(g || []);
       } else {
         const [sumRes, recRes] = await Promise.allSettled([
-          financeApi.getSummary(userId),
-          financeApi.getByUser(userId),
+          financeApi.getSummary(),
+          financeApi.getAll(),
         ]);
         if (sumRes.status === 'fulfilled') setFinSummary(sumRes.value);
         if (recRes.status === 'fulfilled') setRecords((recRes.value || []).slice(0, 10));

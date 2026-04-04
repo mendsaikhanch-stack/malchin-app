@@ -73,7 +73,7 @@ export default function HomeScreen() {
         weatherApi.getByAimag('Төв'),
         alertsApi.getAll(),
         aiApi.getTip(),
-        financeApi.getSummary(userId),
+        financeApi.getSummary(),
       ]);
 
       if (statsRes.status === 'fulfilled') {

@@ -89,12 +89,62 @@ export const diseaseApi = {
 
 // Finance
 export const financeApi = {
-  getByUser: (userId: number) =>
-    request<any>(`/finance/${userId}`),
-  getSummary: (userId: number) =>
-    request<any>(`/finance/summary/${userId}`),
-  add: (data: { user_id: number; type: string; category: string; amount: number; note?: string }) =>
+  getAll: (filters?: { type?: string; category?: string; month?: number; year?: number; from_date?: string; to_date?: string }) => {
+    const params = new URLSearchParams();
+    if (filters?.type) params.set('type', filters.type);
+    if (filters?.category) params.set('category', filters.category);
+    if (filters?.month) params.set('month', String(filters.month));
+    if (filters?.year) params.set('year', String(filters.year));
+    if (filters?.from_date) params.set('from_date', filters.from_date);
+    if (filters?.to_date) params.set('to_date', filters.to_date);
+    return request<any>(`/finance?${params}`);
+  },
+  getById: (id: number) => request<any>(`/finance/record/${id}`),
+  add: (data: { type: string; category: string; amount: number; note?: string; record_date?: string }) =>
     request<any>('/finance/add', { method: 'POST', body: JSON.stringify(data) }),
+  update: (id: number, data: { type?: string; category?: string; amount?: number; note?: string; record_date?: string }) =>
+    request<any>(`/finance/update/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+  delete: (id: number) =>
+    request<any>(`/finance/delete/${id}`, { method: 'DELETE' }),
+  deleteBatch: (ids: number[]) =>
+    request<any>('/finance/delete-batch', { method: 'POST', body: JSON.stringify({ ids }) }),
+  getSummary: (filters?: { year?: number; month?: number; from_date?: string; to_date?: string }) => {
+    const params = new URLSearchParams();
+    if (filters?.year) params.set('year', String(filters.year));
+    if (filters?.month) params.set('month', String(filters.month));
+    if (filters?.from_date) params.set('from_date', filters.from_date);
+    if (filters?.to_date) params.set('to_date', filters.to_date);
+    return request<any>(`/finance/summary?${params}`);
+  },
+  getMonthlySummary: (year?: number) =>
+    request<any>(`/finance/summary/monthly${year ? `?year=${year}` : ''}`),
+  getCategorySummary: (filters?: { year?: number; type?: string }) => {
+    const params = new URLSearchParams();
+    if (filters?.year) params.set('year', String(filters.year));
+    if (filters?.type) params.set('type', filters.type);
+    return request<any>(`/finance/summary/category?${params}`);
+  },
+  getProfitability: (year?: number) =>
+    request<any>(`/finance/profitability${year ? `?year=${year}` : ''}`),
+  getBudgets: (filters?: { year?: number; month?: number }) => {
+    const params = new URLSearchParams();
+    if (filters?.year) params.set('year', String(filters.year));
+    if (filters?.month) params.set('month', String(filters.month));
+    return request<any>(`/finance/budget?${params}`);
+  },
+  setBudget: (data: { year: number; month: number; category?: string; type?: string; budget_amount: number; note?: string }) =>
+    request<any>('/finance/budget', { method: 'POST', body: JSON.stringify(data) }),
+  deleteBudget: (id: number) =>
+    request<any>(`/finance/budget/${id}`, { method: 'DELETE' }),
+  compareBudget: (year?: number, month?: number) => {
+    const params = new URLSearchParams();
+    if (year) params.set('year', String(year));
+    if (month) params.set('month', String(month));
+    return request<any>(`/finance/budget/compare?${params}`);
+  },
+  getYears: () => request<any>('/finance/years'),
+  getTrend: (months?: number) =>
+    request<any>(`/finance/trend${months ? `?months=${months}` : ''}`),
 };
 
 // Market
