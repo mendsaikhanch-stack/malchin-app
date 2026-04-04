@@ -365,7 +365,7 @@ function showApp() {
 
 // Verify saved token by testing stats endpoint
 if (token) {
-  fetch(API + "/stats").then(r => {
+  fetch(API + "/stats", { headers: { "Authorization": "Bearer " + token } }).then(r => {
     if (r.ok) showApp();
     else { token = ""; localStorage.removeItem("admin_token"); }
   }).catch(() => { token = ""; localStorage.removeItem("admin_token"); });
@@ -388,7 +388,7 @@ function loadSection(name) {
 
 // ============ API HELPERS ============
 async function api(path, method = "GET", body = null) {
-  const opts = { method, headers: { "Content-Type": "application/json" } };
+  const opts = { method, headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token } };
   if (body) opts.body = JSON.stringify(body);
   const r = await fetch(API + path, opts);
   if (r.status === 401) { doLogout(); return null; }
