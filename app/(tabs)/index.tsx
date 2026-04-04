@@ -46,7 +46,7 @@ const quickActionItems = [
   { emoji: '🤰', label: 'Хээлтүүлэг', route: '/breeding' },
   { emoji: '🏥', label: 'Эрүүл мэнд', route: '/health' },
   { emoji: '🌿', label: 'Бэлчээр', route: '/pasture' },
-  { emoji: '🛡️', label: 'Даатгал', route: '/insurance' },
+  { emoji: '📰', label: 'Мэдээ', route: '/news' },
   { emoji: '👨‍👩‍👧‍👦', label: 'Өрх бүл', route: '/household' },
   { emoji: '📍', label: 'Газрын зураг', route: '/map-view' },
   { emoji: '💰', label: 'Санхүү', route: '/finance' },

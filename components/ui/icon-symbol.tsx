@@ -30,6 +30,7 @@ const MAPPING = {
   'lightbulb.fill': 'lightbulb',
   'eye.fill': 'visibility',
   'gearshape.fill': 'settings',
+  'shield.fill': 'shield',
 } as IconMapping;
 
 /**

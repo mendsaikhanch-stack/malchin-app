@@ -21,7 +21,7 @@ const BRAND = {
   bg: '#f5f7f0',
 };
 
-type TabKey = 'insurance' | 'welfare' | 'docs' | 'calc';
+type TabKey = 'insurance' | 'livestock' | 'welfare' | 'docs' | 'calc';
 
 function formatPrice(n: number): string {
   return '₮' + n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
@@ -40,6 +40,7 @@ export default function InsuranceScreen() {
 
   // Expanded items
   const [expandedInsurance, setExpandedInsurance] = useState<number | null>(null);
+  const [expandedLivestock, setExpandedLivestock] = useState<number | null>(null);
   const [expandedWelfare, setExpandedWelfare] = useState<number | null>(null);
 
   const loadData = useCallback(async () => {
@@ -97,6 +98,7 @@ export default function InsuranceScreen() {
     <View style={styles.tabBar}>
       {([
         { key: 'insurance' as TabKey, label: '🏦 НД' },
+        { key: 'livestock' as TabKey, label: '🐑 Малын' },
         { key: 'welfare' as TabKey, label: '🤝 Халамж' },
         { key: 'docs' as TabKey, label: '📄 Баримт' },
         { key: 'calc' as TabKey, label: '🧮 Тооцоо' },
@@ -266,23 +268,6 @@ export default function InsuranceScreen() {
   // ─── Tab 4: Тооцоолуур ───
   const renderCalc = () => (
     <>
-      {/* Малын даатгал руу чиглүүлэх */}
-      <TouchableOpacity
-        style={[styles.card, { borderWidth: 2, borderColor: BRAND.primaryLight }]}
-        onPress={() => router.push('/(tabs)/livestock-insurance')}
-      >
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-          <Text style={{ fontSize: 36 }}>🐑</Text>
-          <View style={{ flex: 1 }}>
-            <Text style={[styles.sectionTitle, { marginBottom: 2 }]}>Малын даатгал</Text>
-            <Text style={{ fontSize: 12, color: AppColors.grayDark, lineHeight: 18 }}>
-              IBLI, арилжааны, зудын даатгал, тооцоолуур, бүртгүүлэх заавар
-            </Text>
-          </View>
-          <Text style={{ fontSize: 20, color: BRAND.primary }}>{'→'}</Text>
-        </View>
-      </TouchableOpacity>
-
       {/* НД шимтгэлийн тооцоолуур */}
       <View style={styles.card}>
         <Text style={styles.sectionTitle}>🧮 НД шимтгэлийн тооцоолуур</Text>
@@ -414,6 +399,62 @@ export default function InsuranceScreen() {
         {renderTabBar()}
 
         {activeTab === 'insurance' && renderInsurance()}
+        {activeTab === 'livestock' && (
+          <>
+            <TouchableOpacity
+              style={[styles.card, { borderWidth: 2, borderColor: BRAND.primaryLight }]}
+              onPress={() => router.push('/(tabs)/livestock-insurance')}
+            >
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+                <Text style={{ fontSize: 36 }}>🐑</Text>
+                <View style={{ flex: 1 }}>
+                  <Text style={[styles.sectionTitle, { marginBottom: 2 }]}>Малын даатгал - дэлгэрэнгүй</Text>
+                  <Text style={{ fontSize: 12, color: AppColors.grayDark, lineHeight: 18 }}>
+                    IBLI, арилжааны, зудын даатгал, тооцоолуур, бүртгүүлэх заавар, FAQ
+                  </Text>
+                </View>
+                <Text style={{ fontSize: 20, color: BRAND.primary }}>{'→'}</Text>
+              </View>
+            </TouchableOpacity>
+
+            {(data?.livestock_insurance || []).map((ins: any) => {
+              const isExpanded = expandedLivestock === ins.id;
+              return (
+                <TouchableOpacity key={ins.id} style={styles.card}
+                  onPress={() => setExpandedLivestock(isExpanded ? null : ins.id)} activeOpacity={0.7}>
+                  <View style={styles.cardHeader}>
+                    <Text style={styles.cardEmoji}>{ins.emoji}</Text>
+                    <View style={styles.cardHeaderInfo}>
+                      <Text style={styles.cardTitle}>{ins.title}</Text>
+                      <Text style={styles.cardDesc} numberOfLines={isExpanded ? undefined : 2}>{ins.description}</Text>
+                    </View>
+                    <Text style={styles.expandIcon}>{isExpanded ? '▲' : '▼'}</Text>
+                  </View>
+                  {isExpanded && (
+                    <View style={styles.cardBody}>
+                      <View style={styles.cardMetaRow}>
+                        <Text style={styles.cardMetaLabel}>Хэнд:</Text>
+                        <Text style={styles.cardMetaValue}>{ins.who}</Text>
+                      </View>
+                      <View style={styles.cardMetaRow}>
+                        <Text style={styles.cardMetaLabel}>Давуу тал:</Text>
+                        <Text style={styles.cardMetaValue}>{ins.benefit}</Text>
+                      </View>
+                      <View style={styles.detailsBox}>
+                        {ins.details?.map((d: any, idx: number) => (
+                          <View key={idx} style={styles.detailRow}>
+                            <Text style={styles.detailLabel}>{d.label}</Text>
+                            <Text style={styles.detailValue}>{d.value}</Text>
+                          </View>
+                        ))}
+                      </View>
+                    </View>
+                  )}
+                </TouchableOpacity>
+              );
+            })}
+          </>
+        )}
         {activeTab === 'welfare' && renderWelfare()}
         {activeTab === 'docs' && renderDocs()}
         {activeTab === 'calc' && renderCalc()}
