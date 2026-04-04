@@ -18,7 +18,7 @@ import { AppColors } from '@/constants/theme';
 import { marketApi, pricesApi } from '@/services/api';
 import { AdBanner } from '@/components/ad-banner';
 
-const tabs = ['Ханш', 'Түүхий эд', 'Зарууд'];
+const tabs = ['Ханш', 'Түүхий эд', 'Зарууд', 'Миний зар'];
 
 const itemTypeLabels: Record<string, string> = {
   livestock: 'Мах',
@@ -83,7 +83,9 @@ export default function MarketScreen() {
 
   // Зарууд
   const [listings, setListings] = useState<any[]>([]);
+  const [myListings, setMyListings] = useState<any[]>([]);
   const [showModal, setShowModal] = useState(false);
+  const [editingId, setEditingId] = useState<number | null>(null);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [selectedAnimal, setSelectedAnimal] = useState('sheep');
@@ -92,6 +94,9 @@ export default function MarketScreen() {
   const [location, setLocation] = useState('');
   const [phone, setPhone] = useState('');
   const [imageUrl, setImageUrl] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filterAnimal, setFilterAnimal] = useState('');
+  const [sortBy, setSortBy] = useState('');
 
   const userId = 1;
 
@@ -115,8 +120,19 @@ export default function MarketScreen() {
 
   const loadListings = async () => {
     try {
-      const data = await marketApi.getAll();
+      const params: any = {};
+      if (searchQuery.trim()) params.search = searchQuery.trim();
+      if (filterAnimal) params.animal_type = filterAnimal;
+      if (sortBy) params.sort = sortBy;
+      const data = await marketApi.getAll(params);
       setListings(data || []);
+    } catch {} finally { setLoading(false); setRefreshing(false); }
+  };
+
+  const loadMyListings = async () => {
+    try {
+      const data = await marketApi.getByUser(userId);
+      setMyListings(data || []);
     } catch {} finally { setLoading(false); setRefreshing(false); }
   };
 
@@ -124,20 +140,67 @@ export default function MarketScreen() {
     setLoading(true);
     if (activeTab === 0) loadPrices();
     else if (activeTab === 1) loadRawMaterials();
-    else loadListings();
+    else if (activeTab === 2) loadListings();
+    else loadMyListings();
   };
 
-  useEffect(() => { loadData(); }, [activeTab, selectedRegion, selectedType, selectedMaterial]);
+  useEffect(() => { loadData(); }, [activeTab, selectedRegion, selectedType, selectedMaterial, filterAnimal, sortBy]);
   const onRefresh = () => { setRefreshing(true); loadData(); };
+
+  const resetForm = () => {
+    setTitle(''); setDescription(''); setQuantity(''); setPrice('');
+    setLocation(''); setPhone(''); setImageUrl(''); setSelectedAnimal('sheep');
+    setEditingId(null);
+  };
 
   const handleCreate = async () => {
     if (!title.trim()) { Alert.alert('Алдаа', 'Гарчиг оруулна уу'); return; }
     try {
-      await marketApi.create({ user_id: userId, title: title.trim(), description: description.trim(), animal_type: selectedAnimal, quantity: parseInt(quantity) || 0, price: parseInt(price) || 0, location: location.trim(), phone: phone.trim(), image_url: imageUrl.trim() || undefined });
-      setShowModal(false); setTitle(''); setDescription(''); setQuantity(''); setPrice(''); setLocation(''); setPhone(''); setImageUrl('');
-      loadListings();
-    } catch { Alert.alert('Алдаа', 'Зар нэмэхэд алдаа гарлаа'); }
+      const payload = { user_id: userId, title: title.trim(), description: description.trim(), animal_type: selectedAnimal, quantity: parseInt(quantity) || 0, price: parseInt(price) || 0, location: location.trim(), phone: phone.trim(), image_url: imageUrl.trim() || undefined };
+      if (editingId) {
+        await marketApi.update(editingId, payload);
+      } else {
+        await marketApi.create(payload);
+      }
+      setShowModal(false); resetForm();
+      loadListings(); if (activeTab === 3) loadMyListings();
+    } catch { Alert.alert('Алдаа', editingId ? 'Зар засахад алдаа гарлаа' : 'За�� нэмэхэд алдаа гарлаа'); }
   };
+
+  const handleEdit = (item: any) => {
+    setEditingId(item.id);
+    setTitle(item.title || '');
+    setDescription(item.description || '');
+    setSelectedAnimal(item.animal_type || 'sheep');
+    setQuantity(String(item.quantity || ''));
+    setPrice(String(item.price || ''));
+    setLocation(item.location || '');
+    setPhone(item.phone || '');
+    setImageUrl(item.image_url || '');
+    setShowModal(true);
+  };
+
+  const handleDelete = (id: number) => {
+    Alert.alert('Устгах', 'Энэ зарыг устгах уу?', [
+      { text: 'Болих', style: 'cancel' },
+      { text: 'Устгах', style: 'destructive', onPress: async () => {
+        try { await marketApi.delete(id); loadListings(); loadMyListings(); }
+        catch { Alert.alert('Алдаа', 'Устгахад алдаа гарлаа'); }
+      }},
+    ]);
+  };
+
+  const handleStatusChange = (id: number, newStatus: string) => {
+    Alert.alert('Статус', newStatus === 'sold' ? 'Зарагдсан гэж тэмдэглэх үү?' : 'Идэвхтэй болгох уу?', [
+      { text: 'Болих', style: 'cancel' },
+      { text: 'Тийм', onPress: async () => {
+        try { await marketApi.updateStatus(id, newStatus); loadMyListings(); }
+        catch { Alert.alert('Алдаа'); }
+      }},
+    ]);
+  };
+
+  const handleSearch = () => { setLoading(true); loadListings(); };
 
   // Group prices by market
   const groupedPrices: Record<string, any[]> = {};
@@ -280,9 +343,105 @@ export default function MarketScreen() {
     });
   };
 
+  const renderListingCard = (item: any, showActions = false) => {
+    const animal = animalInfo(item.animal_type);
+    const isSold = item.status === 'sold';
+    return (
+      <View key={item.id} style={[styles.listingCard, isSold && { opacity: 0.6 }]}>
+        {isSold && (
+          <View style={styles.soldBadge}><Text style={styles.soldBadgeText}>ЗАРАГДСАН</Text></View>
+        )}
+        {item.image_url ? (
+          <Image source={{ uri: item.image_url }} style={styles.listingImage} resizeMode="cover" />
+        ) : null}
+        <View style={styles.listingHeader}>
+          <Text style={{ fontSize: 32, marginRight: 12 }}>{animal.emoji}</Text>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.listingTitle}>{item.title}</Text>
+            <Text style={styles.listingMeta}>{animal.label} · {item.quantity} толгой</Text>
+          </View>
+          <View style={styles.priceBadge}><Text style={styles.priceText}>₮{fmt(item.price)}</Text></View>
+        </View>
+        {item.description ? <Text style={styles.listingDesc}>{item.description}</Text> : null}
+        <View style={styles.listingContactRow}>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.footerText}>📍 {item.location || '-'}</Text>
+            <Text style={styles.footerText}>{item.created_at?.split(' ')[0]}</Text>
+          </View>
+          {item.phone ? (
+            <TouchableOpacity style={styles.listingCallBtn} onPress={() => handleCallListing(item.phone)}>
+              <Text style={styles.listingCallBtnText}>📞 Утасдах</Text>
+            </TouchableOpacity>
+          ) : null}
+        </View>
+        {item.phone ? <Text style={styles.listingPhone}>📱 {item.phone}</Text> : null}
+        {showActions && (
+          <View style={styles.listingActions}>
+            <TouchableOpacity style={styles.actionBtnEdit} onPress={() => handleEdit(item)}>
+              <Text style={styles.actionBtnEditText}>✏️ Засах</Text>
+            </TouchableOpacity>
+            {item.status === 'active' ? (
+              <TouchableOpacity style={styles.actionBtnSold} onPress={() => handleStatusChange(item.id, 'sold')}>
+                <Text style={styles.actionBtnSoldText}>✅ Зарагдсан</Text>
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity style={styles.actionBtnSold} onPress={() => handleStatusChange(item.id, 'active')}>
+                <Text style={styles.actionBtnSoldText}>🔄 Идэвхжүүлэх</Text>
+              </TouchableOpacity>
+            )}
+            <TouchableOpacity style={styles.actionBtnDel} onPress={() => handleDelete(item.id)}>
+              <Text style={styles.actionBtnDelText}>🗑️</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+      </View>
+    );
+  };
+
   const renderListings = () => (
     <>
-      <TouchableOpacity style={styles.addListingBtn} onPress={() => setShowModal(true)}>
+      {/* Хайлт */}
+      <View style={styles.searchRow}>
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Хайх... (жнь: хонь, үхэр)"
+          placeholderTextColor={AppColors.gray}
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+          onSubmitEditing={handleSearch}
+          returnKeyType="search"
+        />
+        <TouchableOpacity style={styles.searchBtn} onPress={handleSearch}>
+          <Text style={styles.searchBtnText}>🔍</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Шүүлтүүр */}
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterScroll} contentContainerStyle={styles.filterContent}>
+        <TouchableOpacity style={[styles.chip, !filterAnimal && styles.chipActive]} onPress={() => setFilterAnimal('')}>
+          <Text style={[styles.chipText, !filterAnimal && styles.chipTextActive]}>Бүгд</Text>
+        </TouchableOpacity>
+        {animalTypes.map((a) => (
+          <TouchableOpacity key={a.key} style={[styles.chip, filterAnimal === a.key && styles.chipActive]} onPress={() => setFilterAnimal(filterAnimal === a.key ? '' : a.key)}>
+            <Text style={[styles.chipText, filterAnimal === a.key && styles.chipTextActive]}>{a.emoji} {a.label}</Text>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
+
+      {/* Эрэмбэлэх */}
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterScroll2} contentContainerStyle={styles.filterContent}>
+        <TouchableOpacity style={[styles.chipSmall, !sortBy && styles.chipSmallActive]} onPress={() => setSortBy('')}>
+          <Text style={[styles.chipSmallText, !sortBy && styles.chipSmallTextActive]}>Шинэ</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={[styles.chipSmall, sortBy === 'price_asc' && styles.chipSmallActive]} onPress={() => setSortBy('price_asc')}>
+          <Text style={[styles.chipSmallText, sortBy === 'price_asc' && styles.chipSmallTextActive]}>Үнэ ↑</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={[styles.chipSmall, sortBy === 'price_desc' && styles.chipSmallActive]} onPress={() => setSortBy('price_desc')}>
+          <Text style={[styles.chipSmallText, sortBy === 'price_desc' && styles.chipSmallTextActive]}>Үнэ ↓</Text>
+        </TouchableOpacity>
+      </ScrollView>
+
+      <TouchableOpacity style={styles.addListingBtn} onPress={() => { resetForm(); setShowModal(true); }}>
         <Text style={styles.addListingText}>+ Зар нэмэх</Text>
       </TouchableOpacity>
       {listings.length === 0 ? (
@@ -291,46 +450,24 @@ export default function MarketScreen() {
           <Text style={styles.emptyTitle}>Зар байхгүй</Text>
         </View>
       ) : (
-        listings.map((item: any) => {
-          const animal = animalInfo(item.animal_type);
-          return (
-            <View key={item.id} style={styles.listingCard}>
-              {item.image_url ? (
-                <Image
-                  source={{ uri: item.image_url }}
-                  style={styles.listingImage}
-                  resizeMode="cover"
-                />
-              ) : null}
-              <View style={styles.listingHeader}>
-                <Text style={{ fontSize: 32, marginRight: 12 }}>{animal.emoji}</Text>
-                <View style={{ flex: 1 }}>
-                  <Text style={styles.listingTitle}>{item.title}</Text>
-                  <Text style={styles.listingMeta}>{animal.label} · {item.quantity} толгой</Text>
-                </View>
-                <View style={styles.priceBadge}><Text style={styles.priceText}>₮{fmt(item.price)}</Text></View>
-              </View>
-              {item.description ? <Text style={styles.listingDesc}>{item.description}</Text> : null}
-              <View style={styles.listingContactRow}>
-                <View style={{ flex: 1 }}>
-                  <Text style={styles.footerText}>📍 {item.location || '-'}</Text>
-                  <Text style={styles.footerText}>{item.created_at?.split(' ')[0]}</Text>
-                </View>
-                {item.phone ? (
-                  <TouchableOpacity
-                    style={styles.listingCallBtn}
-                    onPress={() => handleCallListing(item.phone)}
-                  >
-                    <Text style={styles.listingCallBtnText}>📞 Утасдах</Text>
-                  </TouchableOpacity>
-                ) : null}
-              </View>
-              {item.phone ? (
-                <Text style={styles.listingPhone}>📱 {item.phone}</Text>
-              ) : null}
-            </View>
-          );
-        })
+        listings.map((item: any) => renderListingCard(item))
+      )}
+    </>
+  );
+
+  const renderMyListings = () => (
+    <>
+      <TouchableOpacity style={styles.addListingBtn} onPress={() => { resetForm(); setShowModal(true); }}>
+        <Text style={styles.addListingText}>+ Шинэ зар нэмэх</Text>
+      </TouchableOpacity>
+      {myListings.length === 0 ? (
+        <View style={styles.emptyCard}>
+          <Text style={{ fontSize: 40 }}>📋</Text>
+          <Text style={styles.emptyTitle}>Танд зар байхгүй</Text>
+          <Text style={styles.emptySubtext}>Мал, бүтээгдэхүүнээ зарахын тулд зар нэмнэ ү��</Text>
+        </View>
+      ) : (
+        myListings.map((item: any) => renderListingCard(item, true))
       )}
     </>
   );
@@ -360,6 +497,7 @@ export default function MarketScreen() {
             {activeTab === 0 && renderPrices()}
             {activeTab === 1 && renderRawMaterials()}
             {activeTab === 2 && renderListings()}
+            {activeTab === 3 && renderMyListings()}
           </>
         )}
         <AdBanner placement="market" />
@@ -371,7 +509,7 @@ export default function MarketScreen() {
         <View style={styles.modalOverlay}>
           <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-end' }}>
             <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>Зар нэмэх</Text>
+              <Text style={styles.modalTitle}>{editingId ? 'Зар засах' : 'Зар нэмэх'}</Text>
               <Text style={styles.label}>Малын төрөл</Text>
               <View style={styles.typeSelector}>
                 {animalTypes.map((a) => (
@@ -396,8 +534,8 @@ export default function MarketScreen() {
               <Text style={styles.label}>Зургийн холбоос (заавал биш)</Text>
               <TextInput style={styles.input} value={imageUrl} onChangeText={setImageUrl} placeholder="https://..." placeholderTextColor={AppColors.gray} autoCapitalize="none" keyboardType="url" />
               <View style={{ flexDirection: 'row', gap: 10, marginTop: 20 }}>
-                <TouchableOpacity style={styles.cancelBtn} onPress={() => setShowModal(false)}><Text style={styles.cancelBtnText}>Болих</Text></TouchableOpacity>
-                <TouchableOpacity style={styles.saveBtn} onPress={handleCreate}><Text style={styles.saveBtnText}>Нийтлэх</Text></TouchableOpacity>
+                <TouchableOpacity style={styles.cancelBtn} onPress={() => { setShowModal(false); resetForm(); }}><Text style={styles.cancelBtnText}>Болих</Text></TouchableOpacity>
+                <TouchableOpacity style={styles.saveBtn} onPress={handleCreate}><Text style={styles.saveBtnText}>{editingId ? 'Хадгалах' : 'Нийтлэх'}</Text></TouchableOpacity>
               </View>
             </View>
           </ScrollView>
@@ -477,4 +615,22 @@ const styles = StyleSheet.create({
   cancelBtnText: { fontSize: 15, fontWeight: '600', color: AppColors.grayDark },
   saveBtn: { flex: 1, padding: 14, borderRadius: 12, backgroundColor: AppColors.primary, alignItems: 'center' },
   saveBtnText: { fontSize: 15, fontWeight: '700', color: AppColors.white },
+  // Search
+  searchRow: { flexDirection: 'row', marginHorizontal: 16, marginTop: 12, gap: 8 },
+  searchInput: { flex: 1, borderWidth: 1.5, borderColor: AppColors.grayMedium, borderRadius: 12, padding: 12, fontSize: 14, color: AppColors.black, backgroundColor: '#FAFAFA' },
+  searchBtn: { backgroundColor: AppColors.primary, borderRadius: 12, paddingHorizontal: 16, justifyContent: 'center' },
+  searchBtnText: { fontSize: 18 },
+  // Listing actions
+  listingActions: { flexDirection: 'row', gap: 8, marginTop: 10, paddingTop: 10, borderTopWidth: 1, borderTopColor: '#F0F0F0' },
+  actionBtnEdit: { flex: 1, paddingVertical: 10, borderRadius: 10, backgroundColor: '#E3F2FD', alignItems: 'center' },
+  actionBtnEditText: { fontSize: 13, fontWeight: '700', color: '#1565C0' },
+  actionBtnSold: { flex: 1, paddingVertical: 10, borderRadius: 10, backgroundColor: '#E8F5E9', alignItems: 'center' },
+  actionBtnSoldText: { fontSize: 13, fontWeight: '700', color: '#2E7D32' },
+  actionBtnDel: { paddingVertical: 10, paddingHorizontal: 16, borderRadius: 10, backgroundColor: '#FFEBEE', alignItems: 'center' },
+  actionBtnDelText: { fontSize: 16 },
+  // Sold badge
+  soldBadge: { position: 'absolute', top: 10, right: 10, zIndex: 1, backgroundColor: '#E65100', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 4 },
+  soldBadgeText: { fontSize: 10, fontWeight: '800', color: AppColors.white },
+  // Empty subtext
+  emptySubtext: { fontSize: 13, color: AppColors.gray, marginTop: 4, textAlign: 'center' },
 });

@@ -162,14 +162,27 @@ export const insuranceApi = {
     cachedRequest<any>(`/insurance/documents${type ? `?type=${type}` : ''}`, 'insurance'),
   getContacts: () => cachedRequest<any>('/insurance/contacts', 'insurance'),
   calculate: (income: number) => request<any>(`/insurance/calculate?income=${income}`),
+  livestockCalc: (bod: number, bog: number) =>
+    request<any>(`/insurance/livestock-calc?bod=${bod}&bog=${bog}`),
 };
 
 // Market
 export const marketApi = {
-  getAll: () =>
-    request<any>('/market'),
+  getAll: (params?: { animal_type?: string; search?: string; min_price?: number; max_price?: number; location?: string; sort?: string }) => {
+    const qs = params ? '?' + Object.entries(params).filter(([, v]) => v !== undefined && v !== '').map(([k, v]) => `${k}=${encodeURIComponent(String(v))}`).join('&') : '';
+    return request<any>(`/market${qs}`);
+  },
+  getById: (id: number) => request<any>(`/market/${id}`),
+  getByUser: (userId: number) => request<any>(`/market/user/${userId}`),
   create: (data: any) =>
     request<any>('/market/create', { method: 'POST', body: JSON.stringify(data) }),
+  update: (id: number, data: any) =>
+    request<any>(`/market/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+  delete: (id: number) =>
+    request<any>(`/market/${id}`, { method: 'DELETE' }),
+  updateStatus: (id: number, status: string) =>
+    request<any>(`/market/${id}/status`, { method: 'PUT', body: JSON.stringify({ status }) }),
+  getStats: () => cachedRequest<any>('/market/stats/summary', 'market'),
 };
 
 // Alerts

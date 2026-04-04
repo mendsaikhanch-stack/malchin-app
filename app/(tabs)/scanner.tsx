@@ -8,8 +8,11 @@ import {
   TextInput,
   Alert,
   ActivityIndicator,
+  Share,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
+import * as Clipboard from 'expo-clipboard';
 import { AppColors } from '@/constants/theme';
 import { animalsApi } from '@/services/api';
 
@@ -73,11 +76,32 @@ function formatDate(d: string): string {
 // ─── Main Component ──────────────────────────────────────────────────────────
 
 export default function ScannerScreen() {
+  const router = useRouter();
   const [searchText, setSearchText] = useState('');
   const [loading, setLoading] = useState(false);
   const [animal, setAnimal] = useState<any>(null);
   const [notFound, setNotFound] = useState(false);
   const [recentLookups, setRecentLookups] = useState<{ tag: string; name: string; emoji: string }[]>([]);
+  const [batchMode, setBatchMode] = useState(false);
+  const [batchResults, setBatchResults] = useState<any[]>([]);
+
+  const lookupAnimal = async (query: string) => {
+    try {
+      const lookupResult = await animalsApi.lookup(query);
+      if (!lookupResult || (!lookupResult.id && !lookupResult.animal)) return null;
+      const animalData = lookupResult.animal || lookupResult;
+      let fullData = animalData;
+      if (animalData.id) {
+        try {
+          const detailed = await animalsApi.getById(animalData.id);
+          if (detailed) fullData = detailed.animal || detailed;
+        } catch {}
+      }
+      return fullData;
+    } catch {
+      return null;
+    }
+  };
 
   const handleSearch = useCallback(async (tag?: string) => {
     const query = (tag || searchText).trim();
@@ -87,55 +111,37 @@ export default function ScannerScreen() {
     }
 
     setLoading(true);
+
+    if (batchMode) {
+      // Batch mode: олон дугаарыг таслалаар тусгаарлан хайна
+      const tags = query.split(/[,;\s\n]+/).filter(Boolean);
+      const results: any[] = [];
+      for (const t of tags) {
+        const result = await lookupAnimal(t.trim());
+        results.push({ tag: t.trim(), animal: result, found: !!result });
+      }
+      setBatchResults(results);
+      setLoading(false);
+      return;
+    }
+
     setAnimal(null);
     setNotFound(false);
 
-    try {
-      // Step 1: lookup by tag/chip
-      const lookupResult = await animalsApi.lookup(query);
-      if (!lookupResult || (!lookupResult.id && !lookupResult.animal)) {
-        setNotFound(true);
-        return;
-      }
-
-      const animalData = lookupResult.animal || lookupResult;
-
-      // Step 2: get full details with genealogy, health, vaccinations
-      let fullData = animalData;
-      if (animalData.id) {
-        try {
-          const detailed = await animalsApi.getById(animalData.id);
-          if (detailed) {
-            fullData = detailed.animal || detailed;
-          }
-        } catch {
-          // Use lookup data if getById fails
-        }
-      }
-
+    const fullData = await lookupAnimal(query);
+    if (fullData) {
       setAnimal(fullData);
-
-      // Add to recent lookups
       const info = getAnimalInfo(fullData.animal_type);
-      const newEntry = {
-        tag: query,
-        name: fullData.name || info.label,
-        emoji: info.emoji,
-      };
+      const newEntry = { tag: query, name: fullData.name || info.label, emoji: info.emoji };
       setRecentLookups((prev) => {
         const filtered = prev.filter((r) => r.tag !== query);
         return [newEntry, ...filtered].slice(0, 5);
       });
-    } catch (err: any) {
-      if (err?.status === 404 || err?.message?.includes('404') || err?.message?.includes('not found')) {
-        setNotFound(true);
-      } else {
-        setNotFound(true);
-      }
-    } finally {
-      setLoading(false);
+    } else {
+      setNotFound(true);
     }
-  }, [searchText]);
+    setLoading(false);
+  }, [searchText, batchMode]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -159,7 +165,7 @@ export default function ScannerScreen() {
               <Text style={styles.searchIcon}>🏷️</Text>
               <TextInput
                 style={styles.searchInput}
-                placeholder="Ээмэг/чип дугаар оруулна уу"
+                placeholder={batchMode ? "Дугааруудыг таслалаар тусгаарлана (жнь: MN001, MN002)" : "Ээмэг/чип дугаар оруулна уу"}
                 placeholderTextColor={AppColors.gray}
                 value={searchText}
                 onChangeText={setSearchText}
@@ -167,6 +173,7 @@ export default function ScannerScreen() {
                 returnKeyType="search"
                 autoCapitalize="characters"
                 autoCorrect={false}
+                multiline={batchMode}
               />
             </View>
             <TouchableOpacity
@@ -182,13 +189,21 @@ export default function ScannerScreen() {
             </TouchableOpacity>
           </View>
 
-          {/* Future scanner button */}
-          <TouchableOpacity style={styles.scannerButton} disabled activeOpacity={1}>
-            <Text style={styles.scannerButtonText}>📷 Сканнер</Text>
-            <View style={styles.comingSoonBadge}>
-              <Text style={styles.comingSoonText}>Удахгүй</Text>
-            </View>
-          </TouchableOpacity>
+          {/* Batch mode toggle */}
+          <View style={styles.modeRow}>
+            <TouchableOpacity
+              style={[styles.modeBtn, !batchMode && styles.modeBtnActive]}
+              onPress={() => { setBatchMode(false); setBatchResults([]); }}
+            >
+              <Text style={[styles.modeBtnText, !batchMode && styles.modeBtnTextActive]}>🔍 Нэг хайлт</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.modeBtn, batchMode && styles.modeBtnActive]}
+              onPress={() => { setBatchMode(true); setAnimal(null); setNotFound(false); }}
+            >
+              <Text style={[styles.modeBtnText, batchMode && styles.modeBtnTextActive]}>📋 Олон хайлт</Text>
+            </TouchableOpacity>
+          </View>
         </View>
 
         {/* Recent Lookups */}
@@ -234,7 +249,69 @@ export default function ScannerScreen() {
         )}
 
         {/* Animal Result Card */}
-        {animal && !loading && <AnimalDetailCard animal={animal} />}
+        {animal && !loading && <AnimalDetailCard animal={animal} router={router} />}
+
+        {/* Batch Results */}
+        {batchMode && batchResults.length > 0 && !loading && (
+          <View style={styles.batchSection}>
+            <Text style={styles.batchTitle}>
+              📋 Хайлтын үр дүн ({batchResults.filter(r => r.found).length}/{batchResults.length} олдсон)
+            </Text>
+            {batchResults.map((r, i) => {
+              const info = r.animal ? getAnimalInfo(r.animal.animal_type) : { emoji: '❓', label: '' };
+              const status = r.animal ? (statusLabels[r.animal.status] || statusLabels.active) : null;
+              return (
+                <TouchableOpacity
+                  key={i}
+                  style={[styles.batchItem, !r.found && styles.batchItemNotFound]}
+                  onPress={() => {
+                    if (r.found) {
+                      setBatchMode(false);
+                      setAnimal(r.animal);
+                      setSearchText(r.tag);
+                    }
+                  }}
+                >
+                  <Text style={styles.batchEmoji}>{r.found ? info.emoji : '❌'}</Text>
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.batchTag}>{r.tag}</Text>
+                    {r.found ? (
+                      <Text style={styles.batchInfo}>
+                        {r.animal.name || info.label} · {r.animal.breed || ''} · {genderLabels[r.animal.gender] || ''}
+                      </Text>
+                    ) : (
+                      <Text style={styles.batchNotFoundText}>Олдсонгүй</Text>
+                    )}
+                  </View>
+                  {status && (
+                    <View style={[styles.batchStatusBadge, { backgroundColor: status.bg }]}>
+                      <Text style={[styles.batchStatusText, { color: status.color }]}>{status.label}</Text>
+                    </View>
+                  )}
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+        )}
+
+        {/* Шуурхай үйлдлүүд */}
+        {!animal && !loading && !notFound && batchResults.length === 0 && (
+          <View style={styles.quickActions}>
+            <Text style={styles.quickActionsTitle}>⚡ Шуурхай үйлдлүүд</Text>
+            <TouchableOpacity style={styles.quickActionBtn} onPress={() => router.push('/(tabs)/livestock')}>
+              <Text style={styles.quickActionEmoji}>🐑</Text>
+              <Text style={styles.quickActionLabel}>Мал бүртгэл</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.quickActionBtn} onPress={() => router.push('/(tabs)/health')}>
+              <Text style={styles.quickActionEmoji}>🏥</Text>
+              <Text style={styles.quickActionLabel}>Эрүүл мэнд</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.quickActionBtn} onPress={() => router.push('/(tabs)/breeding')}>
+              <Text style={styles.quickActionEmoji}>🤰</Text>
+              <Text style={styles.quickActionLabel}>Үржил</Text>
+            </TouchableOpacity>
+          </View>
+        )}
       </ScrollView>
     </SafeAreaView>
   );
@@ -242,7 +319,7 @@ export default function ScannerScreen() {
 
 // ─── Animal Detail Card ──────────────────────────────────────────────────────
 
-function AnimalDetailCard({ animal }: { animal: any }) {
+function AnimalDetailCard({ animal, router }: { animal: any; router: any }) {
   const info = getAnimalInfo(animal.animal_type);
   const status = statusLabels[animal.status] || statusLabels.active;
   const genealogy = animal.genealogy || {};
@@ -359,15 +436,39 @@ function AnimalDetailCard({ animal }: { animal: any }) {
       <View style={styles.actionButtons}>
         <TouchableOpacity
           style={styles.editButton}
-          onPress={() => Alert.alert('Мэдээлэл', 'Мал бүртгэл дэлгэц рүү очно уу')}
+          onPress={() => router.push('/(tabs)/livestock')}
         >
           <Text style={styles.editButtonText}>✏️ Засах</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.healthButton}
-          onPress={() => Alert.alert('Мэдээлэл', 'Эрүүл мэнд дэлгэц рүү очно уу')}
+          onPress={() => router.push('/(tabs)/health')}
         >
-          <Text style={styles.healthButtonText}>🏥 Эрүүл мэнд нэмэх</Text>
+          <Text style={styles.healthButtonText}>🏥 Эрүүл мэнд</Text>
+        </TouchableOpacity>
+      </View>
+      <View style={[styles.actionButtons, { marginTop: 8, borderTopWidth: 0, paddingTop: 0 }]}>
+        <TouchableOpacity
+          style={styles.shareButton}
+          onPress={async () => {
+            const info = getAnimalInfo(animal.animal_type);
+            const text = `${info.emoji} ${animal.name || info.label}\nЭэмэг: ${animal.ear_tag || '-'}\nЧип: ${animal.chip_id || '-'}\nҮүлдэр: ${animal.breed || '-'}\nНас: ${animal.birth_date ? calcAge(animal.birth_date) : '-'}`;
+            await Share.share({ message: text });
+          }}
+        >
+          <Text style={styles.shareButtonText}>📤 Хуваалцах</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.copyButton}
+          onPress={async () => {
+            const tag = animal.ear_tag || animal.chip_id || '';
+            if (tag) {
+              await Clipboard.setStringAsync(tag);
+              Alert.alert('Хуулсан', `"${tag}" хуулагдлаа`);
+            }
+          }}
+        >
+          <Text style={styles.copyButtonText}>📋 Дугаар хуулах</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -777,4 +878,123 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#1565C0',
   },
+  shareButton: {
+    flex: 1,
+    paddingVertical: 14,
+    borderRadius: 12,
+    backgroundColor: '#FFF3E0',
+    alignItems: 'center',
+  },
+  shareButtonText: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#E65100',
+  },
+  copyButton: {
+    flex: 1,
+    paddingVertical: 14,
+    borderRadius: 12,
+    backgroundColor: '#F3E5F5',
+    alignItems: 'center',
+  },
+  copyButtonText: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#6A1B9A',
+  },
+
+  // Mode toggle
+  modeRow: {
+    flexDirection: 'row',
+    gap: 8,
+    marginTop: 12,
+  },
+  modeBtn: {
+    flex: 1,
+    paddingVertical: 12,
+    borderRadius: 12,
+    backgroundColor: '#e8ede2',
+    alignItems: 'center',
+    borderWidth: 1.5,
+    borderColor: '#d0d9c6',
+  },
+  modeBtnActive: {
+    backgroundColor: '#2d5016',
+    borderColor: '#2d5016',
+  },
+  modeBtnText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: AppColors.grayDark,
+  },
+  modeBtnTextActive: {
+    color: '#fff',
+  },
+
+  // Batch results
+  batchSection: {
+    marginHorizontal: 20,
+    marginTop: 20,
+  },
+  batchTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#1A1A1A',
+    marginBottom: 12,
+  },
+  batchItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 14,
+    marginBottom: 8,
+    gap: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.04,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  batchItemNotFound: {
+    backgroundColor: '#FFF8F8',
+    borderWidth: 1,
+    borderColor: '#FFCDD2',
+  },
+  batchEmoji: { fontSize: 28 },
+  batchTag: { fontSize: 14, fontWeight: '700', color: '#1A1A1A' },
+  batchInfo: { fontSize: 12, color: AppColors.grayDark, marginTop: 2 },
+  batchNotFoundText: { fontSize: 12, color: '#C62828', marginTop: 2 },
+  batchStatusBadge: { paddingHorizontal: 8, paddingVertical: 3, borderRadius: 8 },
+  batchStatusText: { fontSize: 10, fontWeight: '700' },
+
+  // Quick actions
+  quickActions: {
+    marginHorizontal: 20,
+    marginTop: 24,
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    padding: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  quickActionsTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#1A1A1A',
+    marginBottom: 14,
+  },
+  quickActionBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f0f0',
+    gap: 12,
+  },
+  quickActionEmoji: { fontSize: 24 },
+  quickActionLabel: { fontSize: 15, fontWeight: '600', color: '#2d5016' },
 });

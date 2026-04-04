@@ -36,6 +36,11 @@ export default function InsuranceScreen() {
   const [calcIncome, setCalcIncome] = useState('500000');
   const [calcResult, setCalcResult] = useState<any>(null);
 
+  // Livestock calculator
+  const [calcBod, setCalcBod] = useState('10');
+  const [calcBog, setCalcBog] = useState('50');
+  const [livestockCalcResult, setLivestockCalcResult] = useState<any>(null);
+
   // Expanded items
   const [expandedInsurance, setExpandedInsurance] = useState<number | null>(null);
   const [expandedLivestock, setExpandedLivestock] = useState<number | null>(null);
@@ -338,11 +343,29 @@ export default function InsuranceScreen() {
     </>
   );
 
+  const handleLivestockCalc = async () => {
+    const bod = parseInt(calcBod) || 0;
+    const bog = parseInt(calcBog) || 0;
+    try {
+      const result = await insuranceApi.livestockCalc(bod, bog);
+      setLivestockCalcResult(result);
+    } catch {
+      const bodPremium = bod * 2000;
+      const bogPremium = bog * 500;
+      setLivestockCalcResult({
+        bod_count: bod, bog_count: bog, total_head: bod + bog,
+        bod_premium: bodPremium, bog_premium: bogPremium, total_premium: bodPremium + bogPremium,
+        estimated_compensation: { bod: bod * 150000, bog: bog * 50000, total: bod * 150000 + bog * 50000 },
+      });
+    }
+  };
+
   // ─── Tab 4: Тооцоолуур ───
   const renderCalc = () => (
     <>
+      {/* НД шимтгэлийн тооцоолуур */}
       <View style={styles.card}>
-        <Text style={styles.sectionTitle}>🧮 Шимтгэлийн тооцоолуур</Text>
+        <Text style={styles.sectionTitle}>🧮 НД шимтгэлийн тооцоолуур</Text>
         <Text style={styles.calcHint}>
           Сарын орлогоо оруулбал нийгмийн даатгалын шимтгэлийг тооцоолно.
         </Text>
@@ -365,7 +388,7 @@ export default function InsuranceScreen() {
 
       {calcResult && (
         <View style={styles.card}>
-          <Text style={styles.sectionTitle}>📊 Тооцооны үр дүн</Text>
+          <Text style={styles.sectionTitle}>📊 НД тооцооны үр дүн</Text>
           <Text style={styles.calcSubtitle}>
             Сарын орлого: {formatPrice(calcResult.monthly_income)}
           </Text>
@@ -414,7 +437,93 @@ export default function InsuranceScreen() {
         </View>
       )}
 
-      {/* Хурдан тооцоо */}
+      {/* Малын даатгалын тооцоолуур */}
+      <View style={styles.card}>
+        <Text style={styles.sectionTitle}>🐑 Малын даатгалын тооцоолуур</Text>
+        <Text style={styles.calcHint}>
+          Бод, бог малын тоогоо оруулж IBLI даатгалын шимтгэл, нөхөн олговрыг тооцоолно.
+        </Text>
+
+        <View style={styles.livestockCalcRow}>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.inputLabel}>🐄 Бод мал</Text>
+            <TextInput
+              style={styles.calcInput}
+              keyboardType="numeric"
+              value={calcBod}
+              onChangeText={setCalcBod}
+              placeholder="10"
+              placeholderTextColor={AppColors.gray}
+            />
+          </View>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.inputLabel}>🐑 Бог мал</Text>
+            <TextInput
+              style={styles.calcInput}
+              keyboardType="numeric"
+              value={calcBog}
+              onChangeText={setCalcBog}
+              placeholder="50"
+              placeholderTextColor={AppColors.gray}
+            />
+          </View>
+        </View>
+        <TouchableOpacity style={[styles.calcBtn, { marginTop: 12, paddingVertical: 14, alignItems: 'center' }]} onPress={handleLivestockCalc}>
+          <Text style={styles.calcBtnText}>Тооцоолох</Text>
+        </TouchableOpacity>
+      </View>
+
+      {livestockCalcResult && (
+        <View style={styles.card}>
+          <Text style={styles.sectionTitle}>📊 Малын даатгалын тооцоо</Text>
+          <Text style={styles.calcSubtitle}>
+            Нийт: {livestockCalcResult.total_head} толгой ({livestockCalcResult.bod_count} бод + {livestockCalcResult.bog_count} бог)
+          </Text>
+
+          <View style={styles.calcResultBox}>
+            <View style={styles.calcRow}>
+              <Text style={styles.calcLabel}>🐄 Бод малын шимтгэл</Text>
+              <Text style={styles.calcValue}>{formatPrice(livestockCalcResult.bod_premium)}</Text>
+            </View>
+            <View style={styles.calcRow}>
+              <Text style={styles.calcLabel}>🐑 Бог малын шимтгэл</Text>
+              <Text style={styles.calcValue}>{formatPrice(livestockCalcResult.bog_premium)}</Text>
+            </View>
+            <View style={styles.calcDivider} />
+            <View style={styles.calcTotalRow}>
+              <Text style={styles.calcTotalLabel}>Жилийн нийт шимтгэл</Text>
+              <Text style={styles.calcTotalValue}>{formatPrice(livestockCalcResult.total_premium)}</Text>
+            </View>
+          </View>
+
+          <View style={[styles.calcResultBox, { marginTop: 10 }]}>
+            <Text style={[styles.calcLabel, { marginBottom: 8, fontWeight: '700' }]}>
+              Хорогдлын үед авах нөхөн олговор (ойролцоо):
+            </Text>
+            <View style={styles.calcRow}>
+              <Text style={styles.calcLabel}>🐄 Бод мал</Text>
+              <Text style={styles.calcValue}>{formatPrice(livestockCalcResult.estimated_compensation.bod)}</Text>
+            </View>
+            <View style={styles.calcRow}>
+              <Text style={styles.calcLabel}>🐑 Бог мал</Text>
+              <Text style={styles.calcValue}>{formatPrice(livestockCalcResult.estimated_compensation.bog)}</Text>
+            </View>
+            <View style={styles.calcDivider} />
+            <View style={styles.calcTotalRow}>
+              <Text style={styles.calcTotalLabel}>Нийт нөхөн олговор</Text>
+              <Text style={[styles.calcTotalValue, { color: '#2E7D32' }]}>{formatPrice(livestockCalcResult.estimated_compensation.total)}</Text>
+            </View>
+          </View>
+
+          <View style={styles.calcTipBox}>
+            <Text style={styles.calcTipText}>
+              💡 Аймаг/сумын хэмжээнд малын хорогдол 6%-иас давсан тохиолдолд нөхөн олговор олгоно.
+            </Text>
+          </View>
+        </View>
+      )}
+
+      {/* Түгээмэл тоо */}
       <View style={styles.card}>
         <Text style={styles.sectionTitle}>📋 Түгээмэл орлогын түвшин</Text>
         {[300000, 500000, 800000, 1000000, 1500000].map(income => {
@@ -431,6 +540,28 @@ export default function InsuranceScreen() {
             </TouchableOpacity>
           );
         })}
+      </View>
+
+      {/* Бүртгүүлэх заавар */}
+      <View style={styles.card}>
+        <Text style={styles.sectionTitle}>📝 Бүртгүүлэх алхамууд</Text>
+        {[
+          { step: '1', title: 'Сумын ЗДТГ-аас тодорхойлолт авах', desc: 'Малчин гэсэн тодорхойлолт, мал тооллогын бүртгэл (А данс)' },
+          { step: '2', title: 'НД-ын хэлтэст бүртгүүлэх', desc: 'Иргэний үнэмлэх, тодорхойлолт, банкны данс авч очих' },
+          { step: '3', title: 'Шимтгэл төлөх', desc: 'Банк, хаан банкны апп, эсвэл сумын НД байцаагчаар дамжуулан' },
+          { step: '4', title: 'Малын даатгалд хамрагдах', desc: 'Жил бүрийн 4-6 сард IBLI даатгалд бүртгүүлэх' },
+          { step: '5', title: 'E-Mongolia-д бүртгүүлэх', desc: 'Цахим үйлчилгээ ашиглан лавлагаа авах, шимтгэл шалгах' },
+        ].map((item) => (
+          <View key={item.step} style={styles.stepRow}>
+            <View style={styles.stepCircle}>
+              <Text style={styles.stepNumber}>{item.step}</Text>
+            </View>
+            <View style={styles.stepContent}>
+              <Text style={styles.stepTitle}>{item.title}</Text>
+              <Text style={styles.stepDesc}>{item.desc}</Text>
+            </View>
+          </View>
+        ))}
       </View>
     </>
   );
@@ -633,4 +764,27 @@ const styles = StyleSheet.create({
   quickCalcIncome: { flex: 1, fontSize: 14, fontWeight: '600', color: AppColors.black },
   quickCalcArrow: { fontSize: 14, color: AppColors.gray, marginHorizontal: 8 },
   quickCalcTotal: { fontSize: 14, fontWeight: '700', color: BRAND.primary },
+
+  // Livestock calc
+  livestockCalcRow: { flexDirection: 'row', gap: 12, marginTop: 4 },
+
+  // Steps
+  stepRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: 14,
+    gap: 12,
+  },
+  stepCircle: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: BRAND.primary,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  stepNumber: { fontSize: 14, fontWeight: '800', color: AppColors.white },
+  stepContent: { flex: 1 },
+  stepTitle: { fontSize: 14, fontWeight: '700', color: AppColors.black, marginBottom: 2 },
+  stepDesc: { fontSize: 12, color: AppColors.grayDark, lineHeight: 18 },
 });
