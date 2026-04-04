@@ -9,6 +9,7 @@ app.use("/users", require("./routes/users"));
 app.use("/livestock", require("./routes/livestock"));
 app.use("/market", require("./routes/market"));
 app.use("/finance", require("./routes/finance"));
+app.use("/insurance", require("./routes/insurance"));
 app.use("/weather", require("./routes/weather"));
 app.use("/ai", require("./routes/ai"));
 app.use("/alerts", require("./routes/alerts"));
