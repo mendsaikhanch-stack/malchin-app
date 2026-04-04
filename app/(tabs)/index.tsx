@@ -248,10 +248,10 @@ export default function HomeScreen() {
               <Text style={styles.insuranceEmoji}>🏥</Text>
               <Text style={styles.insuranceLabel}>ЭМД</Text>
             </View>
-            <View style={styles.insuranceItem}>
+            <TouchableOpacity style={styles.insuranceItem} onPress={() => router.push('/(tabs)/livestock-insurance')}>
               <Text style={styles.insuranceEmoji}>🐑</Text>
-              <Text style={styles.insuranceLabel}>Малын даатгал</Text>
-            </View>
+              <Text style={[styles.insuranceLabel, { color: '#2d5016', fontWeight: '700' }]}>Малын даатгал</Text>
+            </TouchableOpacity>
             <View style={styles.insuranceItem}>
               <Text style={styles.insuranceEmoji}>🤝</Text>
               <Text style={styles.insuranceLabel}>Халамж</Text>

@@ -11,6 +11,7 @@ import {
   Linking,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
 import { AppColors } from '@/constants/theme';
 import { insuranceApi } from '@/services/api';
 
@@ -20,13 +21,14 @@ const BRAND = {
   bg: '#f5f7f0',
 };
 
-type TabKey = 'insurance' | 'livestock' | 'welfare' | 'docs' | 'calc';
+type TabKey = 'insurance' | 'welfare' | 'docs' | 'calc';
 
 function formatPrice(n: number): string {
   return '₮' + n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 }
 
 export default function InsuranceScreen() {
+  const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [activeTab, setActiveTab] = useState<TabKey>('insurance');
@@ -36,14 +38,8 @@ export default function InsuranceScreen() {
   const [calcIncome, setCalcIncome] = useState('500000');
   const [calcResult, setCalcResult] = useState<any>(null);
 
-  // Livestock calculator
-  const [calcBod, setCalcBod] = useState('10');
-  const [calcBog, setCalcBog] = useState('50');
-  const [livestockCalcResult, setLivestockCalcResult] = useState<any>(null);
-
   // Expanded items
   const [expandedInsurance, setExpandedInsurance] = useState<number | null>(null);
-  const [expandedLivestock, setExpandedLivestock] = useState<number | null>(null);
   const [expandedWelfare, setExpandedWelfare] = useState<number | null>(null);
 
   const loadData = useCallback(async () => {
@@ -101,7 +97,6 @@ export default function InsuranceScreen() {
     <View style={styles.tabBar}>
       {([
         { key: 'insurance' as TabKey, label: '🏦 НД' },
-        { key: 'livestock' as TabKey, label: '🐑 Малын' },
         { key: 'welfare' as TabKey, label: '🤝 Халамж' },
         { key: 'docs' as TabKey, label: '📄 Баримт' },
         { key: 'calc' as TabKey, label: '🧮 Тооцоо' },
@@ -174,82 +169,7 @@ export default function InsuranceScreen() {
     </>
   );
 
-  // ─── Tab 2: Малын даатгал ───
-  const renderLivestockInsurance = () => {
-    const livestockTypes = data?.livestock_insurance || [];
-    const livestockDocs = data?.livestock_docs;
-    return (
-      <>
-        <View style={styles.infoBox}>
-          <Text style={styles.infoEmoji}>🐑</Text>
-          <Text style={styles.infoText}>
-            Малын даатгал нь зуд, ган, гамшгийн үед малын хорогдлын хохирлыг нөхөх зорилготой.
-          </Text>
-        </View>
-
-        {livestockTypes.map((ins: any) => {
-          const isExpanded = expandedLivestock === ins.id;
-          return (
-            <TouchableOpacity
-              key={ins.id}
-              style={styles.card}
-              onPress={() => setExpandedLivestock(isExpanded ? null : ins.id)}
-              activeOpacity={0.7}
-            >
-              <View style={styles.cardHeader}>
-                <Text style={styles.cardEmoji}>{ins.emoji}</Text>
-                <View style={styles.cardHeaderInfo}>
-                  <Text style={styles.cardTitle}>{ins.title}</Text>
-                  <Text style={styles.cardDesc} numberOfLines={isExpanded ? undefined : 2}>{ins.description}</Text>
-                </View>
-                <Text style={styles.expandIcon}>{isExpanded ? '▲' : '▼'}</Text>
-              </View>
-
-              {isExpanded && (
-                <View style={styles.cardBody}>
-                  <View style={styles.cardMetaRow}>
-                    <Text style={styles.cardMetaLabel}>Хэнд:</Text>
-                    <Text style={styles.cardMetaValue}>{ins.who}</Text>
-                  </View>
-                  <View style={styles.cardMetaRow}>
-                    <Text style={styles.cardMetaLabel}>Давуу тал:</Text>
-                    <Text style={styles.cardMetaValue}>{ins.benefit}</Text>
-                  </View>
-                  <View style={styles.detailsBox}>
-                    {ins.details?.map((d: any, idx: number) => (
-                      <View key={idx} style={styles.detailRow}>
-                        <Text style={styles.detailLabel}>{d.label}</Text>
-                        <Text style={styles.detailValue}>{d.value}</Text>
-                      </View>
-                    ))}
-                  </View>
-                </View>
-              )}
-            </TouchableOpacity>
-          );
-        })}
-
-        {livestockDocs && (
-          <View style={styles.card}>
-            <View style={styles.cardHeader}>
-              <Text style={styles.cardEmoji}>{livestockDocs.emoji}</Text>
-              <Text style={[styles.cardTitle, { flex: 1 }]}>{livestockDocs.title}</Text>
-            </View>
-            <View style={styles.docList}>
-              {livestockDocs.items?.map((item: string, idx: number) => (
-                <View key={idx} style={styles.docItem}>
-                  <Text style={styles.docBullet}>✓</Text>
-                  <Text style={styles.docText}>{item}</Text>
-                </View>
-              ))}
-            </View>
-          </View>
-        )}
-      </>
-    );
-  };
-
-  // ─── Tab 3: Халамж ───
+  // ─── Tab 2: Халамж ───
   const renderWelfare = () => (
     <>
       {welfarePrograms.map((prog: any) => {
@@ -343,26 +263,26 @@ export default function InsuranceScreen() {
     </>
   );
 
-  const handleLivestockCalc = async () => {
-    const bod = parseInt(calcBod) || 0;
-    const bog = parseInt(calcBog) || 0;
-    try {
-      const result = await insuranceApi.livestockCalc(bod, bog);
-      setLivestockCalcResult(result);
-    } catch {
-      const bodPremium = bod * 2000;
-      const bogPremium = bog * 500;
-      setLivestockCalcResult({
-        bod_count: bod, bog_count: bog, total_head: bod + bog,
-        bod_premium: bodPremium, bog_premium: bogPremium, total_premium: bodPremium + bogPremium,
-        estimated_compensation: { bod: bod * 150000, bog: bog * 50000, total: bod * 150000 + bog * 50000 },
-      });
-    }
-  };
-
   // ─── Tab 4: Тооцоолуур ───
   const renderCalc = () => (
     <>
+      {/* Малын даатгал руу чиглүүлэх */}
+      <TouchableOpacity
+        style={[styles.card, { borderWidth: 2, borderColor: BRAND.primaryLight }]}
+        onPress={() => router.push('/(tabs)/livestock-insurance')}
+      >
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+          <Text style={{ fontSize: 36 }}>🐑</Text>
+          <View style={{ flex: 1 }}>
+            <Text style={[styles.sectionTitle, { marginBottom: 2 }]}>Малын даатгал</Text>
+            <Text style={{ fontSize: 12, color: AppColors.grayDark, lineHeight: 18 }}>
+              IBLI, арилжааны, зудын даатгал, тооцоолуур, бүртгүүлэх заавар
+            </Text>
+          </View>
+          <Text style={{ fontSize: 20, color: BRAND.primary }}>{'→'}</Text>
+        </View>
+      </TouchableOpacity>
+
       {/* НД шимтгэлийн тооцоолуур */}
       <View style={styles.card}>
         <Text style={styles.sectionTitle}>🧮 НД шимтгэлийн тооцоолуур</Text>
@@ -437,92 +357,6 @@ export default function InsuranceScreen() {
         </View>
       )}
 
-      {/* Малын даатгалын тооцоолуур */}
-      <View style={styles.card}>
-        <Text style={styles.sectionTitle}>🐑 Малын даатгалын тооцоолуур</Text>
-        <Text style={styles.calcHint}>
-          Бод, бог малын тоогоо оруулж IBLI даатгалын шимтгэл, нөхөн олговрыг тооцоолно.
-        </Text>
-
-        <View style={styles.livestockCalcRow}>
-          <View style={{ flex: 1 }}>
-            <Text style={styles.inputLabel}>🐄 Бод мал</Text>
-            <TextInput
-              style={styles.calcInput}
-              keyboardType="numeric"
-              value={calcBod}
-              onChangeText={setCalcBod}
-              placeholder="10"
-              placeholderTextColor={AppColors.gray}
-            />
-          </View>
-          <View style={{ flex: 1 }}>
-            <Text style={styles.inputLabel}>🐑 Бог мал</Text>
-            <TextInput
-              style={styles.calcInput}
-              keyboardType="numeric"
-              value={calcBog}
-              onChangeText={setCalcBog}
-              placeholder="50"
-              placeholderTextColor={AppColors.gray}
-            />
-          </View>
-        </View>
-        <TouchableOpacity style={[styles.calcBtn, { marginTop: 12, paddingVertical: 14, alignItems: 'center' }]} onPress={handleLivestockCalc}>
-          <Text style={styles.calcBtnText}>Тооцоолох</Text>
-        </TouchableOpacity>
-      </View>
-
-      {livestockCalcResult && (
-        <View style={styles.card}>
-          <Text style={styles.sectionTitle}>📊 Малын даатгалын тооцоо</Text>
-          <Text style={styles.calcSubtitle}>
-            Нийт: {livestockCalcResult.total_head} толгой ({livestockCalcResult.bod_count} бод + {livestockCalcResult.bog_count} бог)
-          </Text>
-
-          <View style={styles.calcResultBox}>
-            <View style={styles.calcRow}>
-              <Text style={styles.calcLabel}>🐄 Бод малын шимтгэл</Text>
-              <Text style={styles.calcValue}>{formatPrice(livestockCalcResult.bod_premium)}</Text>
-            </View>
-            <View style={styles.calcRow}>
-              <Text style={styles.calcLabel}>🐑 Бог малын шимтгэл</Text>
-              <Text style={styles.calcValue}>{formatPrice(livestockCalcResult.bog_premium)}</Text>
-            </View>
-            <View style={styles.calcDivider} />
-            <View style={styles.calcTotalRow}>
-              <Text style={styles.calcTotalLabel}>Жилийн нийт шимтгэл</Text>
-              <Text style={styles.calcTotalValue}>{formatPrice(livestockCalcResult.total_premium)}</Text>
-            </View>
-          </View>
-
-          <View style={[styles.calcResultBox, { marginTop: 10 }]}>
-            <Text style={[styles.calcLabel, { marginBottom: 8, fontWeight: '700' }]}>
-              Хорогдлын үед авах нөхөн олговор (ойролцоо):
-            </Text>
-            <View style={styles.calcRow}>
-              <Text style={styles.calcLabel}>🐄 Бод мал</Text>
-              <Text style={styles.calcValue}>{formatPrice(livestockCalcResult.estimated_compensation.bod)}</Text>
-            </View>
-            <View style={styles.calcRow}>
-              <Text style={styles.calcLabel}>🐑 Бог мал</Text>
-              <Text style={styles.calcValue}>{formatPrice(livestockCalcResult.estimated_compensation.bog)}</Text>
-            </View>
-            <View style={styles.calcDivider} />
-            <View style={styles.calcTotalRow}>
-              <Text style={styles.calcTotalLabel}>Нийт нөхөн олговор</Text>
-              <Text style={[styles.calcTotalValue, { color: '#2E7D32' }]}>{formatPrice(livestockCalcResult.estimated_compensation.total)}</Text>
-            </View>
-          </View>
-
-          <View style={styles.calcTipBox}>
-            <Text style={styles.calcTipText}>
-              💡 Аймаг/сумын хэмжээнд малын хорогдол 6%-иас давсан тохиолдолд нөхөн олговор олгоно.
-            </Text>
-          </View>
-        </View>
-      )}
-
       {/* Түгээмэл тоо */}
       <View style={styles.card}>
         <Text style={styles.sectionTitle}>📋 Түгээмэл орлогын түвшин</Text>
@@ -580,7 +414,6 @@ export default function InsuranceScreen() {
         {renderTabBar()}
 
         {activeTab === 'insurance' && renderInsurance()}
-        {activeTab === 'livestock' && renderLivestockInsurance()}
         {activeTab === 'welfare' && renderWelfare()}
         {activeTab === 'docs' && renderDocs()}
         {activeTab === 'calc' && renderCalc()}
@@ -764,9 +597,6 @@ const styles = StyleSheet.create({
   quickCalcIncome: { flex: 1, fontSize: 14, fontWeight: '600', color: AppColors.black },
   quickCalcArrow: { fontSize: 14, color: AppColors.gray, marginHorizontal: 8 },
   quickCalcTotal: { fontSize: 14, fontWeight: '700', color: BRAND.primary },
-
-  // Livestock calc
-  livestockCalcRow: { flexDirection: 'row', gap: 12, marginTop: 4 },
 
   // Steps
   stepRow: {
