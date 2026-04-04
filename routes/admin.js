@@ -5,6 +5,24 @@ const db = require("../db");
 // ============ ADMIN AUTH ============
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "malchin2024";
 
+// Админ токен шалгах middleware
+function verifyAdmin(req, res, next) {
+  const header = req.headers.authorization;
+  if (!header || !header.startsWith("Bearer ")) {
+    return res.status(401).json({ error: "Админ нэвтрэлт шаардлагатай" });
+  }
+  try {
+    const token = header.split(" ")[1];
+    const decoded = Buffer.from(token, "base64").toString("utf-8");
+    if (!decoded.startsWith("admin:")) {
+      return res.status(403).json({ error: "Админ эрх шаардлагатай" });
+    }
+    next();
+  } catch (e) {
+    return res.status(401).json({ error: "Токен хүчингүй байна" });
+  }
+}
+
 router.post("/login", (req, res) => {
   if (req.body.password === ADMIN_PASSWORD) {
     res.json({ ok: true, token: Buffer.from("admin:" + Date.now()).toString("base64") });
@@ -12,6 +30,9 @@ router.post("/login", (req, res) => {
     res.status(401).json({ error: "Нууц үг буруу" });
   }
 });
+
+// Бүх route-д админ шалгалт хийх (login-ээс бусад)
+router.use(verifyAdmin);
 
 // ============ DASHBOARD STATS ============
 router.get("/stats", (req, res) => {

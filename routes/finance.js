@@ -1,9 +1,13 @@
 const express = require("express");
 const router = express.Router();
 const db = require("../db");
+const { verifyToken } = require("../middleware/auth");
 
 const getByUser = db.prepare("SELECT * FROM finance_records WHERE user_id = ? ORDER BY record_date DESC");
 const insert = db.prepare("INSERT INTO finance_records (user_id, type, category, amount, note) VALUES (?, ?, ?, ?, ?)");
+
+// Бүх route-д нэвтрэлт шалгах
+router.use(verifyToken);
 
 router.get("/:user_id", (req, res) => {
   res.json(getByUser.all(req.params.user_id));

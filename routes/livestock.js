@@ -1,6 +1,10 @@
 const express = require("express");
 const router = express.Router();
 const db = require("../db");
+const { verifyToken } = require("../middleware/auth");
+
+// Бүх route-д нэвтрэлт шалгах
+router.use(verifyToken);
 
 const getByUser = db.prepare("SELECT * FROM livestock WHERE user_id = ?");
 const getOne = db.prepare("SELECT * FROM livestock WHERE user_id = ? AND animal_type = ?");

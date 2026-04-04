@@ -21,4 +21,42 @@ function verifyToken(req, res, next) {
   }
 }
 
-module.exports = { generateToken, verifyToken, JWT_SECRET };
+// ============ RATE LIMITING (in-memory) ============
+const rateLimitStore = new Map();
+
+// Хуучин бичлэгүүдийг цэвэрлэх (5 минут тутам)
+setInterval(() => {
+  const now = Date.now();
+  for (const [key, entry] of rateLimitStore) {
+    if (now - entry.windowStart > 60000) {
+      rateLimitStore.delete(key);
+    }
+  }
+}, 300000);
+
+/**
+ * Rate limiter middleware үүсгэх
+ * @param {number} maxRequests - Нэг цонхонд зөвшөөрөх хүсэлтийн тоо
+ * @param {number} windowMs - Цонхны хугацаа (мс), default 60 секунд
+ */
+function rateLimit(maxRequests = 60, windowMs = 60000) {
+  return (req, res, next) => {
+    const key = req.ip + ":" + req.path;
+    const now = Date.now();
+    let entry = rateLimitStore.get(key);
+
+    if (!entry || now - entry.windowStart > windowMs) {
+      entry = { windowStart: now, count: 1 };
+      rateLimitStore.set(key, entry);
+      return next();
+    }
+
+    entry.count++;
+    if (entry.count > maxRequests) {
+      return res.status(429).json({ error: "Хэт олон хүсэлт. Түр хүлээнэ үү." });
+    }
+    next();
+  };
+}
+
+module.exports = { generateToken, verifyToken, rateLimit, JWT_SECRET };
