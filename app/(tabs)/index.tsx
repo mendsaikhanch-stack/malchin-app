@@ -47,6 +47,8 @@ const quickActionItems = [
   { emoji: '🌿', label: 'Бэлчээр', route: '/pasture' },
   { emoji: '🏷️', label: 'Ээмэг хайх', route: '/scanner' },
   { emoji: '👨‍👩‍👧‍👦', label: 'Өрх бүл', route: '/household' },
+  { emoji: '📍', label: 'Газрын зураг', route: '/map-view' },
+  { emoji: '💰', label: 'Санхүү', route: '/finance' },
 ];
 
 export default function HomeScreen() {
