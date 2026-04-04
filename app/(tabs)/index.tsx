@@ -11,7 +11,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { AppColors } from '@/constants/theme';
-import { livestockApi, weatherApi, alertsApi, aiApi } from '@/services/api';
+import { livestockApi, weatherApi, alertsApi, aiApi, financeApi } from '@/services/api';
 import { AdBanner, AdBannerLarge } from '@/components/ad-banner';
 
 const animalNames: Record<string, string> = {
@@ -36,9 +36,18 @@ const dzudMn = (risk: string) => {
 };
 
 const animalEmojis: Record<string, string> = {
-  sheep: '\uD83D\uDC11', goat: '\uD83D\uDC10', cattle: '\uD83D\uDC02',
-  horse: '\uD83D\uDC0E', camel: '\uD83D\uDC2A',
+  sheep: '🐑', goat: '🐐', cattle: '🐂',
+  horse: '🐎', camel: '🐪',
 };
+
+const quickActionItems = [
+  { emoji: '🐑', label: 'Мал бүртгэл', route: '/livestock' },
+  { emoji: '🤰', label: 'Хээлтүүлэг', route: '/breeding' },
+  { emoji: '🏥', label: 'Эрүүл мэнд', route: '/health' },
+  { emoji: '🌿', label: 'Бэлчээр', route: '/pasture' },
+  { emoji: '🏷️', label: 'Ээмэг хайх', route: '/scanner' },
+  { emoji: '👨‍👩‍👧‍👦', label: 'Өрх бүл', route: '/household' },
+];
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -49,22 +58,24 @@ export default function HomeScreen() {
   const [weather, setWeather] = useState<any>(null);
   const [alerts, setAlerts] = useState<any[]>([]);
   const [tip, setTip] = useState('');
+  const [finance, setFinance] = useState<any>(null);
 
   const userId = 1;
 
   const loadData = async () => {
     try {
-      const [statsRes, weatherRes, alertsRes, tipRes] = await Promise.allSettled([
+      const [statsRes, weatherRes, alertsRes, tipRes, financeRes] = await Promise.allSettled([
         livestockApi.getStats(userId),
         weatherApi.getByAimag('Төв'),
         alertsApi.getAll(),
         aiApi.getTip(),
+        financeApi.getSummary(userId),
       ]);
 
       if (statsRes.status === 'fulfilled') {
         const items = (statsRes.value.livestock || []).map((item: any) => ({
           ...item,
-          emoji: animalEmojis[item.animal_type] || '\uD83D\uDC3E',
+          emoji: animalEmojis[item.animal_type] || '🐾',
         }));
         setLivestock(items);
         setTotalAnimals(statsRes.value.total_animals || 0);
@@ -72,6 +83,7 @@ export default function HomeScreen() {
       if (weatherRes.status === 'fulfilled') setWeather(weatherRes.value);
       if (alertsRes.status === 'fulfilled') setAlerts((alertsRes.value || []).slice(0, 3));
       if (tipRes.status === 'fulfilled') setTip(tipRes.value.tip || '');
+      if (financeRes.status === 'fulfilled') setFinance(financeRes.value);
     } catch {
       // show what we can
     } finally {
@@ -94,6 +106,11 @@ export default function HomeScreen() {
     if (s === 'high') return AppColors.danger;
     if (s === 'medium') return AppColors.warning;
     return AppColors.accent;
+  };
+
+  const formatMoney = (amount: number) => {
+    if (amount == null) return '0₮';
+    return amount.toLocaleString('mn-MN') + '₮';
   };
 
   if (loading) {
@@ -120,7 +137,7 @@ export default function HomeScreen() {
         {/* Малын тоо */}
         <TouchableOpacity style={styles.card} onPress={() => router.push('/(tabs)/livestock')}>
           <View style={styles.cardHeader}>
-            <Text style={styles.cardTitle}>{'\uD83D\uDC11'} Миний мал</Text>
+            <Text style={styles.cardTitle}>🐑 Миний мал</Text>
             <View style={styles.totalBadge}>
               <Text style={styles.totalBadgeText}>{totalAnimals} толгой</Text>
             </View>
@@ -140,7 +157,7 @@ export default function HomeScreen() {
 
         {/* Цаг агаар */}
         <TouchableOpacity style={styles.card} onPress={() => router.push('/(tabs)/weather')}>
-          <Text style={styles.cardTitle}>{'\u26C5'} Цаг агаар - {weather?.aimag || 'Төв'}</Text>
+          <Text style={styles.cardTitle}>⛅ Цаг агаар - {weather?.aimag || 'Төв'}</Text>
           {weather ? (
             <View style={styles.weatherRow}>
               <Text style={styles.weatherTemp}>{weather.temp}°C</Text>
@@ -160,7 +177,7 @@ export default function HomeScreen() {
         {/* Сэрэмжлүүлэг */}
         {alerts.length > 0 && (
           <View style={styles.card}>
-            <Text style={styles.cardTitle}>{'\uD83D\uDEA8'} Сэрэмжлүүлэг</Text>
+            <Text style={styles.cardTitle}>🚨 Сэрэмжлүүлэг</Text>
             {alerts.map((alert: any) => (
               <View key={alert.id} style={[styles.alertItem, { borderLeftColor: severityColor(alert.severity) }]}>
                 <Text style={styles.alertTitle}>{alert.title}</Text>
@@ -173,27 +190,78 @@ export default function HomeScreen() {
         {/* Өдрийн зөвлөгөө */}
         {tip ? (
           <TouchableOpacity style={[styles.card, styles.tipCard]} onPress={() => router.push('/(tabs)/ai-advisor')}>
-            <Text style={styles.cardTitle}>{'\uD83D\uDCA1'} Өдрийн зөвлөгөө</Text>
+            <Text style={styles.cardTitle}>💡 Өдрийн зөвлөгөө</Text>
             <Text style={styles.tipText}>{tip}</Text>
           </TouchableOpacity>
         ) : null}
 
-        {/* Quick actions */}
+        {/* Санхүүгийн тойм */}
+        <TouchableOpacity style={styles.card} onPress={() => router.push('/(tabs)/finance')}>
+          <Text style={styles.cardTitle}>💰 Санхүүгийн тойм</Text>
+          {finance ? (
+            <View style={styles.financeContainer}>
+              <View style={styles.financeRow}>
+                <View style={[styles.financeItem, { backgroundColor: '#E8F5E9' }]}>
+                  <Text style={styles.financeLabel}>Орлого</Text>
+                  <Text style={[styles.financeAmount, { color: AppColors.success }]}>
+                    {formatMoney(finance.total_income || 0)}
+                  </Text>
+                </View>
+                <View style={[styles.financeItem, { backgroundColor: '#FFEBEE' }]}>
+                  <Text style={styles.financeLabel}>Зарлага</Text>
+                  <Text style={[styles.financeAmount, { color: AppColors.danger }]}>
+                    {formatMoney(finance.total_expense || 0)}
+                  </Text>
+                </View>
+              </View>
+              <View style={styles.profitRow}>
+                <Text style={styles.profitLabel}>Цэвэр ашиг</Text>
+                <Text style={[
+                  styles.profitAmount,
+                  { color: (finance.profit || 0) >= 0 ? AppColors.success : AppColors.danger }
+                ]}>
+                  {(finance.profit || 0) >= 0 ? '+' : ''}{formatMoney(finance.profit || 0)}
+                </Text>
+              </View>
+            </View>
+          ) : (
+            <Text style={styles.emptyText}>Санхүүгийн мэдээлэл ачааллаж чадсангүй</Text>
+          )}
+        </TouchableOpacity>
+
+        {/* Шуурхай үйлдэл - 2x3 grid */}
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>⚡ Шуурхай үйлдэл</Text>
+          <View style={styles.quickActionsGrid}>
+            {quickActionItems.map((item) => (
+              <TouchableOpacity
+                key={item.route}
+                style={styles.gridActionBtn}
+                onPress={() => router.push(item.route as any)}
+              >
+                <Text style={styles.gridActionIcon}>{item.emoji}</Text>
+                <Text style={styles.gridActionLabel}>{item.label}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
+
+        {/* Quick actions - existing 4 buttons */}
         <View style={styles.quickActions}>
           <TouchableOpacity style={[styles.actionBtn, { backgroundColor: '#FFEBEE' }]} onPress={() => router.push('/(tabs)/diagnose')}>
-            <Text style={styles.actionIcon}>{'\uD83E\uDE7A'}</Text>
+            <Text style={styles.actionIcon}>🩺</Text>
             <Text style={styles.actionLabel}>Оношлогч</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.actionBtn} onPress={() => router.push('/(tabs)/market')}>
-            <Text style={styles.actionIcon}>{'\uD83C\uDFEA'}</Text>
+            <Text style={styles.actionIcon}>🏪</Text>
             <Text style={styles.actionLabel}>Зах зээл</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.actionBtn} onPress={() => router.push('/(tabs)/weather')}>
-            <Text style={styles.actionIcon}>{'\uD83C\uDF21\uFE0F'}</Text>
+            <Text style={styles.actionIcon}>🌡️</Text>
             <Text style={styles.actionLabel}>Цаг агаар</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.actionBtn} onPress={() => router.push('/(tabs)/ai-advisor')}>
-            <Text style={styles.actionIcon}>{'\uD83E\uDD16'}</Text>
+            <Text style={styles.actionIcon}>🤖</Text>
             <Text style={styles.actionLabel}>Зөвлөгч</Text>
           </TouchableOpacity>
         </View>
@@ -244,6 +312,33 @@ const styles = StyleSheet.create({
   alertRegion: { fontSize: 12, color: AppColors.grayDark, marginTop: 2 },
   tipCard: { backgroundColor: '#F0FFF4', borderWidth: 1, borderColor: '#C6F6D5' },
   tipText: { fontSize: 14, color: AppColors.grayDark, lineHeight: 20 },
+  // Finance Summary
+  financeContainer: { gap: 12 },
+  financeRow: { flexDirection: 'row', gap: 12 },
+  financeItem: {
+    flex: 1, borderRadius: 12, padding: 14, alignItems: 'center',
+  },
+  financeLabel: { fontSize: 13, color: AppColors.grayDark, marginBottom: 4 },
+  financeAmount: { fontSize: 18, fontWeight: '700' },
+  profitRow: {
+    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
+    backgroundColor: '#F5F5F5', borderRadius: 12, padding: 14,
+  },
+  profitLabel: { fontSize: 14, fontWeight: '600', color: AppColors.black },
+  profitAmount: { fontSize: 20, fontWeight: '800' },
+  // Quick Actions Grid (2x3)
+  quickActionsGrid: {
+    flexDirection: 'row', flexWrap: 'wrap', gap: 10,
+  },
+  gridActionBtn: {
+    width: '31%', backgroundColor: '#F0FFF4', borderRadius: 14, paddingVertical: 16,
+    alignItems: 'center', borderWidth: 1, borderColor: '#C6F6D5',
+  },
+  gridActionIcon: { fontSize: 28 },
+  gridActionLabel: {
+    fontSize: 12, fontWeight: '600', color: AppColors.primaryDark, marginTop: 8, textAlign: 'center',
+  },
+  // Existing quick actions row
   quickActions: { flexDirection: 'row', marginHorizontal: 16, marginTop: 16, gap: 12 },
   actionBtn: {
     flex: 1, backgroundColor: AppColors.white, borderRadius: 16, padding: 16,

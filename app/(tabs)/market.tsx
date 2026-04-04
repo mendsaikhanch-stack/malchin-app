@@ -10,6 +10,8 @@ import {
   Alert,
   RefreshControl,
   ActivityIndicator,
+  Linking,
+  Image,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { AppColors } from '@/constants/theme';
@@ -88,6 +90,8 @@ export default function MarketScreen() {
   const [quantity, setQuantity] = useState('');
   const [price, setPrice] = useState('');
   const [location, setLocation] = useState('');
+  const [phone, setPhone] = useState('');
+  const [imageUrl, setImageUrl] = useState('');
 
   const userId = 1;
 
@@ -129,8 +133,8 @@ export default function MarketScreen() {
   const handleCreate = async () => {
     if (!title.trim()) { Alert.alert('Алдаа', 'Гарчиг оруулна уу'); return; }
     try {
-      await marketApi.create({ user_id: userId, title: title.trim(), description: description.trim(), animal_type: selectedAnimal, quantity: parseInt(quantity) || 0, price: parseInt(price) || 0, location: location.trim() });
-      setShowModal(false); setTitle(''); setDescription(''); setQuantity(''); setPrice(''); setLocation('');
+      await marketApi.create({ user_id: userId, title: title.trim(), description: description.trim(), animal_type: selectedAnimal, quantity: parseInt(quantity) || 0, price: parseInt(price) || 0, location: location.trim(), phone: phone.trim(), image_url: imageUrl.trim() || undefined });
+      setShowModal(false); setTitle(''); setDescription(''); setQuantity(''); setPrice(''); setLocation(''); setPhone(''); setImageUrl('');
       loadListings();
     } catch { Alert.alert('Алдаа', 'Зар нэмэхэд алдаа гарлаа'); }
   };
@@ -265,6 +269,17 @@ export default function MarketScreen() {
     </>
   );
 
+  const handleCallListing = (phoneNum: string) => {
+    const url = `tel:${phoneNum}`;
+    Linking.canOpenURL(url).then((supported) => {
+      if (supported) {
+        Linking.openURL(url);
+      } else {
+        Alert.alert('Утасны дугаар', phoneNum);
+      }
+    });
+  };
+
   const renderListings = () => (
     <>
       <TouchableOpacity style={styles.addListingBtn} onPress={() => setShowModal(true)}>
@@ -272,7 +287,7 @@ export default function MarketScreen() {
       </TouchableOpacity>
       {listings.length === 0 ? (
         <View style={styles.emptyCard}>
-          <Text style={{ fontSize: 40 }}>{'\uD83D\uDCE6'}</Text>
+          <Text style={{ fontSize: 40 }}>📦</Text>
           <Text style={styles.emptyTitle}>Зар байхгүй</Text>
         </View>
       ) : (
@@ -280,19 +295,39 @@ export default function MarketScreen() {
           const animal = animalInfo(item.animal_type);
           return (
             <View key={item.id} style={styles.listingCard}>
+              {item.image_url ? (
+                <Image
+                  source={{ uri: item.image_url }}
+                  style={styles.listingImage}
+                  resizeMode="cover"
+                />
+              ) : null}
               <View style={styles.listingHeader}>
                 <Text style={{ fontSize: 32, marginRight: 12 }}>{animal.emoji}</Text>
                 <View style={{ flex: 1 }}>
                   <Text style={styles.listingTitle}>{item.title}</Text>
                   <Text style={styles.listingMeta}>{animal.label} · {item.quantity} толгой</Text>
                 </View>
-                <View style={styles.priceBadge}><Text style={styles.priceText}>{'\u20AE'}{fmt(item.price)}</Text></View>
+                <View style={styles.priceBadge}><Text style={styles.priceText}>₮{fmt(item.price)}</Text></View>
               </View>
               {item.description ? <Text style={styles.listingDesc}>{item.description}</Text> : null}
-              <View style={styles.listingFooter}>
-                <Text style={styles.footerText}>{'\uD83D\uDCCD'} {item.location || '-'}</Text>
-                <Text style={styles.footerText}>{item.created_at?.split(' ')[0]}</Text>
+              <View style={styles.listingContactRow}>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.footerText}>📍 {item.location || '-'}</Text>
+                  <Text style={styles.footerText}>{item.created_at?.split(' ')[0]}</Text>
+                </View>
+                {item.phone ? (
+                  <TouchableOpacity
+                    style={styles.listingCallBtn}
+                    onPress={() => handleCallListing(item.phone)}
+                  >
+                    <Text style={styles.listingCallBtnText}>📞 Утасдах</Text>
+                  </TouchableOpacity>
+                ) : null}
               </View>
+              {item.phone ? (
+                <Text style={styles.listingPhone}>📱 {item.phone}</Text>
+              ) : null}
             </View>
           );
         })
@@ -356,6 +391,10 @@ export default function MarketScreen() {
               </View>
               <Text style={styles.label}>Байршил</Text>
               <TextInput style={styles.input} value={location} onChangeText={setLocation} placeholder="Төв аймаг, Зуунмод" placeholderTextColor={AppColors.gray} />
+              <Text style={styles.label}>Утасны дугаар</Text>
+              <TextInput style={styles.input} keyboardType="phone-pad" value={phone} onChangeText={setPhone} placeholder="99112233" placeholderTextColor={AppColors.gray} />
+              <Text style={styles.label}>Зургийн холбоос (заавал биш)</Text>
+              <TextInput style={styles.input} value={imageUrl} onChangeText={setImageUrl} placeholder="https://..." placeholderTextColor={AppColors.gray} autoCapitalize="none" keyboardType="url" />
               <View style={{ flexDirection: 'row', gap: 10, marginTop: 20 }}>
                 <TouchableOpacity style={styles.cancelBtn} onPress={() => setShowModal(false)}><Text style={styles.cancelBtnText}>Болих</Text></TouchableOpacity>
                 <TouchableOpacity style={styles.saveBtn} onPress={handleCreate}><Text style={styles.saveBtnText}>Нийтлэх</Text></TouchableOpacity>
@@ -418,7 +457,11 @@ const styles = StyleSheet.create({
   priceBadge: { backgroundColor: '#E8F5E9', paddingHorizontal: 10, paddingVertical: 6, borderRadius: 10 },
   priceText: { fontSize: 13, fontWeight: '800', color: AppColors.primaryDark },
   listingDesc: { fontSize: 12, color: AppColors.grayDark, marginTop: 8 },
-  listingFooter: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 10, paddingTop: 8, borderTopWidth: 1, borderTopColor: '#F0F0F0' },
+  listingImage: { width: '100%', height: 160, borderRadius: 12, marginBottom: 10 },
+  listingContactRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 10, paddingTop: 8, borderTopWidth: 1, borderTopColor: '#F0F0F0' },
+  listingCallBtn: { backgroundColor: '#E8F5E9', paddingHorizontal: 14, paddingVertical: 8, borderRadius: 10, borderWidth: 1, borderColor: '#C8E6C9' },
+  listingCallBtnText: { fontSize: 13, fontWeight: '700', color: AppColors.primaryDark },
+  listingPhone: { fontSize: 12, color: AppColors.gray, marginTop: 6 },
   footerText: { fontSize: 11, color: AppColors.gray },
   // Modal
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },

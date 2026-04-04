@@ -130,6 +130,15 @@ export const mapApi = {
     if (aimag) params.set('aimag', aimag);
     return request<any>(`/map/services?${params}`);
   },
+  getPastures: () => request<any>('/map/pastures'),
+  getMarkets: () => request<any>('/map/markets'),
+  getNearby: (lat?: number, lng?: number, radius?: number) => {
+    const params = new URLSearchParams();
+    if (lat) params.set('lat', String(lat));
+    if (lng) params.set('lng', String(lng));
+    if (radius) params.set('radius', String(radius));
+    return request<any>(`/map/nearby?${params}`);
+  },
 };
 
 // News & Programs
