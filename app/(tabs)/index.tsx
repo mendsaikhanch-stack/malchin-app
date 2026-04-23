@@ -364,6 +364,45 @@ export default function HomeScreen() {
           </TouchableOpacity>
         </View>
 
+        {/* Өрхийн хөгжил — шинэ модулиуд */}
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>🌱 Өрхийн хөгжил</Text>
+          <View style={styles.moduleGrid}>
+            <TouchableOpacity
+              style={styles.moduleItem}
+              onPress={() => router.push('/malchin-khun' as any)}
+            >
+              <Text style={styles.moduleEmoji}>🩺</Text>
+              <Text style={styles.moduleLabel}>Малчин хүн</Text>
+              <Text style={styles.moduleDesc}>Эрүүл мэнд, ЭМД</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.moduleItem}
+              onPress={() => router.push('/family-future' as any)}
+            >
+              <Text style={styles.moduleEmoji}>🎓</Text>
+              <Text style={styles.moduleLabel}>Өрх-ирээдүй</Text>
+              <Text style={styles.moduleDesc}>Хүүхэд, тэтгэлэг</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.moduleItem}
+              onPress={() => router.push('/extra-income' as any)}
+            >
+              <Text style={styles.moduleEmoji}>💼</Text>
+              <Text style={styles.moduleLabel}>Нэмэлт орлого</Text>
+              <Text style={styles.moduleDesc}>Гэр буудал, идээ</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.moduleItem}
+              onPress={() => router.push('/chat' as any)}
+            >
+              <Text style={styles.moduleEmoji}>💬</Text>
+              <Text style={styles.moduleLabel}>Чат</Text>
+              <Text style={styles.moduleDesc}>Сум, баг, хоршоо</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
         {/* Том сурталчилгаа */}
         <AdBannerLarge placement="home" />
 
@@ -431,6 +470,15 @@ const styles = StyleSheet.create({
   taskNumText: { color: AppColors.white, fontSize: 13, fontWeight: '700' },
   taskTitle: { fontSize: 14, fontWeight: '700', color: AppColors.black },
   taskDetail: { fontSize: 12, color: AppColors.grayDark, marginTop: 2 },
+  moduleGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
+  moduleItem: {
+    width: '47%', backgroundColor: '#F0FFF4', borderRadius: 12,
+    padding: 12, alignItems: 'center',
+    borderWidth: 1, borderColor: '#C6F6D5',
+  },
+  moduleEmoji: { fontSize: 30 },
+  moduleLabel: { fontSize: 13, fontWeight: '700', color: AppColors.primaryDark, marginTop: 6 },
+  moduleDesc: { fontSize: 11, color: AppColors.grayDark, marginTop: 3, textAlign: 'center' },
   tipText: { fontSize: 14, color: AppColors.grayDark, lineHeight: 20 },
   // Finance Summary
   financeContainer: { gap: 12 },
