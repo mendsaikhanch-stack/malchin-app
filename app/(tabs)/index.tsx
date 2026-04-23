@@ -16,6 +16,7 @@ import { AdBanner, AdBannerLarge } from '@/components/ad-banner';
 import { useLocation } from '@/hooks/use-location';
 import { useUserRole, ROLE_LABEL, ROLE_EMOJI } from '@/hooks/use-user-role';
 import { getDailyTasks, type DailyTask } from '@/services/daily-tasks';
+import { getMigrationAdvice, type MigrationAdvice } from '@/services/migration-advice';
 
 const animalNames: Record<string, string> = {
   sheep: 'Хонь', goat: 'Ямаа', cattle: 'Үхэр',
@@ -60,6 +61,7 @@ export default function HomeScreen() {
   const { address: myLocation, loading: locLoading } = useLocation();
   const { role, name: userName } = useUserRole();
   const [dailyTasks, setDailyTasks] = useState<DailyTask[]>([]);
+  const [migrationAdvice, setMigrationAdvice] = useState<MigrationAdvice | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   const [loading, setLoading] = useState(true);
   const [livestock, setLivestock] = useState<any[]>([]);
@@ -113,6 +115,14 @@ export default function HomeScreen() {
       hasHighAlert: alerts.some((a: any) => a.severity === 'high'),
     });
     setDailyTasks(tasks);
+
+    setMigrationAdvice(
+      getMigrationAdvice({
+        month: new Date().getMonth() + 1,
+        weatherTemp: weather?.temp,
+        dzudRisk: weather?.dzud_risk,
+      })
+    );
   }, [role, totalAnimals, weather, alerts]);
 
   const onRefresh = () => { setRefreshing(true); loadData(); };
@@ -254,6 +264,47 @@ export default function HomeScreen() {
                 <Text style={styles.alertRegion}>{alert.region}</Text>
               </View>
             ))}
+          </View>
+        )}
+
+        {/* Нүүх/Оторлох зөвлөгөө */}
+        {migrationAdvice && (role === 'malchin' || !role) && (
+          <View style={[
+            styles.card,
+            migrationAdvice.urgency === 'now' && { borderLeftWidth: 4, borderLeftColor: AppColors.danger },
+            migrationAdvice.urgency === 'soon' && { borderLeftWidth: 4, borderLeftColor: AppColors.warning },
+          ]}>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Text style={styles.cardTitle}>
+                {migrationAdvice.action === 'move' ? '🚶 Нүүх зөвлөгөө' :
+                 migrationAdvice.action === 'prepare' ? '🎒 Нүүдлийн бэлтгэл' :
+                 migrationAdvice.action === 'otor' ? '⚠️ Оторлох санал' : '🏕️ Байрандаа'}
+              </Text>
+              <View style={[
+                styles.urgencyBadge,
+                migrationAdvice.urgency === 'now' && { backgroundColor: AppColors.danger },
+                migrationAdvice.urgency === 'soon' && { backgroundColor: AppColors.warning },
+              ]}>
+                <Text style={styles.urgencyText}>
+                  {migrationAdvice.urgency === 'now' ? 'Яаралтай' :
+                   migrationAdvice.urgency === 'soon' ? 'Удахгүй' : 'Тогтвортой'}
+                </Text>
+              </View>
+            </View>
+            <Text style={styles.migrationTitle}>{migrationAdvice.title}</Text>
+            {migrationAdvice.reasons.slice(0, 2).map((r, i) => (
+              <Text key={i} style={styles.migrationReason}>• {r}</Text>
+            ))}
+            {migrationAdvice.steps.length > 0 && (
+              <View style={styles.migrationSteps}>
+                <Text style={styles.migrationStepsTitle}>Үе шат:</Text>
+                {migrationAdvice.steps.slice(0, 3).map((s, i) => (
+                  <Text key={i} style={styles.migrationStep}>
+                    {i + 1}. {s}
+                  </Text>
+                ))}
+              </View>
+            )}
           </View>
         )}
 
@@ -479,6 +530,15 @@ const styles = StyleSheet.create({
   moduleEmoji: { fontSize: 30 },
   moduleLabel: { fontSize: 13, fontWeight: '700', color: AppColors.primaryDark, marginTop: 6 },
   moduleDesc: { fontSize: 11, color: AppColors.grayDark, marginTop: 3, textAlign: 'center' },
+  urgencyBadge: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 8, backgroundColor: AppColors.grayLight },
+  urgencyText: { fontSize: 11, fontWeight: '700', color: AppColors.white },
+  migrationTitle: { fontSize: 15, fontWeight: '700', color: AppColors.black, marginTop: 8 },
+  migrationReason: { fontSize: 13, color: AppColors.grayDark, marginTop: 4 },
+  migrationSteps: {
+    marginTop: 10, padding: 10, backgroundColor: '#F0FFF4', borderRadius: 8,
+  },
+  migrationStepsTitle: { fontSize: 12, fontWeight: '700', color: AppColors.primaryDark },
+  migrationStep: { fontSize: 12, color: AppColors.grayDark, marginTop: 4, lineHeight: 18 },
   tipText: { fontSize: 14, color: AppColors.grayDark, lineHeight: 20 },
   // Finance Summary
   financeContainer: { gap: 12 },
