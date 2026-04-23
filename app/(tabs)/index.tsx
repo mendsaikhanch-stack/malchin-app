@@ -15,6 +15,7 @@ import { livestockApi, weatherApi, alertsApi, aiApi, financeApi } from '@/servic
 import { AdBanner, AdBannerLarge } from '@/components/ad-banner';
 import { useLocation } from '@/hooks/use-location';
 import { useUserRole, ROLE_LABEL, ROLE_EMOJI } from '@/hooks/use-user-role';
+import { getDailyTasks, type DailyTask } from '@/services/daily-tasks';
 
 const animalNames: Record<string, string> = {
   sheep: 'Хонь', goat: 'Ямаа', cattle: 'Үхэр',
@@ -58,6 +59,7 @@ export default function HomeScreen() {
   const router = useRouter();
   const { address: myLocation, loading: locLoading } = useLocation();
   const { role, name: userName } = useUserRole();
+  const [dailyTasks, setDailyTasks] = useState<DailyTask[]>([]);
   const [refreshing, setRefreshing] = useState(false);
   const [loading, setLoading] = useState(true);
   const [livestock, setLivestock] = useState<any[]>([]);
@@ -100,6 +102,18 @@ export default function HomeScreen() {
   };
 
   useEffect(() => { loadData(); }, []);
+
+  useEffect(() => {
+    const tasks = getDailyTasks({
+      month: new Date().getMonth() + 1,
+      role,
+      hasLivestock: totalAnimals > 0,
+      weatherTemp: weather?.temp,
+      dzudRisk: weather?.dzud_risk,
+      hasHighAlert: alerts.some((a: any) => a.severity === 'high'),
+    });
+    setDailyTasks(tasks);
+  }, [role, totalAnimals, weather, alerts]);
 
   const onRefresh = () => { setRefreshing(true); loadData(); };
 
@@ -205,6 +219,30 @@ export default function HomeScreen() {
 
         {/* Сурталчилгаа */}
         <AdBanner placement="home" />
+
+        {/* Өнөөдөр хийх 3 ажил */}
+        {dailyTasks.length > 0 && (
+          <View style={styles.card}>
+            <Text style={styles.cardTitle}>✅ Өнөөдөр хийх 3 ажил</Text>
+            {dailyTasks.map((t, i) => (
+              <View key={t.id} style={styles.taskItem}>
+                <View style={[
+                  styles.taskNum,
+                  t.priority === 'high' && { backgroundColor: AppColors.danger },
+                  t.priority === 'medium' && { backgroundColor: AppColors.warning },
+                ]}>
+                  <Text style={styles.taskNumText}>{i + 1}</Text>
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.taskTitle}>
+                    {t.emoji} {t.title}
+                  </Text>
+                  <Text style={styles.taskDetail}>{t.detail}</Text>
+                </View>
+              </View>
+            ))}
+          </View>
+        )}
 
         {/* Сэрэмжлүүлэг */}
         {alerts.length > 0 && (
@@ -383,6 +421,16 @@ const styles = StyleSheet.create({
   alertTitle: { fontSize: 14, fontWeight: '600', color: AppColors.black },
   alertRegion: { fontSize: 12, color: AppColors.grayDark, marginTop: 2 },
   tipCard: { backgroundColor: '#F0FFF4', borderWidth: 1, borderColor: '#C6F6D5' },
+  taskItem: {
+    flexDirection: 'row', alignItems: 'flex-start', paddingVertical: 8, gap: 10,
+  },
+  taskNum: {
+    width: 26, height: 26, borderRadius: 13, backgroundColor: AppColors.primary,
+    alignItems: 'center', justifyContent: 'center',
+  },
+  taskNumText: { color: AppColors.white, fontSize: 13, fontWeight: '700' },
+  taskTitle: { fontSize: 14, fontWeight: '700', color: AppColors.black },
+  taskDetail: { fontSize: 12, color: AppColors.grayDark, marginTop: 2 },
   tipText: { fontSize: 14, color: AppColors.grayDark, lineHeight: 20 },
   // Finance Summary
   financeContainer: { gap: 12 },
