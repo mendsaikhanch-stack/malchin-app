@@ -70,20 +70,39 @@ export default function ProfileScreen() {
       if (res.user) {
         setUser(res.user);
         setIsLoggedIn(true);
-      } else {
-        Alert.alert('Мэдэгдэл', 'Хэрэглэгч олдсонгүй. Бүртгүүлнэ үү.', [
-          { text: 'Болих' },
-          { text: 'Бүртгүүлэх', onPress: () => setIsRegistering(true) },
-        ]);
+        return;
       }
     } catch {
-      Alert.alert('Мэдэгдэл', 'Хэрэглэгч олдсонгүй. Бүртгүүлнэ үү.', [
-        { text: 'Болих' },
-        { text: 'Бүртгүүлэх', onPress: () => setIsRegistering(true) },
-      ]);
-    } finally {
-      setLoading(false);
+      // backend унасан эсвэл endpoint алга — local онбординг data-аас нэвтрүүлнэ
     }
+
+    // Fallback: AsyncStorage-аас тухайн дугаараар нэвтрэх
+    try {
+      const raw = await AsyncStorage.getItem(ONBOARDING_DATA_KEY);
+      if (raw) {
+        const d = JSON.parse(raw);
+        if (d?.phone === phone) {
+          setUser({
+            phone: d.phone,
+            name: `${d.lastName || ''} ${d.firstName || ''}`.trim(),
+            aimag: d.aimag,
+            sum: d.sum,
+            bag: d.bag,
+            role: d.role,
+          });
+          setIsLoggedIn(true);
+          return;
+        }
+      }
+    } catch {
+      // ignore
+    }
+
+    setLoading(false);
+    Alert.alert('Мэдэгдэл', 'Хэрэглэгч олдсонгүй. Бүртгүүлнэ үү.', [
+      { text: 'Болих' },
+      { text: 'Бүртгүүлэх', onPress: () => setIsRegistering(true) },
+    ]);
   };
 
   const handleRegister = async () => {
