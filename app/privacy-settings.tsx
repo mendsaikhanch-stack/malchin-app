@@ -44,7 +44,7 @@ const LEVEL_DESC: Record<Level, { label: string; desc: string; emoji: string }> 
   off: { label: 'Хаах', desc: 'Байршил огт хуваалцахгүй', emoji: '🚫' },
 };
 
-export default function PrivacySettings() {
+export default function PrivacySettingsScreen() {
   const router = useRouter();
   const [s, setS] = useState<PrivacySettings>(DEFAULT);
   const [loaded, setLoaded] = useState(false);

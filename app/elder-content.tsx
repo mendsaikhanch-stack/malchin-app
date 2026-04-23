@@ -104,7 +104,6 @@ const SPECIES = [
 
 export default function ElderContent() {
   const router = useRouter();
-  const [tab, setTab] = useState<'mine' | 'new'>('mine');
   const [content, setContent] = useState<ContentItem[]>(MOCK_CONTENT);
   const [modalVisible, setModalVisible] = useState(false);
   const [form, setForm] = useState<Partial<ContentItem>>({
