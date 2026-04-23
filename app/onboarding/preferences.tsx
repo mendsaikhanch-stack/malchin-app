@@ -65,8 +65,8 @@ export default function PreferencesScreen() {
       </ScrollView>
       <View style={styles.footer}>
         <PrimaryButton
-          label="Дуусгах"
-          onPress={() => router.push('/onboarding/done' as any)}
+          label="Үргэлжлүүлэх"
+          onPress={() => router.push('/onboarding/review' as any)}
         />
       </View>
     </SafeAreaView>

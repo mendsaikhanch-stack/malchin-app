@@ -6,6 +6,7 @@ import {
   StyleSheet,
   ActivityIndicator,
 } from 'react-native';
+import { useRouter } from 'expo-router';
 import { AppColors } from '@/constants/theme';
 
 export function ProgressBar({
@@ -28,16 +29,41 @@ export function StepHeader({
   total,
   title,
   subtitle,
+  onBack,
+  showBack = true,
 }: {
   step: number;
   total: number;
   title: string;
   subtitle?: string;
+  onBack?: () => void;
+  showBack?: boolean;
 }) {
+  const router = useRouter();
+  const handleBack = () => {
+    if (onBack) onBack();
+    else if (router.canGoBack()) router.back();
+  };
   return (
     <View style={styles.headerWrap}>
-      <ProgressBar current={step} total={total} />
-      <Text style={styles.stepLabel}>Алхам {step}/{total}</Text>
+      <View style={styles.topRow}>
+        {showBack ? (
+          <TouchableOpacity
+            style={styles.backBtn}
+            onPress={handleBack}
+            hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+            activeOpacity={0.6}
+          >
+            <Text style={styles.backArrow}>←</Text>
+          </TouchableOpacity>
+        ) : (
+          <View style={styles.backBtn} />
+        )}
+        <View style={styles.progressWrap}>
+          <ProgressBar current={step} total={total} />
+        </View>
+        <Text style={styles.stepCounter}>{step}/{total}</Text>
+      </View>
       <Text style={styles.headerTitle}>{title}</Text>
       {subtitle ? <Text style={styles.headerSubtitle}>{subtitle}</Text> : null}
     </View>
@@ -106,17 +132,38 @@ const styles = StyleSheet.create({
     paddingTop: 16,
     paddingBottom: 8,
   },
-  stepLabel: {
-    fontSize: 12,
+  topRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  backBtn: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: AppColors.grayLight,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  backArrow: {
+    fontSize: 22,
+    fontWeight: '700',
+    color: AppColors.black,
+    lineHeight: 24,
+  },
+  progressWrap: { flex: 1 },
+  stepCounter: {
+    fontSize: 13,
+    fontWeight: '700',
     color: AppColors.grayDark,
-    fontWeight: '600',
-    marginTop: 12,
+    minWidth: 32,
+    textAlign: 'right',
   },
   headerTitle: {
     fontSize: 26,
     fontWeight: '800',
     color: AppColors.black,
-    marginTop: 8,
+    marginTop: 16,
   },
   headerSubtitle: {
     fontSize: 14,

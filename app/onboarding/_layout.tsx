@@ -198,6 +198,7 @@ export default function OnboardingLayout() {
         <Stack.Screen name="seasonal" />
         <Stack.Screen name="livestock" />
         <Stack.Screen name="preferences" />
+        <Stack.Screen name="review" />
         <Stack.Screen name="done" />
       </Stack>
     </OnboardingContext.Provider>
