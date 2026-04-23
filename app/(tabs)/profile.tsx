@@ -212,6 +212,22 @@ export default function ProfileScreen() {
             <Text style={styles.menuText}>Тээврийн захиалга</Text>
             <Text style={styles.menuArrow}>{'\u203A'}</Text>
           </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.menuItem}
+            onPress={() => router.push('/privacy-settings' as any)}
+          >
+            <Text style={styles.menuIcon}>{'🔒'}</Text>
+            <Text style={styles.menuText}>Нууцлал ба эрх</Text>
+            <Text style={styles.menuArrow}>{'›'}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.menuItem}
+            onPress={() => router.push('/elder-content' as any)}
+          >
+            <Text style={styles.menuIcon}>{'👴'}</Text>
+            <Text style={styles.menuText}>Ахмадын ухаан оруулах</Text>
+            <Text style={styles.menuArrow}>{'›'}</Text>
+          </TouchableOpacity>
           <TouchableOpacity style={styles.menuItem}>
             <Text style={styles.menuIcon}>{'\u2699\uFE0F'}</Text>
             <Text style={styles.menuText}>Тохиргоо</Text>
