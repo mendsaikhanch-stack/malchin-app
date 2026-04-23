@@ -309,21 +309,6 @@ export const adsApi = {
     request<any>(`/ads/${id}/click`, { method: 'POST' }),
 };
 
-// Shinjikh
-export const shinjikhApi = {
-  getAll: (category?: string) =>
-    cachedRequest<any>(`/shinjikh${category ? `?category=${category}` : ''}`, 'shinjikh'),
-  search: (q: string) => cachedRequest<any>(`/shinjikh/search?q=${encodeURIComponent(q)}`, 'shinjikh'),
-};
-
-// Fun facts
-export const funFactsApi = {
-  getAll: (category?: string) =>
-    cachedRequest<any>(`/funfacts${category ? `?category=${category}` : ''}`, 'funfacts'),
-  getDaily: () => cachedRequest<any>('/funfacts/daily', 'funfacts'),
-  getRandom: () => cachedRequest<any>('/funfacts/random', 'funfacts'),
-};
-
 // Animals (individual animal registry)
 export const animalsApi = {
   getAll: (filters?: { type?: string; status?: string; gender?: string; search?: string }) => {

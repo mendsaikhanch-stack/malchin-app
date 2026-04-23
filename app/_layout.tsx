@@ -64,7 +64,6 @@ export default function RootLayout() {
       <Stack>
         <Stack.Screen name="onboarding" options={{ headerShown: false, gestureEnabled: false }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
         <Stack.Screen name="lost-found" options={{ headerShown: false }} />
         <Stack.Screen name="bag-dashboard" options={{ headerShown: false }} />
         <Stack.Screen name="sum-dashboard" options={{ headerShown: false }} />
