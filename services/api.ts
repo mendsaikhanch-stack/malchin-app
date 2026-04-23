@@ -22,16 +22,26 @@ export async function getToken(): Promise<string | null> {
   return _token;
 }
 
+const REQUEST_TIMEOUT_MS = 8000; // 8 сек. Backend унасан үед хурдан fallback хийнэ.
+
 async function request<T>(endpoint: string, options?: RequestInit): Promise<T> {
   const token = await getToken();
   const headers: Record<string, string> = { 'Content-Type': 'application/json' };
   if (token) headers['Authorization'] = `Bearer ${token}`;
-  const res = await fetch(`${API_BASE}${endpoint}`, {
-    headers,
-    ...options,
-  });
-  if (!res.ok) throw new Error(`API error: ${res.status}`);
-  return res.json();
+
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+  try {
+    const res = await fetch(`${API_BASE}${endpoint}`, {
+      headers,
+      signal: controller.signal,
+      ...options,
+    });
+    if (!res.ok) throw new Error(`API error: ${res.status}`);
+    return res.json();
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
 // Оффлайн cache-тэй GET request
