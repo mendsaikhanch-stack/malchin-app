@@ -44,9 +44,22 @@ async function cachedRequest<T>(endpoint: string, category?: string): Promise<T>
 
 // Users
 export const userApi = {
+  sendOtp: (phone: string) =>
+    request<any>('/auth/send-otp', { method: 'POST', body: JSON.stringify({ phone }) }),
+  verifyOtp: (phone: string, code: string) =>
+    request<any>('/auth/verify-otp', { method: 'POST', body: JSON.stringify({ phone, code }) }),
   login: (phone: string) =>
     request<any>('/users/login', { method: 'POST', body: JSON.stringify({ phone }) }),
-  create: (data: { phone: string; name: string; aimag: string; sum: string; bag: string }) =>
+  create: (data: {
+    phone: string;
+    name: string;
+    aimag: string;
+    sum: string;
+    bag: string;
+    role?: string;
+    seasonal?: any;
+    preferences?: any;
+  }) =>
     request<any>('/users/create', { method: 'POST', body: JSON.stringify(data) }),
 };
 

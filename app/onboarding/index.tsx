@@ -11,61 +11,57 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const { width } = Dimensions.get('window');
-
-const ONBOARDING_KEY = '@malchin_onboarding_done';
 
 const pages = [
   {
     emoji: '🐑🐎🐪',
     title: 'МАЛЧИН',
-    description: 'Монгол малчны super app\n\nМалаа бүртгэх, эрүүл мэндийг хянах, зах зээлийн мэдээлэл авах бүгдийг нэг аппаар.',
+    description:
+      'Хөдөөгийн ухаалаг туслах\n\nМалаа бүртгэх, эрүүл мэндийг хянах, цаг агаар, зах зээлийн мэдээлэл авах бүгдийг нэг аппаар.',
   },
   {
     emoji: '📋',
     title: 'Малаа бүртгэ',
-    description: 'Нэг бүрчлэн бүртгэж, эрүүл мэнд, үржил, бэлчээрийн мэдээлэл хөтөл. Ээмэг сканнердаж хурдан бүртгэл хийгээрэй.',
+    description:
+      'Нэг бүрчлэн бүртгэж, эрүүл мэнд, үржил, бэлчээрийн мэдээлэл хөтөл. Ээмэг сканнердаж хурдан бүртгэл хийгээрэй.',
   },
   {
     emoji: '📊',
     title: 'Зах зээлийн мэдээлэл',
-    description: 'Бодит цагийн ханш, түүхий эдийн үнэ, зар нийтлэх. Малын бүтээгдэхүүний үнийг хянаж, ашигтай худалдаа хийгээрэй.',
+    description:
+      'Бодит цагийн ханш, түүхий эдийн үнэ, зар нийтлэх. Малын бүтээгдэхүүний үнийг хянаж, ашигтай худалдаа хийгээрэй.',
   },
   {
     emoji: '🤖',
     title: 'AI Туслах',
-    description: 'Малын өвчин оношлох, зөвлөгөө авах, дуут команд өгөх. Хиймэл оюун ухааны тусламжтай малаа илүү сайн арчлаарай.',
+    description:
+      'Малын өвчин оношлох, зөвлөгөө авах, дуут команд өгөх. Хиймэл оюун ухааны тусламжтай малаа илүү сайн арчлаарай.',
   },
 ];
 
-export default function OnboardingScreen() {
+export default function WelcomeScreen() {
   const router = useRouter();
   const scrollRef = useRef<ScrollView>(null);
   const [currentPage, setCurrentPage] = useState(0);
 
   const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
     const offsetX = event.nativeEvent.contentOffset.x;
-    const page = Math.round(offsetX / width);
-    setCurrentPage(page);
+    setCurrentPage(Math.round(offsetX / width));
   };
 
   const goNext = () => {
     if (currentPage < pages.length - 1) {
-      scrollRef.current?.scrollTo({ x: (currentPage + 1) * width, animated: true });
+      scrollRef.current?.scrollTo({
+        x: (currentPage + 1) * width,
+        animated: true,
+      });
       setCurrentPage(currentPage + 1);
     }
   };
 
-  const handleStart = async () => {
-    try {
-      await AsyncStorage.setItem(ONBOARDING_KEY, 'true');
-    } catch {
-      // ignore storage errors
-    }
-    router.replace('/(tabs)');
-  };
+  const handleStart = () => router.push('/onboarding/phone' as any);
 
   const isLastPage = currentPage === pages.length - 1;
 
@@ -88,7 +84,6 @@ export default function OnboardingScreen() {
         ))}
       </ScrollView>
 
-      {/* Pagination dots */}
       <View style={styles.dotsContainer}>
         {pages.map((_, index) => (
           <View
@@ -101,11 +96,10 @@ export default function OnboardingScreen() {
         ))}
       </View>
 
-      {/* Bottom button */}
       <View style={styles.bottomContainer}>
         {isLastPage ? (
           <TouchableOpacity style={styles.startButton} onPress={handleStart}>
-            <Text style={styles.startButtonText}>Эхлэх</Text>
+            <Text style={styles.startButtonText}>Бүртгүүлэх</Text>
           </TouchableOpacity>
         ) : (
           <TouchableOpacity style={styles.nextButton} onPress={goNext}>
@@ -118,10 +112,7 @@ export default function OnboardingScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#FFFFFF',
-  },
+  container: { flex: 1, backgroundColor: '#FFFFFF' },
   page: {
     width: width,
     flex: 1,
@@ -129,10 +120,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 40,
   },
-  pageEmoji: {
-    fontSize: 72,
-    marginBottom: 32,
-  },
+  pageEmoji: { fontSize: 72, marginBottom: 32 },
   pageTitle: {
     fontSize: 32,
     fontWeight: '800',
@@ -152,35 +140,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 20,
   },
-  dot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    marginHorizontal: 6,
-  },
-  dotActive: {
-    backgroundColor: '#2d5016',
-    width: 28,
-    borderRadius: 5,
-  },
-  dotInactive: {
-    backgroundColor: '#C8D6C0',
-  },
-  bottomContainer: {
-    paddingHorizontal: 32,
-    paddingBottom: 32,
-  },
+  dot: { width: 10, height: 10, borderRadius: 5, marginHorizontal: 6 },
+  dotActive: { backgroundColor: '#2d5016', width: 28, borderRadius: 5 },
+  dotInactive: { backgroundColor: '#C8D6C0' },
+  bottomContainer: { paddingHorizontal: 32, paddingBottom: 32 },
   nextButton: {
     backgroundColor: '#2d5016',
     borderRadius: 16,
     paddingVertical: 18,
     alignItems: 'center',
   },
-  nextButtonText: {
-    color: '#FFFFFF',
-    fontSize: 18,
-    fontWeight: '700',
-  },
+  nextButtonText: { color: '#FFFFFF', fontSize: 18, fontWeight: '700' },
   startButton: {
     backgroundColor: '#2d5016',
     borderRadius: 16,
@@ -192,9 +162,5 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 6,
   },
-  startButtonText: {
-    color: '#FFFFFF',
-    fontSize: 20,
-    fontWeight: '800',
-  },
+  startButtonText: { color: '#FFFFFF', fontSize: 20, fontWeight: '800' },
 });
