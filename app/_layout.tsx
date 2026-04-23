@@ -71,6 +71,8 @@ export default function RootLayout() {
         <Stack.Screen name="family-future" options={{ headerShown: false }} />
         <Stack.Screen name="extra-income" options={{ headerShown: false }} />
         <Stack.Screen name="chat" options={{ headerShown: false }} />
+        <Stack.Screen name="coop-dashboard" options={{ headerShown: false }} />
+        <Stack.Screen name="service-dashboard" options={{ headerShown: false }} />
       </Stack>
       <StatusBar style="auto" />
     </ThemeProvider>
