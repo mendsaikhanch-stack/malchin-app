@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -9,7 +9,7 @@ import {
   Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
+import { useRouter, useFocusEffect } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AppColors } from '@/constants/theme';
 import { userApi } from '@/services/api';
@@ -36,28 +36,31 @@ export default function ProfileScreen() {
   const [isRegistering, setIsRegistering] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  // Онбординг-аас автомат нэвтрэлт. Backend login шаардлагагүй.
-  useEffect(() => {
-    (async () => {
-      try {
-        const raw = await AsyncStorage.getItem(ONBOARDING_DATA_KEY);
-        if (!raw) return;
-        const d = JSON.parse(raw);
-        if (!d?.phone) return;
-        setUser({
-          phone: d.phone,
-          name: `${d.lastName || ''} ${d.firstName || ''}`.trim(),
-          aimag: d.aimag,
-          sum: d.sum,
-          bag: d.bag,
-          role: d.role,
-        });
-        setIsLoggedIn(true);
-      } catch {
-        // ignore
-      }
-    })();
-  }, []);
+  // Онбординг-аас автомат нэвтрэлт. Таб focus болгонд дахин шалгана
+  // (онбординг дуусаад профайл тавхад шилжихэд шинэ data-аа харна).
+  const loadFromOnboarding = useCallback(async () => {
+    if (isLoggedIn) return;
+    try {
+      const raw = await AsyncStorage.getItem(ONBOARDING_DATA_KEY);
+      if (!raw) return;
+      const d = JSON.parse(raw);
+      if (!d?.phone) return;
+      setUser({
+        phone: d.phone,
+        name: `${d.lastName || ''} ${d.firstName || ''}`.trim(),
+        aimag: d.aimag,
+        sum: d.sum,
+        bag: d.bag,
+        role: d.role,
+      });
+      setIsLoggedIn(true);
+    } catch {
+      // ignore
+    }
+  }, [isLoggedIn]);
+
+  useEffect(() => { loadFromOnboarding(); }, [loadFromOnboarding]);
+  useFocusEffect(useCallback(() => { loadFromOnboarding(); }, [loadFromOnboarding]));
 
   const handleLogin = async () => {
     if (!phone.trim() || phone.length < 8) {
