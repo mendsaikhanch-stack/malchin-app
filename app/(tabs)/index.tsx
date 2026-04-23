@@ -14,6 +14,7 @@ import { AppColors } from '@/constants/theme';
 import { livestockApi, weatherApi, alertsApi, aiApi, financeApi } from '@/services/api';
 import { AdBanner, AdBannerLarge } from '@/components/ad-banner';
 import { useLocation } from '@/hooks/use-location';
+import { useUserRole, ROLE_LABEL, ROLE_EMOJI } from '@/hooks/use-user-role';
 
 const animalNames: Record<string, string> = {
   sheep: 'Хонь', goat: 'Ямаа', cattle: 'Үхэр',
@@ -55,6 +56,7 @@ const quickActionItems = [
 export default function HomeScreen() {
   const router = useRouter();
   const { address: myLocation, loading: locLoading } = useLocation();
+  const { role, name: userName } = useUserRole();
   const [refreshing, setRefreshing] = useState(false);
   const [loading, setLoading] = useState(true);
   const [livestock, setLivestock] = useState<any[]>([]);
@@ -134,12 +136,34 @@ export default function HomeScreen() {
       >
         {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.greeting}>Сайн байна уу!</Text>
+          <Text style={styles.greeting}>
+            {userName ? `Сайн байна уу, ${userName}!` : 'Сайн байна уу!'}
+          </Text>
           <Text style={styles.appTitle}>МАЛЧИН</Text>
           {myLocation ? (
             <Text style={styles.locationText}>📍 {myLocation}</Text>
           ) : null}
         </View>
+
+        {/* Role banner — зөвхөн malchin биш role-д харагдана */}
+        {role && role !== 'malchin' && (
+          <TouchableOpacity
+            style={styles.roleBanner}
+            onPress={() => {
+              if (role === 'bag_darga') router.push('/bag-dashboard' as any);
+              else if (role === 'sum_admin') router.push('/sum-dashboard' as any);
+              else if (role === 'khorshoo') router.push('/coop-dashboard' as any);
+              else router.push('/service-dashboard' as any);
+            }}
+          >
+            <Text style={styles.roleEmoji}>{ROLE_EMOJI[role]}</Text>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.roleTitle}>{ROLE_LABEL[role]} хяналт</Text>
+              <Text style={styles.roleDesc}>Ажлын хяналтын самбар руу очих</Text>
+            </View>
+            <Text style={styles.roleArrow}>›</Text>
+          </TouchableOpacity>
+        )}
 
         {/* Малын тоо */}
         <TouchableOpacity style={styles.card} onPress={() => router.push('/(tabs)/livestock')}>
@@ -318,6 +342,17 @@ const styles = StyleSheet.create({
   greeting: { fontSize: 16, color: AppColors.grayDark },
   appTitle: { fontSize: 28, fontWeight: '800', color: AppColors.primary, marginTop: 4 },
   locationText: { fontSize: 13, color: AppColors.grayDark, marginTop: 4 },
+  roleBanner: {
+    flexDirection: 'row', alignItems: 'center',
+    marginHorizontal: 16, marginTop: 12, padding: 14,
+    backgroundColor: AppColors.primary, borderRadius: 14,
+    shadowColor: '#000', shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1, shadowRadius: 6, elevation: 4,
+  },
+  roleEmoji: { fontSize: 30, marginRight: 12 },
+  roleTitle: { fontSize: 16, fontWeight: '700', color: AppColors.white },
+  roleDesc: { fontSize: 12, color: '#E8F5E9', marginTop: 2 },
+  roleArrow: { fontSize: 28, color: AppColors.white, fontWeight: '700' },
   card: {
     backgroundColor: AppColors.white, marginHorizontal: 16, marginTop: 12,
     borderRadius: 16, padding: 16, shadowColor: '#000',
