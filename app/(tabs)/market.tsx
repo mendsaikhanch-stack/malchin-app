@@ -17,6 +17,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { AppColors } from '@/constants/theme';
 import { marketApi, pricesApi } from '@/services/api';
 import { AdBanner } from '@/components/ad-banner';
+import { ReportButton } from '@/components/report-button';
 
 const tabs = ['Ханш', 'Түүхий эд', 'Зарууд', 'Миний зар'];
 
@@ -375,6 +376,11 @@ export default function MarketScreen() {
           ) : null}
         </View>
         {item.phone ? <Text style={styles.listingPhone}>📱 {item.phone}</Text> : null}
+        {!showActions && (
+          <View style={{ flexDirection: 'row', justifyContent: 'flex-end', marginTop: 8 }}>
+            <ReportButton listingId={item.id} compact />
+          </View>
+        )}
         {showActions && (
           <View style={styles.listingActions}>
             <TouchableOpacity style={styles.actionBtnEdit} onPress={() => handleEdit(item)}>
