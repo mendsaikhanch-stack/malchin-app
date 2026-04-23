@@ -12,6 +12,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Stack, useRouter } from 'expo-router';
 import { AppColors } from '@/constants/theme';
+import { ReportButton } from '@/components/report-button';
 
 type ListingType = 'lost' | 'found';
 
@@ -390,6 +391,10 @@ export default function LostFoundScreen() {
                       <Text style={styles.btnPrimaryText}>Эзэнд хүрсэн</Text>
                     </TouchableOpacity>
                   )}
+                </View>
+
+                <View style={{ marginTop: 14 }}>
+                  <ReportButton listingId={detailModal.id} />
                 </View>
               </ScrollView>
             </View>
