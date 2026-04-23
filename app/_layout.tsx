@@ -68,6 +68,7 @@ export default function RootLayout() {
         <Stack.Screen name="lost-found" options={{ headerShown: false }} />
         <Stack.Screen name="bag-dashboard" options={{ headerShown: false }} />
         <Stack.Screen name="sum-dashboard" options={{ headerShown: false }} />
+        <Stack.Screen name="malchin-khun" options={{ headerShown: false }} />
       </Stack>
       <StatusBar style="auto" />
     </ThemeProvider>
