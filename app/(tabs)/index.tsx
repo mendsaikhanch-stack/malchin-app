@@ -162,13 +162,24 @@ export default function HomeScreen() {
       >
         {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.greeting}>
-            {userName ? `Сайн байна уу, ${userName}!` : 'Сайн байна уу!'}
-          </Text>
-          <Text style={styles.appTitle}>МАЛЧИН</Text>
-          {myLocation ? (
-            <Text style={styles.locationText}>📍 {myLocation}</Text>
-          ) : null}
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.greeting}>
+                {userName ? `Сайн байна уу, ${userName}!` : 'Сайн байна уу!'}
+              </Text>
+              <Text style={styles.appTitle}>МАЛЧИН</Text>
+              {myLocation ? (
+                <Text style={styles.locationText}>📍 {myLocation}</Text>
+              ) : null}
+            </View>
+            <TouchableOpacity
+              style={styles.inboxBtn}
+              onPress={() => router.push('/inbox' as any)}
+            >
+              <Text style={styles.inboxIcon}>🔔</Text>
+              <View style={styles.inboxDot} />
+            </TouchableOpacity>
+          </View>
         </View>
 
         {/* Role banner — зөвхөн malchin биш role-д харагдана */}
@@ -480,6 +491,18 @@ const styles = StyleSheet.create({
   greeting: { fontSize: 16, color: AppColors.grayDark },
   appTitle: { fontSize: 28, fontWeight: '800', color: AppColors.primary, marginTop: 4 },
   locationText: { fontSize: 13, color: AppColors.grayDark, marginTop: 4 },
+  inboxBtn: {
+    width: 44, height: 44, borderRadius: 22, backgroundColor: AppColors.white,
+    alignItems: 'center', justifyContent: 'center',
+    shadowColor: '#000', shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1, shadowRadius: 4, elevation: 3,
+  },
+  inboxIcon: { fontSize: 22 },
+  inboxDot: {
+    position: 'absolute', top: 8, right: 10,
+    width: 10, height: 10, borderRadius: 5, backgroundColor: AppColors.danger,
+    borderWidth: 2, borderColor: AppColors.white,
+  },
   roleBanner: {
     flexDirection: 'row', alignItems: 'center',
     marginHorizontal: 16, marginTop: 12, padding: 14,

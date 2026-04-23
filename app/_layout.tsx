@@ -77,6 +77,7 @@ export default function RootLayout() {
         <Stack.Screen name="elder-content" options={{ headerShown: false }} />
         <Stack.Screen name="vet-booking" options={{ headerShown: false }} />
         <Stack.Screen name="wisdom-feed" options={{ headerShown: false }} />
+        <Stack.Screen name="inbox" options={{ headerShown: false }} />
       </Stack>
       <StatusBar style="auto" />
     </ThemeProvider>
