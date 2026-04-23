@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <linearGradient id="bg4" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#2d5016"/>
+      <stop offset="50%" style="stop-color:#3a6b1e"/>
+      <stop offset="100%" style="stop-color:#4a7c28"/>
+    </linearGradient>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFD700"/>
+      <stop offset="100%" style="stop-color:#FFA000"/>
+    </linearGradient>
+  </defs>
+  <!-- Background -->
+  <rect width="1024" height="1024" rx="220" fill="url(#bg4)"/>
+  <!-- Subtle pattern -->
+  <circle cx="512" cy="512" r="400" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="60"/>
+  <circle cx="512" cy="512" r="320" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="40"/>
+  <!-- M letter stylized as mountains/ger -->
+  <path d="M180 680 L180 350 L370 180 L512 350 L654 180 L844 350 L844 680"
+    fill="none" stroke="white" stroke-width="55" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Small ger on top of M -->
+  <g transform="translate(512, 310)">
+    <rect x="-35" y="0" width="70" height="40" rx="4" fill="url(#gold)"/>
+    <path d="M-45 3 L0 -35 L45 3Z" fill="url(#gold)"/>
+    <circle cx="0" cy="-25" r="8" fill="#FFF176" stroke="#FFA000" stroke-width="2"/>
+    <rect x="-8" y="15" width="16" height="25" rx="2" fill="#C49555"/>
+  </g>
+  <!-- Sheep silhouettes at bottom -->
+  <g transform="translate(350, 700)" opacity="0.4">
+    <ellipse cx="0" cy="0" rx="25" ry="16" fill="white"/>
+    <circle cx="-18" cy="-8" r="10" fill="white"/>
+  </g>
+  <g transform="translate(430, 710)" opacity="0.3">
+    <ellipse cx="0" cy="0" rx="20" ry="13" fill="white"/>
+    <circle cx="-14" cy="-6" r="8" fill="white"/>
+  </g>
+  <g transform="translate(580, 705)" opacity="0.35">
+    <ellipse cx="0" cy="0" rx="22" ry="14" fill="white"/>
+    <circle cx="-16" cy="-7" r="9" fill="white"/>
+  </g>
+  <g transform="translate(670, 712)" opacity="0.25">
+    <ellipse cx="0" cy="0" rx="18" ry="12" fill="white"/>
+    <circle cx="-13" cy="-6" r="7" fill="white"/>
+  </g>
+  <!-- Text -->
+  <text x="512" y="830" font-family="Arial, sans-serif" font-size="78" font-weight="900" fill="white" text-anchor="middle" letter-spacing="8">МАЛЧИН</text>
+  <text x="512" y="890" font-family="Arial, sans-serif" font-size="28" font-weight="400" fill="rgba(255,255,255,0.5)" text-anchor="middle" letter-spacing="10">SUPER APP</text>
+</svg>

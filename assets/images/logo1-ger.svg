@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <linearGradient id="bg1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#2d5016"/>
+      <stop offset="100%" style="stop-color:#4a7c28"/>
+    </linearGradient>
+    <linearGradient id="sky1" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#87CEEB"/>
+      <stop offset="100%" style="stop-color:#E8F5E9"/>
+    </linearGradient>
+  </defs>
+  <!-- Background -->
+  <rect width="1024" height="1024" rx="220" fill="url(#bg1)"/>
+  <!-- Mountains -->
+  <path d="M0 650 L200 420 L350 520 L512 340 L674 520 L824 420 L1024 650 L1024 1024 L0 1024Z" fill="#1a3a0a" opacity="0.3"/>
+  <path d="M0 720 L256 520 L400 600 L512 480 L624 600 L768 520 L1024 720 L1024 1024 L0 1024Z" fill="#1a3a0a" opacity="0.2"/>
+  <!-- Ger (Yurt) -->
+  <ellipse cx="512" cy="520" rx="160" ry="30" fill="#1a3a0a" opacity="0.15"/>
+  <rect x="382" y="390" width="260" height="130" rx="8" fill="#F5F0E0"/>
+  <path d="M362 395 L512 260 L662 395Z" fill="#D4A96A"/>
+  <rect x="362" y="385" width="300" height="15" rx="4" fill="#C49555"/>
+  <!-- Ger door -->
+  <rect x="485" y="440" width="54" height="80" rx="4" fill="#8B6914"/>
+  <rect x="489" y="444" width="22" height="72" rx="2" fill="#A07828"/>
+  <rect x="515" y="444" width="22" height="72" rx="2" fill="#A07828"/>
+  <!-- Ger toono -->
+  <circle cx="512" cy="290" r="22" fill="#C49555" stroke="#8B6914" stroke-width="3"/>
+  <line x1="512" y1="268" x2="512" y2="312" stroke="#8B6914" stroke-width="2"/>
+  <line x1="490" y1="290" x2="534" y2="290" stroke="#8B6914" stroke-width="2"/>
+  <!-- Sheep -->
+  <g transform="translate(680, 440)">
+    <ellipse cx="0" cy="0" rx="45" ry="30" fill="white"/>
+    <circle cx="-35" cy="-15" r="18" fill="white"/>
+    <circle cx="-42" cy="-22" r="4" fill="#333"/>
+    <rect x="-20" y="25" width="6" height="20" rx="2" fill="#666"/>
+    <rect x="-5" y="25" width="6" height="20" rx="2" fill="#666"/>
+    <rect x="15" y="25" width="6" height="20" rx="2" fill="#666"/>
+    <rect x="30" y="25" width="6" height="20" rx="2" fill="#666"/>
+  </g>
+  <!-- Small sheep -->
+  <g transform="translate(760, 460) scale(0.6)">
+    <ellipse cx="0" cy="0" rx="40" ry="25" fill="white" opacity="0.9"/>
+    <circle cx="-28" cy="-12" r="14" fill="white" opacity="0.9"/>
+    <rect x="-15" y="20" width="5" height="15" rx="2" fill="#666"/>
+    <rect x="5" y="20" width="5" height="15" rx="2" fill="#666"/>
+    <rect x="20" y="20" width="5" height="15" rx="2" fill="#666"/>
+  </g>
+  <!-- Text -->
+  <text x="512" y="680" font-family="Arial, sans-serif" font-size="88" font-weight="900" fill="white" text-anchor="middle" letter-spacing="4">МАЛЧИН</text>
+  <text x="512" y="740" font-family="Arial, sans-serif" font-size="32" font-weight="400" fill="rgba(255,255,255,0.7)" text-anchor="middle" letter-spacing="6">SUPER APP</text>
+  <!-- Sun -->
+  <circle cx="180" cy="200" r="50" fill="#FFD700" opacity="0.8"/>
+  <circle cx="180" cy="200" r="38" fill="#FFF176"/>
+</svg>

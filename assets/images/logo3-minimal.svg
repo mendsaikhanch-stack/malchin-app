@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <linearGradient id="bg3" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#E8F5E9"/>
+      <stop offset="100%" style="stop-color:#C8E6C9"/>
+    </linearGradient>
+  </defs>
+  <!-- Background -->
+  <rect width="1024" height="1024" rx="220" fill="url(#bg3)"/>
+  <!-- Main circle -->
+  <circle cx="512" cy="430" r="270" fill="#2d5016"/>
+  <circle cx="512" cy="430" r="250" fill="#3a6b1e"/>
+  <!-- Stylized sheep head -->
+  <g transform="translate(512, 400)">
+    <!-- Wool cloud -->
+    <circle cx="0" cy="-60" r="65" fill="white"/>
+    <circle cx="-55" cy="-40" r="50" fill="white"/>
+    <circle cx="55" cy="-40" r="50" fill="white"/>
+    <circle cx="-45" cy="10" r="45" fill="white"/>
+    <circle cx="45" cy="10" r="45" fill="white"/>
+    <circle cx="0" cy="20" r="50" fill="white"/>
+    <!-- Face -->
+    <ellipse cx="0" cy="40" rx="55" ry="65" fill="#F5EEE0"/>
+    <!-- Eyes -->
+    <circle cx="-22" cy="20" r="12" fill="#1a3a0a"/>
+    <circle cx="22" cy="20" r="12" fill="#1a3a0a"/>
+    <circle cx="-19" cy="17" r="4" fill="white"/>
+    <circle cx="25" cy="17" r="4" fill="white"/>
+    <!-- Nose -->
+    <ellipse cx="0" cy="55" rx="18" ry="12" fill="#C49555"/>
+    <circle cx="-6" cy="53" r="3" fill="#8B6914"/>
+    <circle cx="6" cy="53" r="3" fill="#8B6914"/>
+    <!-- Mouth -->
+    <path d="M-8 68 Q0 76 8 68" fill="none" stroke="#8B6914" stroke-width="2.5"/>
+    <!-- Ears -->
+    <ellipse cx="-75" cy="-10" rx="28" ry="16" fill="#E8DCC8" transform="rotate(-25 -75 -10)"/>
+    <ellipse cx="75" cy="-10" rx="28" ry="16" fill="#E8DCC8" transform="rotate(25 75 -10)"/>
+    <ellipse cx="-72" cy="-10" rx="18" ry="10" fill="#D4C4A8" transform="rotate(-25 -72 -10)"/>
+    <ellipse cx="72" cy="-10" rx="18" ry="10" fill="#D4C4A8" transform="rotate(25 72 -10)"/>
+  </g>
+  <!-- Text -->
+  <text x="512" y="780" font-family="Arial, sans-serif" font-size="88" font-weight="900" fill="#2d5016" text-anchor="middle" letter-spacing="4">МАЛЧИН</text>
+  <text x="512" y="838" font-family="Arial, sans-serif" font-size="30" font-weight="600" fill="#4a7c28" text-anchor="middle" letter-spacing="8">SUPER APP</text>
+</svg>
