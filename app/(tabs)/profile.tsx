@@ -9,6 +9,7 @@ import {
   Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
 import { AppColors } from '@/constants/theme';
 import { userApi } from '@/services/api';
 import { clearCache, getCacheSize } from '@/services/offline';
@@ -20,6 +21,7 @@ const aimagList = [
 ];
 
 export default function ProfileScreen() {
+  const router = useRouter();
   const isConnected = useNetwork();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState<any>(null);
