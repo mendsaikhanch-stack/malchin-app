@@ -17,16 +17,17 @@ export type SeasonalCamp = {
   note?: string;
 };
 
+export type SpeciesKey = 'horse' | 'cow' | 'sheep' | 'goat' | 'camel';
+export type SubKey = 'young' | 'milk' | 'pregnant' | 'weak';
+export type SubCounts = { young: number; milk: number; pregnant: number; weak: number };
+
 export type LivestockCounts = {
   horse: number;
   cow: number;
   sheep: number;
   goat: number;
   camel: number;
-  youngStock: number;
-  milkStock: number;
-  pregnantStock: number;
-  weakStock: number;
+  subCounts: Record<SpeciesKey, SubCounts>;
 };
 
 export type Preferences = {
@@ -81,10 +82,13 @@ const DEFAULT_DATA: OnboardingData = {
     sheep: 0,
     goat: 0,
     camel: 0,
-    youngStock: 0,
-    milkStock: 0,
-    pregnantStock: 0,
-    weakStock: 0,
+    subCounts: {
+      horse: { young: 0, milk: 0, pregnant: 0, weak: 0 },
+      cow: { young: 0, milk: 0, pregnant: 0, weak: 0 },
+      sheep: { young: 0, milk: 0, pregnant: 0, weak: 0 },
+      goat: { young: 0, milk: 0, pregnant: 0, weak: 0 },
+      camel: { young: 0, milk: 0, pregnant: 0, weak: 0 },
+    },
   },
   preferences: {
     weather: true,
@@ -110,7 +114,8 @@ type ContextValue = {
     key: keyof OnboardingData['seasonal'],
     value: SeasonalCamp
   ) => void;
-  updateLivestock: (key: keyof LivestockCounts, value: number) => void;
+  updateLivestock: (key: SpeciesKey, value: number) => void;
+  updateSubCount: (species: SpeciesKey, sub: SubKey, value: number) => void;
   togglePreference: (key: keyof Preferences) => void;
   reset: () => Promise<void>;
 };
@@ -158,10 +163,25 @@ export default function OnboardingLayout() {
       seasonal: { ...prev.seasonal, [key]: value },
     }));
 
-  const updateLivestock = (key: keyof LivestockCounts, value: number) =>
+  const updateLivestock = (key: SpeciesKey, value: number) =>
     setData((prev) => ({
       ...prev,
       livestock: { ...prev.livestock, [key]: Math.max(0, value) },
+    }));
+
+  const updateSubCount = (species: SpeciesKey, sub: SubKey, value: number) =>
+    setData((prev) => ({
+      ...prev,
+      livestock: {
+        ...prev.livestock,
+        subCounts: {
+          ...prev.livestock.subCounts,
+          [species]: {
+            ...prev.livestock.subCounts[species],
+            [sub]: Math.max(0, value),
+          },
+        },
+      },
     }));
 
   const togglePreference = (key: keyof Preferences) =>
@@ -182,6 +202,7 @@ export default function OnboardingLayout() {
         update,
         updateSeasonal,
         updateLivestock,
+        updateSubCount,
         togglePreference,
         reset,
       }}

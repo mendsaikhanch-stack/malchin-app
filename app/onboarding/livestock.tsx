@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -10,9 +10,9 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { AppColors } from '@/constants/theme';
 import { StepHeader, PrimaryButton, SecondaryButton } from './_components';
-import { useOnboarding, LivestockCounts } from './_layout';
+import { useOnboarding, SpeciesKey, SubKey } from './_layout';
 
-const TYPES: Array<{ key: keyof LivestockCounts; label: string; emoji: string }> = [
+const TYPES: { key: SpeciesKey; label: string; emoji: string }[] = [
   { key: 'horse', label: 'Адуу', emoji: '🐎' },
   { key: 'cow', label: 'Үхэр', emoji: '🐄' },
   { key: 'sheep', label: 'Хонь', emoji: '🐑' },
@@ -20,11 +20,11 @@ const TYPES: Array<{ key: keyof LivestockCounts; label: string; emoji: string }>
   { key: 'camel', label: 'Тэмээ', emoji: '🐪' },
 ];
 
-const SUBTYPES: Array<{ key: keyof LivestockCounts; label: string }> = [
-  { key: 'youngStock', label: 'Төл мал' },
-  { key: 'milkStock', label: 'Саалийн мал' },
-  { key: 'pregnantStock', label: 'Хээлтэй мал' },
-  { key: 'weakStock', label: 'Сул дорой мал' },
+const SUBTYPES: { key: SubKey; label: string; emoji: string }[] = [
+  { key: 'young', label: 'Төл', emoji: '🐣' },
+  { key: 'milk', label: 'Саалийн', emoji: '🥛' },
+  { key: 'pregnant', label: 'Хээлтэй', emoji: '🤰' },
+  { key: 'weak', label: 'Сул дорой', emoji: '🩹' },
 ];
 
 function StepperBig({
@@ -54,7 +54,7 @@ function StepperBig({
   );
 }
 
-function Stepper({
+function StepperSmall({
   value,
   onChange,
 }: {
@@ -62,16 +62,13 @@ function Stepper({
   onChange: (n: number) => void;
 }) {
   return (
-    <View style={styles.stepper}>
-      <TouchableOpacity
-        style={styles.stepBtn}
-        onPress={() => onChange(Math.max(0, value - 1))}
-      >
-        <Text style={styles.stepBtnText}>−</Text>
+    <View style={styles.stepperSmall}>
+      <TouchableOpacity style={styles.smallBtn} onPress={() => onChange(Math.max(0, value - 1))}>
+        <Text style={styles.smallBtnText}>−</Text>
       </TouchableOpacity>
-      <Text style={styles.stepValue}>{value}</Text>
-      <TouchableOpacity style={styles.stepBtn} onPress={() => onChange(value + 1)}>
-        <Text style={styles.stepBtnText}>+</Text>
+      <Text style={styles.smallValue}>{value}</Text>
+      <TouchableOpacity style={styles.smallBtn} onPress={() => onChange(value + 1)}>
+        <Text style={styles.smallBtnText}>+</Text>
       </TouchableOpacity>
     </View>
   );
@@ -79,14 +76,17 @@ function Stepper({
 
 export default function LivestockScreen() {
   const router = useRouter();
-  const { data, updateLivestock } = useOnboarding();
+  const { data, updateLivestock, updateSubCount } = useOnboarding();
+  const [expanded, setExpanded] = useState<SpeciesKey | null>(null);
 
-  const totalMain = TYPES.reduce(
-    (s, t) => s + (data.livestock[t.key] as number),
-    0
-  );
+  const totalMain = TYPES.reduce((s, t) => s + data.livestock[t.key], 0);
 
   const goNext = () => router.push('/onboarding/preferences' as any);
+
+  const subTotalOf = (species: SpeciesKey) => {
+    const sc = data.livestock.subCounts[species];
+    return sc.young + sc.milk + sc.pregnant + sc.weak;
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -94,7 +94,7 @@ export default function LivestockScreen() {
         step={7}
         total={8}
         title="Малын тоо"
-        subtitle="Малын төрөл бүрийн тоо толгойг оруулна уу"
+        subtitle="Малын төрөл бүрийн тоо толгой, төл, саалийн, хээлтэй, сул дорой малын тоо"
       />
       <ScrollView contentContainerStyle={styles.body}>
         <View style={styles.totalCard}>
@@ -102,29 +102,63 @@ export default function LivestockScreen() {
           <Text style={styles.totalValue}>{totalMain} толгой</Text>
         </View>
 
-        {TYPES.map((t) => (
-          <View key={t.key} style={styles.row}>
-            <View style={styles.rowHeader}>
-              <Text style={styles.emoji}>{t.emoji}</Text>
-              <Text style={styles.rowLabel}>{t.label}</Text>
-            </View>
-            <StepperBig
-              value={data.livestock[t.key]}
-              onChange={(n) => updateLivestock(t.key, n)}
-            />
-          </View>
-        ))}
+        {TYPES.map((t) => {
+          const isExpanded = expanded === t.key;
+          const subTotal = subTotalOf(t.key);
+          const hasAnimals = data.livestock[t.key] > 0;
+          return (
+            <View key={t.key} style={styles.row}>
+              <View style={styles.rowHeader}>
+                <Text style={styles.emoji}>{t.emoji}</Text>
+                <Text style={styles.rowLabel}>{t.label}</Text>
+                {hasAnimals && subTotal > 0 && (
+                  <View style={styles.badge}>
+                    <Text style={styles.badgeText}>төл {subTotal}</Text>
+                  </View>
+                )}
+              </View>
+              <StepperBig
+                value={data.livestock[t.key]}
+                onChange={(n) => updateLivestock(t.key, n)}
+              />
 
-        <Text style={styles.sectionTitle}>Нэмэлт ангилал (заавал биш)</Text>
-        {SUBTYPES.map((s) => (
-          <View key={s.key} style={styles.subRow}>
-            <Text style={styles.subLabel}>{s.label}</Text>
-            <Stepper
-              value={data.livestock[s.key]}
-              onChange={(n) => updateLivestock(s.key, n)}
-            />
-          </View>
-        ))}
+              {/* Expand row */}
+              {hasAnimals && (
+                <TouchableOpacity
+                  style={styles.expandBtn}
+                  onPress={() => setExpanded(isExpanded ? null : t.key)}
+                >
+                  <Text style={styles.expandText}>
+                    {isExpanded ? '▲ Хаах' : '▼ Төл, саалийн, хээлтэй, сул дорой'}
+                  </Text>
+                </TouchableOpacity>
+              )}
+
+              {/* Expandable subtypes */}
+              {isExpanded && hasAnimals && (
+                <View style={styles.subtypesBox}>
+                  {SUBTYPES.map((s) => (
+                    <View key={s.key} style={styles.subRow}>
+                      <View style={styles.subLabelBox}>
+                        <Text style={styles.subEmoji}>{s.emoji}</Text>
+                        <Text style={styles.subLabel}>{s.label}</Text>
+                      </View>
+                      <StepperSmall
+                        value={data.livestock.subCounts[t.key][s.key]}
+                        onChange={(n) => updateSubCount(t.key, s.key, n)}
+                      />
+                    </View>
+                  ))}
+                </View>
+              )}
+            </View>
+          );
+        })}
+
+        <Text style={styles.hint}>
+          💡 Малын тоо бүртгэсний дараа төрөл тус бүр дээр "▼ Төл, саалийн..."
+          дарвал дэлгэрэнгүй тоог оруулж болно.
+        </Text>
       </ScrollView>
       <View style={styles.footer}>
         <PrimaryButton label="Үргэлжлүүлэх" onPress={goNext} />
@@ -154,9 +188,21 @@ const styles = StyleSheet.create({
     padding: 12,
     marginBottom: 10,
   },
-  rowHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 8 },
-  emoji: { fontSize: 24, marginRight: 10 },
-  rowLabel: { fontSize: 16, fontWeight: '700', color: AppColors.black },
+  rowHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+    gap: 8,
+  },
+  emoji: { fontSize: 24, marginRight: 6 },
+  rowLabel: { fontSize: 16, fontWeight: '700', color: AppColors.black, flex: 1 },
+  badge: {
+    backgroundColor: AppColors.primary,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 10,
+  },
+  badgeText: { color: AppColors.white, fontSize: 11, fontWeight: '700' },
   stepperBig: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -179,38 +225,56 @@ const styles = StyleSheet.create({
     minWidth: 50,
     textAlign: 'center',
   },
-  sectionTitle: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: AppColors.grayDark,
-    marginTop: 16,
-    marginBottom: 8,
+  expandBtn: {
+    marginTop: 8,
+    paddingVertical: 6,
+    alignItems: 'center',
+    backgroundColor: AppColors.white,
+    borderRadius: 8,
+  },
+  expandText: { fontSize: 12, color: AppColors.primary, fontWeight: '600' },
+  subtypesBox: {
+    marginTop: 8,
+    padding: 8,
+    backgroundColor: AppColors.white,
+    borderRadius: 10,
   },
   subRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingVertical: 10,
+    paddingVertical: 8,
     borderBottomWidth: 1,
     borderBottomColor: AppColors.grayLight,
   },
-  subLabel: { fontSize: 15, color: AppColors.black, flex: 1 },
-  stepper: { flexDirection: 'row', alignItems: 'center' },
-  stepBtn: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+  subLabelBox: { flexDirection: 'row', alignItems: 'center', gap: 6, flex: 1 },
+  subEmoji: { fontSize: 18 },
+  subLabel: { fontSize: 14, color: AppColors.black, fontWeight: '600' },
+  stepperSmall: { flexDirection: 'row', alignItems: 'center' },
+  smallBtn: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
     backgroundColor: AppColors.grayLight,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  stepBtnText: { fontSize: 20, fontWeight: '700', color: AppColors.primary },
-  stepValue: {
-    fontSize: 16,
+  smallBtnText: { fontSize: 18, fontWeight: '700', color: AppColors.primary },
+  smallValue: {
+    fontSize: 15,
     fontWeight: '700',
     color: AppColors.black,
-    minWidth: 40,
+    minWidth: 36,
     textAlign: 'center',
+  },
+  hint: {
+    fontSize: 12,
+    color: AppColors.grayDark,
+    lineHeight: 18,
+    marginTop: 10,
+    padding: 10,
+    backgroundColor: '#FFFBEA',
+    borderRadius: 8,
   },
   footer: {
     paddingHorizontal: 24,

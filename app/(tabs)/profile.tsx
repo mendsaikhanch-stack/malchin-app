@@ -10,10 +10,13 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AppColors } from '@/constants/theme';
 import { userApi } from '@/services/api';
 import { clearCache, getCacheSize } from '@/services/offline';
 import { useNetwork } from '@/hooks/use-network';
+
+const ONBOARDING_DATA_KEY = '@malchin_onboarding_data';
 
 const aimagList = [
   'Төв', 'Увс', 'Ховд', 'Баян-Өлгий', 'Завхан', 'Архангай',
@@ -32,6 +35,29 @@ export default function ProfileScreen() {
   const [bag, setBag] = useState('');
   const [isRegistering, setIsRegistering] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  // Онбординг-аас автомат нэвтрэлт. Backend login шаардлагагүй.
+  useEffect(() => {
+    (async () => {
+      try {
+        const raw = await AsyncStorage.getItem(ONBOARDING_DATA_KEY);
+        if (!raw) return;
+        const d = JSON.parse(raw);
+        if (!d?.phone) return;
+        setUser({
+          phone: d.phone,
+          name: `${d.lastName || ''} ${d.firstName || ''}`.trim(),
+          aimag: d.aimag,
+          sum: d.sum,
+          bag: d.bag,
+          role: d.role,
+        });
+        setIsLoggedIn(true);
+      } catch {
+        // ignore
+      }
+    })();
+  }, []);
 
   const handleLogin = async () => {
     if (!phone.trim() || phone.length < 8) {

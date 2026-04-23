@@ -10,7 +10,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { AppColors } from '@/constants/theme';
 import { PrimaryButton } from './_components';
-import { useOnboarding, Role, LivestockCounts, Preferences } from './_layout';
+import { useOnboarding, Role, SpeciesKey, Preferences } from './_layout';
 
 const ROLE_LABELS: Record<Role, string> = {
   malchin: 'Малчин',
@@ -20,17 +20,17 @@ const ROLE_LABELS: Record<Role, string> = {
   service_provider: 'Үйлчилгээ үзүүлэгч',
 };
 
-const LIVESTOCK_LABELS: Record<keyof LivestockCounts, string> = {
+const SPECIES_LABELS: Record<SpeciesKey, string> = {
   horse: 'Адуу',
   cow: 'Үхэр',
   sheep: 'Хонь',
   goat: 'Ямаа',
   camel: 'Тэмээ',
-  youngStock: 'Төл мал',
-  milkStock: 'Саалийн',
-  pregnantStock: 'Хээлтэй',
-  weakStock: 'Сул дорой',
 };
+
+const SUB_LABELS = {
+  young: 'Төл', milk: 'Саалийн', pregnant: 'Хээлтэй', weak: 'Сул дорой',
+} as const;
 
 const PREF_LABELS: Record<keyof Preferences, string> = {
   weather: 'Цаг агаар',
@@ -75,7 +75,17 @@ export default function ReviewScreen() {
 
   const mainAnimals = (['horse', 'cow', 'sheep', 'goat', 'camel'] as const)
     .filter((k) => data.livestock[k] > 0)
-    .map((k) => `${LIVESTOCK_LABELS[k]} ${data.livestock[k]}`);
+    .map((k) => {
+      const sub = data.livestock.subCounts[k];
+      const subTotal = sub.young + sub.milk + sub.pregnant + sub.weak;
+      const label = `${SPECIES_LABELS[k]} ${data.livestock[k]}`;
+      return subTotal > 0
+        ? `${label} (${Object.entries(SUB_LABELS).map(([sk, sl]) => {
+            const n = sub[sk as keyof typeof sub];
+            return n > 0 ? `${sl} ${n}` : '';
+          }).filter(Boolean).join(', ')})`
+        : label;
+    });
 
   const totalLivestock = (['horse', 'cow', 'sheep', 'goat', 'camel'] as const)
     .reduce((s, k) => s + data.livestock[k], 0);

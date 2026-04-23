@@ -13,11 +13,15 @@ import { PrimaryButton } from './_components';
 import { useOnboarding } from './_layout';
 import { userApi, livestockApi, setToken } from '@/services/api';
 
+// reset() дуудахгүй — ингэснээр онбординг дууссаны дараа ч
+// @malchin_onboarding_data түлхүүрт малчны мэдээлэл үлдэнэ.
+// Нүүр, профайл дэлгэц эдгээр өгөгдлийг уншина.
+
 const ONBOARDING_KEY = '@malchin_onboarding_done';
 
 export default function DoneScreen() {
   const router = useRouter();
-  const { data, reset } = useOnboarding();
+  const { data } = useOnboarding();
   const [submitting, setSubmitting] = useState(true);
   const submittedRef = useRef(false);
 
@@ -71,8 +75,7 @@ export default function DoneScreen() {
     })();
   }, [data]);
 
-  const handleFinish = async () => {
-    await reset();
+  const handleFinish = () => {
     router.replace('/(tabs)');
   };
 
