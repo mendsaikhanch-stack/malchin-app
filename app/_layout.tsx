@@ -70,6 +70,7 @@ export default function RootLayout() {
         <Stack.Screen name="sum-dashboard" options={{ headerShown: false }} />
         <Stack.Screen name="malchin-khun" options={{ headerShown: false }} />
         <Stack.Screen name="family-future" options={{ headerShown: false }} />
+        <Stack.Screen name="extra-income" options={{ headerShown: false }} />
       </Stack>
       <StatusBar style="auto" />
     </ThemeProvider>
