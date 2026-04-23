@@ -74,6 +74,7 @@ export default function RootLayout() {
         <Stack.Screen name="coop-dashboard" options={{ headerShown: false }} />
         <Stack.Screen name="service-dashboard" options={{ headerShown: false }} />
         <Stack.Screen name="privacy-settings" options={{ headerShown: false }} />
+        <Stack.Screen name="elder-content" options={{ headerShown: false }} />
       </Stack>
       <StatusBar style="auto" />
     </ThemeProvider>
