@@ -1,11 +1,13 @@
 import { cachedFetch, cacheSet } from './offline';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// Утас дээр ажиллахын тулд компьютерийн IP хаяг ашиглана
+// API хаягийг env-ээс уншина (EXPO_PUBLIC_API_URL).
+// Dev үед утас дээр ажиллахын тулд компьютерийн IP хаяг ашиглана.
 const DEV_IP = '192.168.0.100';
-const API_BASE = __DEV__
-  ? `http://${DEV_IP}:5000`
-  : 'https://your-production-url.com';
+const ENV_API = process.env.EXPO_PUBLIC_API_URL;
+export const API_BASE = ENV_API && ENV_API.length > 0
+  ? ENV_API
+  : (__DEV__ ? `http://${DEV_IP}:5000` : 'https://api.malchin.mn');
 
 let _token: string | null = null;
 

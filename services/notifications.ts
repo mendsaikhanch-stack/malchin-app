@@ -1,9 +1,7 @@
 import * as Notifications from 'expo-notifications';
 import * as Device from 'expo-device';
 import { Platform } from 'react-native';
-import { getToken } from './api';
-
-const API_BASE = 'http://localhost:5000';
+import { getToken, API_BASE } from './api';
 
 /**
  * Push notification үйлчилгээ - Expo Notifications
