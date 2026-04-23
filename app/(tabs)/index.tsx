@@ -452,6 +452,14 @@ export default function HomeScreen() {
               <Text style={styles.moduleLabel}>Чат</Text>
               <Text style={styles.moduleDesc}>Сум, баг, хоршоо</Text>
             </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.moduleItem}
+              onPress={() => router.push('/wisdom-feed' as any)}
+            >
+              <Text style={styles.moduleEmoji}>👴</Text>
+              <Text style={styles.moduleLabel}>Малчны ухаан</Text>
+              <Text style={styles.moduleDesc}>Ахмад, мэргэжилтэн</Text>
+            </TouchableOpacity>
           </View>
         </View>
 
