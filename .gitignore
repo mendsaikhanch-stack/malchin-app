@@ -38,6 +38,9 @@ yarn-error.*
 # typescript
 *.tsbuildinfo
 
+# Claude Code harness
+.claude/
+
 app-example
 
 # generated native folders
