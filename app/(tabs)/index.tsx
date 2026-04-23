@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AppColors } from '@/constants/theme';
 import { livestockApi, weatherApi, alertsApi, aiApi, financeApi } from '@/services/api';
 import { AdBanner, AdBannerLarge } from '@/components/ad-banner';
@@ -19,9 +20,29 @@ import { getDailyTasks, type DailyTask } from '@/services/daily-tasks';
 import { getMigrationAdvice, type MigrationAdvice } from '@/services/migration-advice';
 
 const animalNames: Record<string, string> = {
-  sheep: 'Хонь', goat: 'Ямаа', cattle: 'Үхэр',
+  sheep: 'Хонь', goat: 'Ямаа', cattle: 'Үхэр', cow: 'Үхэр',
   horse: 'Адуу', camel: 'Тэмээ',
 };
+
+const ONBOARDING_DATA_KEY = '@malchin_onboarding_data';
+
+// Онбординг-д бүртгэсэн малын тоог backend-ийн format руу хөрвүүлэх
+async function loadLivestockFromOnboarding(): Promise<{ livestock: any[]; total_animals: number } | null> {
+  try {
+    const raw = await AsyncStorage.getItem(ONBOARDING_DATA_KEY);
+    if (!raw) return null;
+    const d = JSON.parse(raw);
+    if (!d?.livestock) return null;
+    const types = ['horse', 'cow', 'sheep', 'goat', 'camel'] as const;
+    const items = types
+      .filter((t) => (d.livestock[t] || 0) > 0)
+      .map((t) => ({ animal_type: t, total_count: d.livestock[t] }));
+    const total = items.reduce((s, i) => s + i.total_count, 0);
+    return items.length > 0 ? { livestock: items, total_animals: total } : null;
+  } catch {
+    return null;
+  }
+}
 
 const conditionMn = (condition: string) => {
   const c = (condition || '').toLowerCase();
@@ -84,13 +105,20 @@ export default function HomeScreen() {
         financeApi.getSummary(),
       ]);
 
-      if (statsRes.status === 'fulfilled') {
-        const items = (statsRes.value.livestock || []).map((item: any) => ({
+      // Backend-ээс ирсэн тоо эсвэл онбординг data-аас fallback
+      let stats: { livestock: any[]; total_animals: number } | null = null;
+      if (statsRes.status === 'fulfilled' && statsRes.value?.total_animals > 0) {
+        stats = statsRes.value;
+      } else {
+        stats = await loadLivestockFromOnboarding();
+      }
+      if (stats) {
+        const items = stats.livestock.map((item: any) => ({
           ...item,
           emoji: animalEmojis[item.animal_type] || '🐾',
         }));
         setLivestock(items);
-        setTotalAnimals(statsRes.value.total_animals || 0);
+        setTotalAnimals(stats.total_animals || 0);
       }
       if (weatherRes.status === 'fulfilled') setWeather(weatherRes.value);
       if (alertsRes.status === 'fulfilled') setAlerts((alertsRes.value || []).slice(0, 3));

@@ -15,7 +15,28 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { AppColors } from '@/constants/theme';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { animalsApi, livestockApi } from '@/services/api';
+
+const ONBOARDING_DATA_KEY = '@malchin_onboarding_data';
+
+// Backend унасан үед онбординг-д бүртгэсэн малын тоог fallback болгон унших
+async function loadFromOnboardingStorage(): Promise<{ livestock: any[]; total_animals: number } | null> {
+  try {
+    const raw = await AsyncStorage.getItem(ONBOARDING_DATA_KEY);
+    if (!raw) return null;
+    const d = JSON.parse(raw);
+    if (!d?.livestock) return null;
+    const types = ['horse', 'cow', 'sheep', 'goat', 'camel'] as const;
+    const items = types
+      .filter((t) => (d.livestock[t] || 0) > 0)
+      .map((t) => ({ animal_type: t, total_count: d.livestock[t] }));
+    const total = items.reduce((s, i) => s + i.total_count, 0);
+    return items.length > 0 ? { livestock: items, total_animals: total } : null;
+  } catch {
+    return null;
+  }
+}
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
@@ -965,9 +986,15 @@ function AggregateTab() {
         livestockApi.getStats(userId),
         livestockApi.getEvents(userId),
       ]);
-      if (statsRes.status === 'fulfilled') {
-        setLivestock(statsRes.value.livestock || []);
-        setTotalAnimals(statsRes.value.total_animals || 0);
+      let stats: { livestock: any[]; total_animals: number } | null = null;
+      if (statsRes.status === 'fulfilled' && (statsRes.value?.total_animals || 0) > 0) {
+        stats = statsRes.value;
+      } else {
+        stats = await loadFromOnboardingStorage();
+      }
+      if (stats) {
+        setLivestock(stats.livestock);
+        setTotalAnimals(stats.total_animals);
       }
       if (eventsRes.status === 'fulfilled') {
         setEvents((eventsRes.value || []).slice(0, 10));
