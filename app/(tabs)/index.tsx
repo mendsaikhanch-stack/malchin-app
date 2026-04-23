@@ -383,4 +383,22 @@ const styles = StyleSheet.create({
   },
   actionIcon: { fontSize: 28 },
   actionLabel: { fontSize: 12, fontWeight: '600', color: AppColors.grayDark, marginTop: 8 },
+  // Insurance grid (2x2)
+  insuranceGrid: {
+    flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginTop: 4,
+  },
+  insuranceItem: {
+    width: '47%', backgroundColor: '#F0FFF4', borderRadius: 12,
+    paddingVertical: 14, alignItems: 'center',
+    borderWidth: 1, borderColor: '#C6F6D5',
+  },
+  insuranceEmoji: { fontSize: 26 },
+  insuranceLabel: {
+    fontSize: 13, fontWeight: '600', color: AppColors.grayDark, marginTop: 6,
+  },
+  insuranceTip: {
+    marginTop: 12, padding: 10, backgroundColor: '#FFFBEA',
+    borderRadius: 10, borderLeftWidth: 3, borderLeftColor: AppColors.secondary,
+  },
+  insuranceTipText: { fontSize: 13, color: AppColors.grayDark, lineHeight: 18 },
 });

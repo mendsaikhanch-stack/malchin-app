@@ -59,7 +59,7 @@ const eventTypes = [
 ];
 
 const tabs = ['Бүртгэл', 'Тоо толгой'];
-const filterTypes = [{ key: '', label: 'Бүгд' }, ...animalTypes];
+const filterTypes = [{ key: '', label: 'Бүгд', emoji: '' }, ...animalTypes];
 
 const getAnimalInfo = (type: string) =>
   animalTypes.find((a) => a.key === type) || { label: type, emoji: '🐾', key: type };
