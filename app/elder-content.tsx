@@ -244,6 +244,28 @@ export default function ElderContent() {
             )}
           </TouchableOpacity>
         ))}
+
+        {/* Capability унтраах — Ноорог хэвээр үлдэнэ, зөвхөн access алдагдана */}
+        <TouchableOpacity
+          style={styles.disableBtn}
+          onPress={() =>
+            Alert.alert(
+              'Capability-г унтраах',
+              'Ахмад/контент бүтээгч capability-г унтраах уу? Ноорог + нийтэлсэн контент хэвээр үлдэнэ, зөвхөн энэ дэлгэцийн хандалт хаагдана. Хэзээ ч дахин идэвхжүүлэх боломжтой.',
+              [
+                { text: 'Болих', style: 'cancel' },
+                {
+                  text: 'Унтраах',
+                  style: 'destructive',
+                  onPress: () => toggle(false),
+                },
+              ]
+            )
+          }
+        >
+          <Text style={styles.disableBtnText}>Capability-г унтраах</Text>
+        </TouchableOpacity>
+
         <View style={{ height: 100 }} />
       </ScrollView>
 
@@ -461,6 +483,21 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   optInBtnText: { color: AppColors.white, fontSize: 15, fontWeight: '700' },
+  disableBtn: {
+    marginTop: 24,
+    marginHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: AppColors.grayMedium,
+    alignItems: 'center',
+    backgroundColor: AppColors.white,
+  },
+  disableBtnText: {
+    fontSize: 13,
+    color: AppColors.grayDark,
+    fontWeight: '600',
+  },
   verifiedBadge: { paddingHorizontal: 8, paddingVertical: 4, borderRadius: 8, backgroundColor: AppColors.success },
   verifiedText: { color: AppColors.white, fontSize: 10, fontWeight: '700' },
   stats: { flexDirection: 'row', gap: 8, padding: 12, backgroundColor: AppColors.white },

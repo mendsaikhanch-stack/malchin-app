@@ -1,5 +1,6 @@
 import React from 'react';
 import { render, fireEvent, waitFor } from '@testing-library/react-native';
+import { Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import ElderContent from '../elder-content';
 
@@ -55,5 +56,37 @@ describe('ElderContent opt-in gate', () => {
     await AsyncStorage.setItem(ELDER_KEY, 'false');
     const { findByText } = render(<ElderContent />);
     expect(await findByText('Идэвхжүүлэх')).toBeTruthy();
+  });
+
+  it('enabled үед "Capability-г унтраах" button харагдана', async () => {
+    await AsyncStorage.setItem(ELDER_KEY, 'true');
+    const { findByText } = render(<ElderContent />);
+    expect(await findByText('Capability-г унтраах')).toBeTruthy();
+  });
+
+  it('disable confirm дараа flag=false + opt-in дахин гарна', async () => {
+    await AsyncStorage.setItem(ELDER_KEY, 'true');
+    // Alert.alert-г mock хийж confirm callback-ийг auto-дуудна
+    const alertSpy = jest
+      .spyOn(Alert, 'alert')
+      .mockImplementation((_title, _msg, buttons) => {
+        const destructive = buttons?.find((b) => b.style === 'destructive');
+        destructive?.onPress?.();
+      });
+
+    const { findByText, queryByText } = render(<ElderContent />);
+    const disableBtn = await findByText('Capability-г унтраах');
+    fireEvent.press(disableBtn);
+
+    await waitFor(async () => {
+      const flag = await AsyncStorage.getItem(ELDER_KEY);
+      expect(flag).toBe('false');
+    });
+
+    // Opt-in screen дахиад гарсан — "Идэвхжүүлэх" button
+    expect(await findByText('Идэвхжүүлэх')).toBeTruthy();
+    expect(queryByText('Capability-г унтраах')).toBeNull();
+
+    alertSpy.mockRestore();
   });
 });
