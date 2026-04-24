@@ -54,9 +54,12 @@ describe('Weather — initial load', () => {
     expect(await findByText(/Цаг агаар/)).toBeTruthy();
   });
 
-  it('13 аймгийн chip render', async () => {
+  it('"Өөр газар" toggle дарахад 21 аймгийн chip wrap grid-д render', async () => {
     const { findByText, getByText } = render(<WeatherScreen />);
     await findByText(/Цаг агаар/);
+    // Default: picker хаалттай, аймгийн chip-үүд харагдахгүй
+    fireEvent.press(getByText(/Өөр газрын цаг агаар/));
+    // Нээсний дараа 21 аймгийн chip-үүд render
     expect(getByText('Төв')).toBeTruthy();
     expect(getByText('Увс')).toBeTruthy();
     expect(getByText('Ховд')).toBeTruthy();
@@ -132,6 +135,7 @@ describe('Weather — аймаг солих', () => {
   it('"Увс" chip дарахад getByAimag("Увс") дуудна', async () => {
     const { findByText, getByText } = render(<WeatherScreen />);
     await findByText(/Цаг агаар/);
+    fireEvent.press(getByText(/Өөр газрын цаг агаар/));
     fireEvent.press(getByText('Увс'));
     await waitFor(() => expect(mockGetByAimag).toHaveBeenCalledWith('Увс'));
   });

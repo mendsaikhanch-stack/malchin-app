@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -9,21 +9,51 @@ import {
   RefreshControl,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AppColors } from '@/constants/theme';
 import { weatherApi } from '@/services/api';
 import { getAimagList, getSumsByAimag } from '@/services/mongolia-geo';
+import {
+  parseOnboardingSnapshot,
+  toUserFallback,
+} from '@/services/onboarding-fallback';
 
+const ONBOARDING_DATA_KEY = '@malchin_onboarding_data';
 const aimags = getAimagList();
 
 export default function WeatherScreen() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [userAimag, setUserAimag] = useState<string | null>(null);
+  const [userSum, setUserSum] = useState<string | null>(null);
   const [selectedAimag, setSelectedAimag] = useState('Төв');
   const [selectedSum, setSelectedSum] = useState<string | null>(null);
   const [weatherData, setWeatherData] = useState<any>(null);
   const [forecast, setForecast] = useState<any[]>([]);
+  const [showPicker, setShowPicker] = useState(false);
+  const initialAimagRef = useRef<string | null>(null);
 
   const sums = useMemo(() => getSumsByAimag(selectedAimag), [selectedAimag]);
+
+  const loadUserLocation = useCallback(async () => {
+    try {
+      const raw = await AsyncStorage.getItem(ONBOARDING_DATA_KEY);
+      const user = toUserFallback(parseOnboardingSnapshot(raw));
+      if (user?.aimag) {
+        initialAimagRef.current = user.aimag;
+        setUserAimag(user.aimag);
+        setSelectedAimag(user.aimag);
+        if (user.sum) {
+          setUserSum(user.sum);
+          setSelectedSum(user.sum);
+        }
+      }
+    } catch {
+      // ignore
+    }
+  }, []);
+
+  useEffect(() => { loadUserLocation(); }, [loadUserLocation]);
 
   const loadWeather = async (aimag: string) => {
     try {
@@ -40,7 +70,12 @@ export default function WeatherScreen() {
   };
 
   useEffect(() => { loadWeather(selectedAimag); }, [selectedAimag]);
-  useEffect(() => { setSelectedSum(null); }, [selectedAimag]);
+  // Аймаг солих үед сум reset — гэхдээ onboarding-оос анх set хийх үед reset хийхгүй
+  useEffect(() => {
+    if (initialAimagRef.current && initialAimagRef.current !== selectedAimag) {
+      setSelectedSum(null);
+    }
+  }, [selectedAimag]);
 
   const onRefresh = () => { setRefreshing(true); loadWeather(selectedAimag); };
 
@@ -70,13 +105,15 @@ export default function WeatherScreen() {
 
   const weatherIcon = (condition: string) => {
     const c = (condition || '').toLowerCase();
-    if (c.includes('clear') || c.includes('sunny')) return '\u2600\uFE0F';
-    if (c.includes('cloud')) return '\u2601\uFE0F';
-    if (c.includes('rain')) return '\uD83C\uDF27\uFE0F';
-    if (c.includes('snow')) return '\uD83C\uDF28\uFE0F';
-    if (c.includes('wind')) return '\uD83C\uDF2C\uFE0F';
-    return '\u26C5';
+    if (c.includes('clear') || c.includes('sunny')) return '☀️';
+    if (c.includes('cloud')) return '☁️';
+    if (c.includes('rain')) return '🌧️';
+    if (c.includes('snow')) return '🌨️';
+    if (c.includes('wind')) return '🌬️';
+    return '⛅';
   };
+
+  const isOwnLocation = userAimag === selectedAimag && userSum === selectedSum;
 
   if (loading) {
     return (
@@ -93,49 +130,81 @@ export default function WeatherScreen() {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.header}>
-          <Text style={styles.title}>{'\u26C5'} Цаг агаар</Text>
+          <Text style={styles.title}>{'⛅'} Цаг агаар</Text>
+          <Text style={styles.subtitle}>
+            {'📍'} {selectedAimag}{selectedSum ? ` / ${selectedSum}` : ''}
+            {isOwnLocation && userAimag ? '  (таны байршил)' : ''}
+          </Text>
         </View>
 
-        {/* Аймаг сонгох — wrap (2+ эгнээ) */}
-        <Text style={styles.sectionLabel}>Аймаг</Text>
-        <View style={styles.aimagWrap}>
-          {aimags.map((aimag) => (
+        {/* "Өөр газар үзэх" toggle — default хаалттай, malchin өөрийн байршлаа харна */}
+        <View style={styles.pickerToggleRow}>
+          <TouchableOpacity
+            style={styles.pickerToggle}
+            onPress={() => setShowPicker(!showPicker)}
+          >
+            <Text style={styles.pickerToggleText}>
+              {showPicker ? '▲ Газрын сонголт хаах' : '▼ Өөр газрын цаг агаар'}
+            </Text>
+          </TouchableOpacity>
+          {userAimag && !isOwnLocation && (
             <TouchableOpacity
-              key={aimag}
-              style={[styles.aimagChip, selectedAimag === aimag && styles.aimagChipActive]}
-              onPress={() => { setSelectedAimag(aimag); setLoading(true); }}
+              onPress={() => {
+                setSelectedAimag(userAimag);
+                setSelectedSum(userSum);
+                setLoading(true);
+              }}
+              style={styles.resetLocationBtn}
             >
-              <Text style={[styles.aimagChipText, selectedAimag === aimag && styles.aimagChipTextActive]}>
-                {aimag}
-              </Text>
+              <Text style={styles.resetLocationText}>↩ Миний байршил</Text>
             </TouchableOpacity>
-          ))}
+          )}
         </View>
 
-        {/* Сум сонгох — wrap */}
-        {sums.length > 0 && (
+        {showPicker && (
           <>
-            <Text style={styles.sectionLabel}>Сум</Text>
-            <View style={styles.sumWrap}>
-              {sums.map((sum) => (
+            {/* Аймаг сонгох — wrap (2+ эгнээ) */}
+            <Text style={styles.sectionLabel}>Аймаг</Text>
+            <View style={styles.aimagWrap}>
+              {aimags.map((aimag) => (
                 <TouchableOpacity
-                  key={sum}
-                  style={[styles.sumChip, selectedSum === sum && styles.sumChipActive]}
-                  onPress={() => setSelectedSum(selectedSum === sum ? null : sum)}
+                  key={aimag}
+                  style={[styles.aimagChip, selectedAimag === aimag && styles.aimagChipActive]}
+                  onPress={() => { setSelectedAimag(aimag); setLoading(true); }}
                 >
-                  <Text style={[styles.sumChipText, selectedSum === sum && styles.sumChipTextActive]}>
-                    {sum}
+                  <Text style={[styles.aimagChipText, selectedAimag === aimag && styles.aimagChipTextActive]}>
+                    {aimag}
                   </Text>
                 </TouchableOpacity>
               ))}
             </View>
+
+            {/* Сум сонгох — wrap */}
+            {sums.length > 0 && (
+              <>
+                <Text style={styles.sectionLabel}>Сум</Text>
+                <View style={styles.sumWrap}>
+                  {sums.map((sum) => (
+                    <TouchableOpacity
+                      key={sum}
+                      style={[styles.sumChip, selectedSum === sum && styles.sumChipActive]}
+                      onPress={() => setSelectedSum(selectedSum === sum ? null : sum)}
+                    >
+                      <Text style={[styles.sumChipText, selectedSum === sum && styles.sumChipTextActive]}>
+                        {sum}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              </>
+            )}
           </>
         )}
 
         {selectedSum && (
           <View style={styles.sumBanner}>
             <Text style={styles.sumBannerText}>
-              📍 {selectedAimag} / {selectedSum} · <Text style={styles.sumBannerNote}>Аймгийн ерөнхий мэдээ</Text>
+              {'ℹ️'} Одоогоор <Text style={styles.sumBannerNote}>аймгийн ерөнхий мэдээ</Text> харуулж байна. Сум тус бүрийн нарийн мэдээ удахгүй нэмэгдэнэ.
             </Text>
           </View>
         )}
@@ -177,7 +246,7 @@ export default function WeatherScreen() {
             {/* Зудын эрсдэл */}
             <View style={[styles.dzudCard, { borderColor: dzudColor(weatherData.dzud_risk) }]}>
               <View style={styles.dzudHeader}>
-                <Text style={styles.dzudTitle}>{'\uD83C\uDF28\uFE0F'} Зудын эрсдэл</Text>
+                <Text style={styles.dzudTitle}>{'🌨️'} Зудын эрсдэл</Text>
                 <View style={[styles.dzudBadge, { backgroundColor: dzudColor(weatherData.dzud_risk) }]}>
                   <Text style={styles.dzudBadgeText}>{weatherData.dzud_risk?.toUpperCase()}</Text>
                 </View>
@@ -185,7 +254,7 @@ export default function WeatherScreen() {
               <Text style={styles.dzudDescription}>{dzudLabel(weatherData.dzud_risk)}</Text>
               {weatherData.dzud_risk === 'high' && (
                 <Text style={styles.dzudWarning}>
-                  {'\u26A0\uFE0F'} Малаа дулаан хашаанд оруулж, тэжээл нөөцлөхийг зөвлөж байна!
+                  {'⚠️'} Малаа дулаан хашаанд оруулж, тэжээл нөөцлөхийг зөвлөж байна!
                 </Text>
               )}
             </View>
@@ -230,11 +299,23 @@ export default function WeatherScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F8F9FA' },
   loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#F8F9FA' },
-  header: { paddingHorizontal: 20, paddingTop: 16, paddingBottom: 8 },
+  header: { paddingHorizontal: 20, paddingTop: 16, paddingBottom: 4 },
   title: { fontSize: 24, fontWeight: '800', color: AppColors.black },
+  subtitle: { fontSize: 13, color: AppColors.grayDark, marginTop: 4 },
+  pickerToggleRow: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+    paddingHorizontal: 16, paddingVertical: 8, marginTop: 4,
+  },
+  pickerToggle: { paddingVertical: 6, paddingHorizontal: 8 },
+  pickerToggleText: { fontSize: 13, fontWeight: '600', color: AppColors.primary },
+  resetLocationBtn: {
+    paddingHorizontal: 10, paddingVertical: 6, borderRadius: 8,
+    backgroundColor: AppColors.primary + '14',
+  },
+  resetLocationText: { fontSize: 12, fontWeight: '700', color: AppColors.primary },
   sectionLabel: {
     fontSize: 12, fontWeight: '700', color: AppColors.gray,
-    paddingHorizontal: 16, marginTop: 12, marginBottom: 6,
+    paddingHorizontal: 16, marginTop: 8, marginBottom: 6,
     textTransform: 'uppercase', letterSpacing: 0.5,
   },
   aimagWrap: {
