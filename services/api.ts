@@ -1,5 +1,7 @@
 import { cachedFetch, cacheSet } from './offline';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { fetchOpenWeather } from './openweather-client';
+import { getAimagCenter } from './mongolia-geo';
 
 // API хаягийг env-ээс уншина (EXPO_PUBLIC_API_URL).
 // Dev үед утас дээр ажиллахын тулд компьютерийн IP хаяг ашиглана.
@@ -104,12 +106,39 @@ export const livestockApi = {
     request<any>(`/livestock/events/${userId}`),
 };
 
-// Weather
+// Weather — backend → cache → OpenWeather direct (3-түвшний fallback)
+export type WeatherWithMeta = CachedResult<any> & {
+  provider: 'backend' | 'openweather';
+};
+
+async function weatherByAimagWithFallback(aimag: string): Promise<WeatherWithMeta> {
+  try {
+    const r = await cachedRequestWithMeta<any>(
+      `/weather/${encodeURIComponent(aimag)}`,
+      'weather'
+    );
+    // Backend амжилттай эсвэл cache-ээс ирсэн — backend provider-тэй буцаана
+    return { ...r, provider: 'backend' };
+  } catch (backendErr) {
+    // Backend унасан + cache-д data үгүй — OpenWeather-аас шууд татах
+    const coords = getAimagCenter(aimag);
+    if (!coords) throw backendErr;
+    const ow = await fetchOpenWeather(coords);
+    if (!ow) throw backendErr;
+    return {
+      data: ow,
+      fromCache: false,
+      offline: true,           // backend unavailable — UI-д signal
+      expired: false,
+      provider: 'openweather',
+    };
+  }
+}
+
 export const weatherApi = {
   getByAimag: (aimag: string) =>
     cachedRequest<any>(`/weather/${encodeURIComponent(aimag)}`, 'weather'),
-  getByAimagWithMeta: (aimag: string) =>
-    cachedRequestWithMeta<any>(`/weather/${encodeURIComponent(aimag)}`, 'weather'),
+  getByAimagWithMeta: weatherByAimagWithFallback,
   getAll: () =>
     cachedRequest<any>('/weather', 'weather'),
 };

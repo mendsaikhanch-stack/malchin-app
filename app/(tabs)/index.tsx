@@ -29,6 +29,7 @@ import {
 } from '@/services/onboarding-fallback';
 import {
   normalizeBackendWeather,
+  normalizeOpenWeather,
   type NormalizedWeather,
 } from '@/services/weather-provider';
 import { StaleBadge } from '@/components/stale-badge';
@@ -149,7 +150,11 @@ export default function HomeScreen() {
       }
       if (weatherRes.status === 'fulfilled') {
         const wr = weatherRes.value;
-        setWeather(normalizeBackendWeather(wr.data));
+        const normalized =
+          wr.provider === 'openweather'
+            ? normalizeOpenWeather(wr.data, userAimag || 'Төв')
+            : normalizeBackendWeather(wr.data);
+        setWeather(normalized);
         setWeatherMeta({
           fromCache: wr.fromCache,
           offline: wr.offline,
