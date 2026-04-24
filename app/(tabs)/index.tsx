@@ -16,6 +16,7 @@ import { livestockApi, weatherApi, alertsApi, aiApi, financeApi } from '@/servic
 import { AdBanner, AdBannerLarge } from '@/components/ad-banner';
 import { useLocation } from '@/hooks/use-location';
 import { useUserRole, ROLE_LABEL, ROLE_EMOJI } from '@/hooks/use-user-role';
+import { useHomeFeed } from '@/hooks/use-home-feed';
 import { getDailyTasks, type DailyTask } from '@/services/daily-tasks';
 import { getMigrationAdvice, type MigrationAdvice } from '@/services/migration-advice';
 
@@ -94,6 +95,13 @@ export default function HomeScreen() {
   const [finance, setFinance] = useState<any>(null);
 
   const userId = 1;
+
+  // Home feed rule engine: preferences + role + season + location-ээс card-ууд шийдэгдэнэ
+  const { visibleCards } = useHomeFeed({
+    role,
+    hasLivestock: totalAnimals > 0,
+    hasHighAlert: alerts.some((a: any) => a.severity === 'high'),
+  });
 
   const loadData = async () => {
     try {
@@ -307,8 +315,8 @@ export default function HomeScreen() {
           </View>
         )}
 
-        {/* Нүүх/Оторлох зөвлөгөө */}
-        {migrationAdvice && (role === 'malchin' || !role) && (
+        {/* Нүүх/Оторлох зөвлөгөө — rule engine: preferences + role + мал байгаа эсэх */}
+        {migrationAdvice && visibleCards.has('migration_advice') && (
           <View style={[
             styles.card,
             migrationAdvice.urgency === 'now' && { borderLeftWidth: 4, borderLeftColor: AppColors.danger },
