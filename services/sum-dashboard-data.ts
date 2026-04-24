@@ -161,12 +161,23 @@ export function getMockEvents(): SumEvent[] {
   ];
 }
 
-export async function fetchSumBags(_sumId?: string): Promise<BagStat[]> {
-  // TODO: replace with backend /sums/:sumId/bags
-  return getMockBags();
+import { sumDashboardApi } from './api';
+
+// Backend → cache → mock fallback (contract frozen — backend-gaps.md §1.2).
+export async function fetchSumBags(sumId?: string): Promise<BagStat[]> {
+  if (!sumId) return getMockBags();
+  try {
+    return await sumDashboardApi.getBags(sumId);
+  } catch {
+    return getMockBags();
+  }
 }
 
-export async function fetchSumEvents(_sumId?: string): Promise<SumEvent[]> {
-  // TODO: replace with backend /sums/:sumId/events
-  return getMockEvents();
+export async function fetchSumEvents(sumId?: string): Promise<SumEvent[]> {
+  if (!sumId) return getMockEvents();
+  try {
+    return await sumDashboardApi.getEvents(sumId);
+  } catch {
+    return getMockEvents();
+  }
 }

@@ -217,10 +217,20 @@ export function getMockListings(): Listing[] {
   ];
 }
 
-// Backend эндпоинт бэлэн болтол mock буцаана.
-// TODO: marketApi.getAll({category: 'lost_animal' | 'found_animal'}) руу шилжих
-export async function fetchLostFoundListings(): Promise<Listing[]> {
-  return getMockListings();
+import { lostFoundApi } from './api';
+
+// Backend → cache → mock fallback (contract frozen — backend-gaps.md §1.3).
+// Params хамгаалагдсан — UI-аас filter (type/aimag/sum) дамжуулахад тохирно.
+export async function fetchLostFoundListings(params?: {
+  type?: 'lost' | 'found';
+  aimag?: string;
+  sum?: string;
+}): Promise<Listing[]> {
+  try {
+    return await lostFoundApi.list(params);
+  } catch {
+    return getMockListings();
+  }
 }
 
 // Шинэ listing нэмэх (client-side id generate; backend орлуулна)

@@ -130,8 +130,15 @@ export function getMockHouseholds(): Household[] {
   });
 }
 
-// Backend-ээс татах (одоогоор mock руу буцаана, real endpoint гармагц солино)
-export async function fetchBagHouseholds(_bagId?: string): Promise<Household[]> {
-  // TODO: replace with `householdApi.getBag(bagId)` when endpoint is ready
-  return getMockHouseholds();
+import { bagDashboardApi } from './api';
+
+// Backend → cache → mock fallback. Endpoint бэлэн болмогц энэ функц
+// өөрчлөгдөхгүй (contract frozen — backend-gaps.md §1.1).
+export async function fetchBagHouseholds(bagId?: string): Promise<Household[]> {
+  if (!bagId) return getMockHouseholds();
+  try {
+    return await bagDashboardApi.getHouseholds(bagId);
+  } catch {
+    return getMockHouseholds();
+  }
 }

@@ -2,6 +2,11 @@ import { cachedFetch, cacheSet } from './offline';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { fetchOpenWeather } from './openweather-client';
 import { getAimagCenter } from './mongolia-geo';
+// Type-only imports (circular safe — erased at runtime)
+import type { Household } from './bag-dashboard-data';
+import type { BagStat, SumEvent } from './sum-dashboard-data';
+import type { Listing } from './lost-found-data';
+import type { OwnerSnapshot } from './owner-dashboard-data';
 
 // API хаягийг env-ээс уншина (EXPO_PUBLIC_API_URL).
 // Dev үед утас дээр ажиллахын тулд компьютерийн IP хаяг ашиглана.
@@ -550,4 +555,78 @@ export const pricesApi = {
     request<any>(`/prices/raw-materials${type ? `?type=${type}` : ''}`),
   getSummary: () => cachedRequest<any>('/prices/summary', 'prices'),
   getSummaryWithMeta: () => cachedRequestWithMeta<any>('/prices/summary', 'prices'),
+};
+
+// ---------------------------------------------------------------------
+// Governance / dashboard contracts
+// ---------------------------------------------------------------------
+// Эдгээр endpoint-ууд одоогоор backend дээр байхгүй (docs/backend-gaps.md §1
+// priority 0). Client тал typed contract-оор "freeze" хийж байгаа — ирмэгц
+// нэг ч мөр UI кодод өөрчлөлт орохгүй. Тест орчинд fetch шидэхэд data layer
+// fetch* функц fallback mock буцаана (docs/backend-gaps.md §7 pattern).
+
+type BroadcastResult = { recipients: number; sent_at: string };
+
+// Багийн даргын dashboard — backend-gaps.md §1.1
+export const bagDashboardApi = {
+  getHouseholds: (bagId: string) =>
+    cachedRequest<Household[]>(`/households/bag/${bagId}`, 'default'),
+  broadcast: (bagId: string, body: { title: string; body: string }) =>
+    request<BroadcastResult>(`/households/bag/${bagId}/broadcast`, {
+      method: 'POST',
+      body: JSON.stringify(body),
+    }),
+};
+
+// Сумын удирдлагын dashboard — backend-gaps.md §1.2
+export const sumDashboardApi = {
+  getBags: (sumId: string) =>
+    cachedRequest<BagStat[]>(`/sums/${sumId}/bags`, 'default'),
+  getEvents: (sumId: string) =>
+    cachedRequest<SumEvent[]>(`/sums/${sumId}/events`, 'news'),
+  broadcast: (
+    sumId: string,
+    body: { title: string; body: string; scope: 'all' | string }
+  ) =>
+    request<BroadcastResult>(`/sums/${sumId}/broadcast`, {
+      method: 'POST',
+      body: JSON.stringify(body),
+    }),
+};
+
+// Алдсан / Олдсон мал — backend-gaps.md §1.3 (сонголт A, dedicated endpoint)
+export const lostFoundApi = {
+  list: (params?: { type?: 'lost' | 'found'; aimag?: string; sum?: string }) => {
+    const qs = new URLSearchParams();
+    if (params?.type) qs.set('type', params.type);
+    if (params?.aimag) qs.set('aimag', params.aimag);
+    if (params?.sum) qs.set('sum', params.sum);
+    const q = qs.toString();
+    return cachedRequest<Listing[]>(
+      `/lost-found${q ? `?${q}` : ''}`,
+      'market'
+    );
+  },
+  create: (data: Omit<Listing, 'id' | 'status'>) =>
+    request<Listing>('/lost-found', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+  resolve: (id: string) =>
+    request<{ status: 'resolved' }>(`/lost-found/${id}/resolve`, {
+      method: 'PUT',
+    }),
+  report: (id: string, reason: string) =>
+    request<{ reported: true }>(`/lost-found/${id}/report`, {
+      method: 'POST',
+      body: JSON.stringify({ reason }),
+    }),
+};
+
+// Owner dashboard (web-only) — backend-gaps.md §7
+// Mobile bundle-д import хийсэн ч UI wiring-гүй — эндээс цөөн unit test
+// л ашиглана. Backend /owner/snapshot endpoint зохиох үед тус бүр хэсэг
+// (growth/revenue/...) тусад нь хайлттай хувилбарыг нэмж болно.
+export const ownerApi = {
+  snapshot: () => cachedRequest<OwnerSnapshot>('/owner/snapshot', 'default'),
 };

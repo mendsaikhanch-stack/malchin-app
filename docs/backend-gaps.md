@@ -237,10 +237,34 @@ digest helper-уудад өөрчлөлт орохгүй.
 
 ---
 
-## 8. Status snapshot (2026-04-24)
+## 8. Contract freeze (2026-04-24)
 
-- Тест: **280/280** (pure 256 + rn 24), 19 test suite.
+Priority 0 + 7 endpoint-уудын typed contract `services/api.ts`-д орлоо.
+Backend team эхлэхэд энэ shape-ийг authoritative гэж үзнэ.
+
+Namespace | endpoint | return type
+---|---|---
+`bagDashboardApi.getHouseholds` | `GET /households/bag/:id` | `Household[]`
+`bagDashboardApi.broadcast` | `POST /households/bag/:id/broadcast` | `BroadcastResult`
+`sumDashboardApi.getBags` | `GET /sums/:id/bags` | `BagStat[]`
+`sumDashboardApi.getEvents` | `GET /sums/:id/events` | `SumEvent[]`
+`sumDashboardApi.broadcast` | `POST /sums/:id/broadcast` | `BroadcastResult`
+`lostFoundApi.list` | `GET /lost-found?type=&aimag=&sum=` | `Listing[]`
+`lostFoundApi.create` | `POST /lost-found` | `Listing`
+`lostFoundApi.resolve` | `PUT /lost-found/:id/resolve` | `{ status: 'resolved' }`
+`lostFoundApi.report` | `POST /lost-found/:id/report` | `{ reported: true }`
+`ownerApi.snapshot` | `GET /owner/snapshot` | `OwnerSnapshot`
+
+Data-layer `fetch*()` функцүүд дээрх api method-ыг эхэнд дуудаж, алдаа
+гарвал mock-руу падна. Real endpoint ирэхэд UI-д өөрчлөлт орохгүй —
+зөвхөн backend response-ийг типтэй тааруулж гаргана.
+
+---
+
+## 9. Status snapshot (2026-04-24)
+
+- Тест: **289/289** (pure 265 + rn 24), 20 test suite.
 - 6/9 home card SWR StaleBadge-тэй.
-- 4 pure data layer + mock provider (bag, sum, lost-found, owner) —
-  backend ready болмогц 1 файлд `fetch*` implementation-г солино.
+- 4 typed API namespace (bag, sum, lost-found, owner) + data-layer
+  real→mock fallback wired.
 - Pricing flag service (pure, 21 test) — UI gating wired биш.

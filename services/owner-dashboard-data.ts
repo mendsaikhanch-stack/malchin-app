@@ -291,7 +291,15 @@ export function getMockOwnerSnapshot(): OwnerSnapshot {
   };
 }
 
+import { ownerApi } from './api';
+
+// Backend → cache → mock fallback (contract frozen — backend-gaps.md §7).
+// Mobile-д wiring-гүй (web-only locked) — энэ функц зөвхөн future web client
+// болон data integrity test-д хэрэглэгдэнэ.
 export async function fetchOwnerSnapshot(): Promise<OwnerSnapshot> {
-  // TODO: replace with backend GET /owner/snapshot
-  return getMockOwnerSnapshot();
+  try {
+    return await ownerApi.snapshot();
+  } catch {
+    return getMockOwnerSnapshot();
+  }
 }

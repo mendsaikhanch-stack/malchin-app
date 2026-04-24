@@ -161,7 +161,7 @@ backend-аас ирэх weather contract primary эх сурвалж хэвээ�
 |---|---|---|
 | Pricing flag UI wiring | `services/pricing.ts` pure бэлэн (21 test) | Profile screen pricing CTA + route guard wiring |
 | Owner dashboard UI | `services/owner-dashboard-data.ts` pure бэлэн (20 test) | Web front-end (mobile-д нэмэхгүй — web-only locked) |
-| API endpoint contract | Mock only (backend-gaps.md §1) | Backend team-тэй contract freeze |
+| API endpoint contract (wired) | `api.ts` 4 typed namespace + data-layer real→mock fallback | Backend implementation per contract (no client change needed) |
 | `elder_contributor` flag gating | Flag decision locked, `/elder-content` access бүх role-д нээлттэй | Profile toggle UI + route guard (implementation step) |
 
 ---
