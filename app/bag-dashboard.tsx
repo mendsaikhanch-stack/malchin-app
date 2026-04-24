@@ -21,6 +21,11 @@ import {
   type Household,
   type BagStats,
 } from '@/services/bag-dashboard-data';
+import { bagDashboardApi } from '@/services/api';
+import { queueOnFailure } from '@/services/sync-queue';
+
+// Одоогоор hardcoded bagId — Phase 2-т useUserRole()-оос авах.
+const BAG_ID = '3';
 
 const RISK_COLOR = {
   low: AppColors.success,
@@ -45,15 +50,30 @@ export default function BagDashboard() {
   const stats: BagStats = computeBagStats(households);
   const risky = filterRisky(households);
 
-  const sendBroadcast = () => {
+  const sendBroadcast = async () => {
     if (!broadcastTitle || !broadcastBody) {
       Alert.alert('Алдаа', 'Гарчиг болон агуулгаа бичнэ үү');
       return;
     }
-    Alert.alert('Илгээгдлээ', `${stats.totalHouseholds} өрхөд мэдэгдэл илгээлээ.`);
+    const payload = { title: broadcastTitle, body: broadcastBody };
+    const result = await queueOnFailure(
+      () => bagDashboardApi.broadcast(BAG_ID, payload),
+      {
+        table_name: 'bag_broadcasts',
+        action: 'INSERT',
+        record_id: 0,
+        data: { bag_id: BAG_ID, ...payload },
+      }
+    );
     setBroadcastModal(false);
     setBroadcastTitle('');
     setBroadcastBody('');
+    Alert.alert(
+      result.synced ? 'Илгээгдлээ' : 'Локал хадгалагдлаа',
+      result.synced
+        ? `${stats.totalHouseholds} өрхөд мэдэгдэл илгээлээ.`
+        : 'Сүлжээнд холбогдох үед автоматаар илгээгдэнэ.'
+    );
   };
 
   return (

@@ -24,6 +24,10 @@ import {
   type SumStats,
 } from '@/services/sum-dashboard-data';
 import { FeatureGate } from '@/components/feature-gate';
+import { sumDashboardApi } from '@/services/api';
+import { queueOnFailure } from '@/services/sync-queue';
+
+const SUM_ID = 'altanbulag';
 
 export default function SumDashboard() {
   const router = useRouter();
@@ -47,7 +51,7 @@ export default function SumDashboard() {
   const stats: SumStats = computeSumStats(bags);
   const sorted = rankBags(bags, 'readPct');
 
-  const sendBroadcast = () => {
+  const sendBroadcast = async () => {
     if (!bTitle || !bBody) {
       Alert.alert('Алдаа', 'Гарчиг болон агуулгаа бичнэ үү');
       return;
@@ -56,10 +60,25 @@ export default function SumDashboard() {
       scope === 'all'
         ? `бүх ${stats.totalHouseholds} өрх`
         : `${bags.find((b) => b.id === scope)?.name}`;
-    Alert.alert('Илгээгдлээ', `${target}-д мэдэгдэл илгээлээ.`);
+    const payload = { title: bTitle, body: bBody, scope };
+    const result = await queueOnFailure(
+      () => sumDashboardApi.broadcast(SUM_ID, payload),
+      {
+        table_name: 'sum_broadcasts',
+        action: 'INSERT',
+        record_id: 0,
+        data: { sum_id: SUM_ID, ...payload },
+      }
+    );
     setBroadcastModal(false);
     setBTitle('');
     setBBody('');
+    Alert.alert(
+      result.synced ? 'Илгээгдлээ' : 'Локал хадгалагдлаа',
+      result.synced
+        ? `${target}-д мэдэгдэл илгээлээ.`
+        : 'Сүлжээнд холбогдох үед автоматаар илгээгдэнэ.'
+    );
   };
 
   return (
