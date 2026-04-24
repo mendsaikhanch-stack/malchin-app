@@ -84,8 +84,9 @@ export default function LivestockScreen() {
   const goNext = () => router.push('/onboarding/preferences' as any);
 
   const subTotalOf = (species: SpeciesKey) => {
-    const sc = data.livestock.subCounts[species];
-    return sc.young + sc.milk + sc.pregnant + sc.weak;
+    const sc = data.livestock.subCounts?.[species];
+    if (!sc) return 0;
+    return (sc.young || 0) + (sc.milk || 0) + (sc.pregnant || 0) + (sc.weak || 0);
   };
 
   return (
@@ -144,7 +145,7 @@ export default function LivestockScreen() {
                         <Text style={styles.subLabel}>{s.label}</Text>
                       </View>
                       <StepperSmall
-                        value={data.livestock.subCounts[t.key][s.key]}
+                        value={data.livestock.subCounts?.[t.key]?.[s.key] ?? 0}
                         onChange={(n) => updateSubCount(t.key, s.key, n)}
                       />
                     </View>

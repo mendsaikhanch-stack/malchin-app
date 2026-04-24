@@ -138,7 +138,23 @@ export default function OnboardingLayout() {
       .then((s) => {
         if (s) {
           try {
-            setData({ ...DEFAULT_DATA, ...JSON.parse(s) });
+            const parsed = JSON.parse(s);
+            // Deep merge — хуучин cached dата subCounts/seasonal/preferences
+            // бүтэцгүй байж болох тул DEFAULT_DATA-г fallback болгоно.
+            setData({
+              ...DEFAULT_DATA,
+              ...parsed,
+              seasonal: { ...DEFAULT_DATA.seasonal, ...(parsed?.seasonal || {}) },
+              livestock: {
+                ...DEFAULT_DATA.livestock,
+                ...(parsed?.livestock || {}),
+                subCounts: {
+                  ...DEFAULT_DATA.livestock.subCounts,
+                  ...(parsed?.livestock?.subCounts || {}),
+                },
+              },
+              preferences: { ...DEFAULT_DATA.preferences, ...(parsed?.preferences || {}) },
+            });
           } catch {
             // ignore parse errors
           }
@@ -170,19 +186,23 @@ export default function OnboardingLayout() {
     }));
 
   const updateSubCount = (species: SpeciesKey, sub: SubKey, value: number) =>
-    setData((prev) => ({
-      ...prev,
-      livestock: {
-        ...prev.livestock,
-        subCounts: {
-          ...prev.livestock.subCounts,
-          [species]: {
-            ...prev.livestock.subCounts[species],
-            [sub]: Math.max(0, value),
+    setData((prev) => {
+      const existingSubCounts = prev.livestock.subCounts || DEFAULT_DATA.livestock.subCounts;
+      const existingSpecies = existingSubCounts[species] || { young: 0, milk: 0, pregnant: 0, weak: 0 };
+      return {
+        ...prev,
+        livestock: {
+          ...prev.livestock,
+          subCounts: {
+            ...existingSubCounts,
+            [species]: {
+              ...existingSpecies,
+              [sub]: Math.max(0, value),
+            },
           },
         },
-      },
-    }));
+      };
+    });
 
   const togglePreference = (key: keyof Preferences) =>
     setData((prev) => ({
