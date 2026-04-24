@@ -36,17 +36,22 @@ export async function cachedFetch<T>(
   key: string,
   fetchFn: () => Promise<T>,
   category?: string
-): Promise<{ data: T; fromCache: boolean; offline: boolean }> {
+): Promise<{ data: T; fromCache: boolean; offline: boolean; expired: boolean }> {
   try {
     // Онлайн - API дуудна, cache шинэчилнэ
     const data = await fetchFn();
     await cacheSet(key, data);
-    return { data, fromCache: false, offline: false };
+    return { data, fromCache: false, offline: false, expired: false };
   } catch (e) {
     // Оффлайн - cache-аас уншина
     const cached = await cacheGet(key, category);
     if (cached) {
-      return { data: cached.data, fromCache: true, offline: true };
+      return {
+        data: cached.data,
+        fromCache: true,
+        offline: true,
+        expired: !!cached.expired,
+      };
     }
     throw e; // Cache ч байхгүй
   }
