@@ -17,6 +17,8 @@ import {
   type AdvisoryTemplate,
 } from '@/services/advisory-templates';
 import { getSeasonKeyForDate } from '@/hooks/use-seasonal';
+import { useQuota } from '@/hooks/use-quota';
+import { UpgradePrompt } from '@/components/feature-gate';
 
 const CATEGORY_EMOJI: Record<AdvisoryCategory, string> = {
   migration: '🚶',
@@ -34,6 +36,16 @@ export default function AdvisoryScreen() {
   const [filter, setFilter] = useState<Filter>('all');
   const [openId, setOpenId] = useState<string | null>(null);
   const currentSeason = useMemo(() => getSeasonKeyForDate(), []);
+  const quota = useQuota('advisory_limited');
+
+  const onToggle = (id: string) => {
+    const next = openId === id ? null : id;
+    setOpenId(next);
+    // Шинээр нээх үед ашиглалт бүртгэнэ (хаах үед биш)
+    if (next !== null && !quota.unlimited && quota.allowed) {
+      quota.record();
+    }
+  };
 
   const filtered = useMemo(() => {
     let list =
@@ -62,6 +74,21 @@ export default function AdvisoryScreen() {
           </Text>
         </View>
       </View>
+
+      {/* Quota banner — free багц 3/сар cap */}
+      {!quota.loading && !quota.unlimited ? (
+        quota.allowed ? (
+          <View style={styles.quotaRow}>
+            <Text style={styles.quotaText}>
+              Энэ сарын ашиглалт: {quota.used}/{quota.limit}
+            </Text>
+          </View>
+        ) : (
+          <View style={{ paddingHorizontal: 16, paddingTop: 8 }}>
+            <UpgradePrompt feature="advisory_unlimited" compact />
+          </View>
+        )
+      ) : null}
 
       {/* Category filter */}
       <ScrollView
@@ -100,7 +127,7 @@ export default function AdvisoryScreen() {
               template={t}
               open={openId === t.id}
               seasonMatch={!!t.season?.includes(currentSeason)}
-              onToggle={() => setOpenId(openId === t.id ? null : t.id)}
+              onToggle={() => onToggle(t.id)}
             />
           ))
         )}
@@ -285,6 +312,18 @@ const styles = StyleSheet.create({
   title: { fontSize: 20, fontWeight: '800', color: AppColors.black },
   subtitle: { fontSize: 12, color: AppColors.grayDark, marginTop: 2 },
 
+  quotaRow: {
+    paddingHorizontal: 16,
+    paddingVertical: 6,
+    backgroundColor: '#F1F8E9',
+    borderBottomWidth: 1,
+    borderBottomColor: '#DCEDC8',
+  },
+  quotaText: {
+    fontSize: 12,
+    color: AppColors.grayDark,
+    fontWeight: '600',
+  },
   filterRow: {
     paddingHorizontal: 16,
     paddingVertical: 10,

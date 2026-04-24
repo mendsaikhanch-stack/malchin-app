@@ -1,5 +1,6 @@
 import React from 'react';
-import { render, fireEvent } from '@testing-library/react-native';
+import { render, fireEvent, waitFor } from '@testing-library/react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import AdvisoryScreen from '../advisory';
 
 // expo-router mock (jest-expo preset-д useRouter auto-mock биш)
@@ -10,6 +11,13 @@ jest.mock('expo-router', () => ({
     replace: jest.fn(),
   }),
 }));
+
+const PACKAGE_KEY = '@malchin_package';
+const ADVISORY_QUOTA_KEY = '@malchin_quota_advisory_limited';
+
+beforeEach(async () => {
+  await AsyncStorage.clear();
+});
 
 describe('AdvisoryScreen', () => {
   it('header + subtitle харагдана', () => {
@@ -68,5 +76,40 @@ describe('AdvisoryScreen', () => {
     // Хаах
     fireEvent.press(getByText('Хэзээ нүүх вэ?'));
     expect(queryByText('Одоо юу хийх')).toBeNull();
+  });
+
+  it('free багц default quota banner 0/3 харуулна', async () => {
+    const { findByText } = render(<AdvisoryScreen />);
+    expect(await findByText(/0\/3/)).toBeTruthy();
+  });
+
+  it('template нээх үед quota counter нэмэгдэнэ (1/3)', async () => {
+    const { findByText, getByText } = render(<AdvisoryScreen />);
+    await findByText(/0\/3/);
+    fireEvent.press(getByText('Хэзээ нүүх вэ?'));
+    expect(await findByText(/1\/3/)).toBeTruthy();
+  });
+
+  it('premium_malchin багц үед quota banner харагдахгүй', async () => {
+    await AsyncStorage.setItem(PACKAGE_KEY, 'premium_malchin');
+    const { queryByText, findByText } = render(<AdvisoryScreen />);
+    // Header байгаа эсэхийг эхлээд шалга (render тогтсон байна)
+    await findByText('Ухаалаг зөвлөгөө');
+    // Quota banner болон upgrade prompt байхгүй
+    await waitFor(() => {
+      expect(queryByText(/0\/3/)).toBeNull();
+      expect(queryByText(/Премиум Малчин багцад нээгдэнэ/)).toBeNull();
+    });
+  });
+
+  it('3/3 хүрсэн free багц → UpgradePrompt харуулна', async () => {
+    // 3 timestamp тухайн сардаа set
+    const now = Date.now();
+    await AsyncStorage.setItem(
+      ADVISORY_QUOTA_KEY,
+      JSON.stringify([now - 1000, now - 500, now - 100])
+    );
+    const { findByText } = render(<AdvisoryScreen />);
+    expect(await findByText(/Премиум Малчин багцад нээгдэнэ/)).toBeTruthy();
   });
 });
