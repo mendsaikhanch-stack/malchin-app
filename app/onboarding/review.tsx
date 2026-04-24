@@ -69,9 +69,21 @@ export default function ReviewScreen() {
     .filter(Boolean)
     .join(', ') || '—';
 
-  const seasonalSet = SEASONAL_LABELS.filter(
-    (s) => data.seasonal[s.key].lat != null
-  ).map((s) => s.label);
+  const seasonalRows = SEASONAL_LABELS.map((s) => {
+    const camp = data.seasonal[s.key];
+    const hasGps = camp.lat != null && camp.lng != null;
+    const coords = hasGps
+      ? `${camp.lat!.toFixed(4)}, ${camp.lng!.toFixed(4)}`
+      : null;
+    return {
+      key: s.key,
+      label: s.label,
+      hasGps,
+      coords,
+      note: camp.note?.trim() || '',
+    };
+  });
+  const seasonalSetCount = seasonalRows.filter((r) => r.hasGps).length;
 
   const mainAnimals = (['horse', 'cow', 'sheep', 'goat', 'camel'] as const)
     .filter((k) => data.livestock[k] > 0)
@@ -131,12 +143,28 @@ export default function ReviewScreen() {
           <Text style={styles.value}>{locationLabel}</Text>
         </Section>
 
-        <Section title="Улирлын отор" step="seasonal" onEdit={goEdit}>
-          <Text style={styles.value}>
-            {seasonalSet.length > 0
-              ? seasonalSet.join(', ')
-              : 'Бүртгээгүй'}
-          </Text>
+        <Section
+          title={`Улирлын байршил${seasonalSetCount ? ` (${seasonalSetCount}/5)` : ''}`}
+          step="seasonal"
+          onEdit={goEdit}
+        >
+          {seasonalRows.map((r) => (
+            <View key={r.key} style={styles.seasonalRow}>
+              <Text style={styles.seasonalLabel}>{r.label}</Text>
+              {r.hasGps ? (
+                <View style={styles.seasonalRight}>
+                  <Text style={styles.seasonalCoords}>📍 {r.coords}</Text>
+                  {r.note ? (
+                    <Text style={styles.seasonalNote} numberOfLines={1}>
+                      {r.note}
+                    </Text>
+                  ) : null}
+                </View>
+              ) : (
+                <Text style={styles.seasonalMissing}>Бүртгээгүй</Text>
+              )}
+            </View>
+          ))}
         </Section>
 
         <Section title="Мал" step="livestock" onEdit={goEdit}>
@@ -262,6 +290,41 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: AppColors.grayDark,
     marginTop: 2,
+  },
+  seasonalRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    paddingVertical: 4,
+    borderBottomWidth: 1,
+    borderBottomColor: AppColors.white,
+  },
+  seasonalLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: AppColors.black,
+    flex: 0,
+    minWidth: 90,
+  },
+  seasonalRight: {
+    flex: 1,
+    alignItems: 'flex-end',
+  },
+  seasonalCoords: {
+    fontSize: 12,
+    color: AppColors.primary,
+    fontWeight: '600',
+  },
+  seasonalNote: {
+    fontSize: 11,
+    color: AppColors.grayDark,
+    marginTop: 2,
+    maxWidth: 200,
+  },
+  seasonalMissing: {
+    fontSize: 13,
+    color: AppColors.gray,
+    fontStyle: 'italic',
   },
   footer: {
     paddingHorizontal: 24,
