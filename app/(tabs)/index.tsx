@@ -12,7 +12,17 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AppColors } from '@/constants/theme';
-import { livestockApi, weatherApi, alertsApi, aiApi, financeApi } from '@/services/api';
+import {
+  livestockApi,
+  weatherApi,
+  alertsApi,
+  aiApi,
+  financeApi,
+  marketApi,
+  pricesApi,
+  healthApi,
+  newsApi,
+} from '@/services/api';
 import { AdBanner, AdBannerLarge } from '@/components/ad-banner';
 import { useLocation } from '@/hooks/use-location';
 import { useUserRole, ROLE_LABEL, ROLE_EMOJI } from '@/hooks/use-user-role';
@@ -93,11 +103,15 @@ export default function HomeScreen() {
   const [alerts, setAlerts] = useState<any[]>([]);
   const [tip, setTip] = useState('');
   const [finance, setFinance] = useState<any>(null);
+  const [marketPrices, setMarketPrices] = useState<any>(null);
+  const [listings, setListings] = useState<any[]>([]);
+  const [healthStats, setHealthStats] = useState<any>(null);
+  const [announcement, setAnnouncement] = useState<any>(null);
 
   const userId = 1;
 
   // Home feed rule engine: preferences + role + season + location-ээс card-ууд шийдэгдэнэ
-  const { visibleCards } = useHomeFeed({
+  const { visibleCards, context: homeCtx } = useHomeFeed({
     role,
     hasLivestock: totalAnimals > 0,
     hasHighAlert: alerts.some((a: any) => a.severity === 'high'),
@@ -105,12 +119,20 @@ export default function HomeScreen() {
 
   const loadData = async () => {
     try {
-      const [statsRes, weatherRes, alertsRes, tipRes, financeRes] = await Promise.allSettled([
+      const userAimag = homeCtx?.aimag || '';
+      const [
+        statsRes, weatherRes, alertsRes, tipRes, financeRes,
+        pricesRes, listingsRes, healthRes, newsRes,
+      ] = await Promise.allSettled([
         livestockApi.getStats(userId),
-        weatherApi.getByAimag('Төв'),
-        alertsApi.getAll(),
+        weatherApi.getByAimag(userAimag || 'Төв'),
+        alertsApi.getAll(userAimag || undefined),
         aiApi.getTip(),
         financeApi.getSummary(),
+        pricesApi.getSummary(),
+        marketApi.getAll(userAimag ? { location: userAimag } : undefined),
+        healthApi.getStats(),
+        newsApi.getAll(),
       ]);
 
       // Backend-ээс ирсэн тоо эсвэл онбординг data-аас fallback
@@ -132,6 +154,20 @@ export default function HomeScreen() {
       if (alertsRes.status === 'fulfilled') setAlerts((alertsRes.value || []).slice(0, 3));
       if (tipRes.status === 'fulfilled') setTip(tipRes.value.tip || '');
       if (financeRes.status === 'fulfilled') setFinance(financeRes.value);
+      if (pricesRes.status === 'fulfilled') setMarketPrices(pricesRes.value);
+      if (listingsRes.status === 'fulfilled') {
+        const arr = Array.isArray(listingsRes.value)
+          ? listingsRes.value
+          : listingsRes.value?.items || listingsRes.value?.data || [];
+        setListings(arr.slice(0, 3));
+      }
+      if (healthRes.status === 'fulfilled') setHealthStats(healthRes.value);
+      if (newsRes.status === 'fulfilled') {
+        const arr = Array.isArray(newsRes.value)
+          ? newsRes.value
+          : newsRes.value?.items || newsRes.value?.data || [];
+        setAnnouncement(arr[0] || null);
+      }
     } catch {
       // show what we can
     } finally {
@@ -140,7 +176,8 @@ export default function HomeScreen() {
     }
   };
 
-  useEffect(() => { loadData(); }, []);
+  // homeCtx бэлэн болмогц (aimag уншигдсан) бодит аймаг-ын мэдээллээр дахин дуудна
+  useEffect(() => { loadData(); }, [homeCtx?.aimag]);
 
   useEffect(() => {
     const tasks = getDailyTasks({
@@ -365,6 +402,90 @@ export default function HomeScreen() {
             <Text style={styles.tipText}>{tip}</Text>
           </TouchableOpacity>
         ) : null}
+
+        {/* Малын эрүүл мэндийн дохио — rule engine: livestock_health (мал бүртгэлтэй бол) */}
+        {healthStats && visibleCards.has('livestock_health') && (
+          <TouchableOpacity style={styles.card} onPress={() => router.push('/(tabs)/health')}>
+            <Text style={styles.cardTitle}>🩺 Малын эрүүл мэнд</Text>
+            <View style={styles.miniStatsRow}>
+              <View style={styles.miniStat}>
+                <Text style={styles.miniStatValue}>
+                  {healthStats.active ?? healthStats.open_cases ?? 0}
+                </Text>
+                <Text style={styles.miniStatLabel}>Идэвхтэй хэрэг</Text>
+              </View>
+              <View style={styles.miniStat}>
+                <Text style={[styles.miniStatValue, { color: AppColors.warning }]}>
+                  {healthStats.due_vaccinations ?? healthStats.upcoming ?? 0}
+                </Text>
+                <Text style={styles.miniStatLabel}>Дараа вакцин</Text>
+              </View>
+              <View style={styles.miniStat}>
+                <Text style={[styles.miniStatValue, { color: AppColors.danger }]}>
+                  {healthStats.severe ?? healthStats.high_severity ?? 0}
+                </Text>
+                <Text style={styles.miniStatLabel}>Яаралтай</Text>
+              </View>
+            </View>
+          </TouchableOpacity>
+        )}
+
+        {/* Сумын шинэ мэдэгдэл — rule engine: sum_announcement (аймаг тодорхой бол) */}
+        {announcement && visibleCards.has('sum_announcement') && (
+          <TouchableOpacity style={styles.card} onPress={() => router.push('/(tabs)/news')}>
+            <Text style={styles.cardTitle}>📢 Сумын шинэ мэдэгдэл</Text>
+            <Text style={styles.announceTitle} numberOfLines={2}>
+              {announcement.title || announcement.name || '—'}
+            </Text>
+            {announcement.summary || announcement.description ? (
+              <Text style={styles.announceSummary} numberOfLines={2}>
+                {announcement.summary || announcement.description}
+              </Text>
+            ) : null}
+          </TouchableOpacity>
+        )}
+
+        {/* Зах зээлийн товч үнэ — rule engine: market_prices (preferences.market) */}
+        {marketPrices && visibleCards.has('market_prices') && (
+          <TouchableOpacity style={styles.card} onPress={() => router.push('/(tabs)/market')}>
+            <Text style={styles.cardTitle}>💹 Зах зээлийн үнэ</Text>
+            <View style={styles.miniStatsRow}>
+              {(Array.isArray(marketPrices)
+                ? marketPrices
+                : marketPrices.items || marketPrices.data || []
+              )
+                .slice(0, 3)
+                .map((p: any, i: number) => (
+                  <View key={i} style={styles.miniStat}>
+                    <Text style={styles.miniStatValue}>
+                      {formatMoney(p.price || p.avg_price || 0)}
+                    </Text>
+                    <Text style={styles.miniStatLabel} numberOfLines={1}>
+                      {p.item_type || p.name || p.animal_type || '—'}
+                    </Text>
+                  </View>
+                ))}
+            </View>
+          </TouchableOpacity>
+        )}
+
+        {/* Ойролцоох хэрэгтэй зар — rule engine: nearby_listings (preferences.listings) */}
+        {listings.length > 0 && visibleCards.has('nearby_listings') && (
+          <TouchableOpacity style={styles.card} onPress={() => router.push('/(tabs)/market')}>
+            <Text style={styles.cardTitle}>📣 Ойролцоох зар</Text>
+            {listings.map((l: any, i: number) => (
+              <View key={l.id ?? i} style={styles.listingItem}>
+                <Text style={styles.listingTitle} numberOfLines={1}>
+                  {l.title || l.name || l.animal_type || 'Зар'}
+                </Text>
+                <Text style={styles.listingMeta}>
+                  {l.price ? formatMoney(l.price) : ''}
+                  {l.location ? ` · ${l.location}` : ''}
+                </Text>
+              </View>
+            ))}
+          </TouchableOpacity>
+        )}
 
         {/* Санхүүгийн тойм */}
         <TouchableOpacity style={styles.card} onPress={() => router.push('/(tabs)/finance')}>
@@ -663,4 +784,57 @@ const styles = StyleSheet.create({
     borderRadius: 10, borderLeftWidth: 3, borderLeftColor: AppColors.secondary,
   },
   insuranceTipText: { fontSize: 13, color: AppColors.grayDark, lineHeight: 18 },
+  // PRD cards: livestock_health / sum_announcement / market_prices / nearby_listings
+  miniStatsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: 8,
+    marginTop: 4,
+  },
+  miniStat: {
+    flex: 1,
+    backgroundColor: '#F7FAFC',
+    borderRadius: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 6,
+    alignItems: 'center',
+  },
+  miniStatValue: {
+    fontSize: 17,
+    fontWeight: '800',
+    color: AppColors.black,
+  },
+  miniStatLabel: {
+    fontSize: 11,
+    color: AppColors.grayDark,
+    marginTop: 4,
+    textAlign: 'center',
+  },
+  announceTitle: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: AppColors.black,
+    marginTop: 4,
+  },
+  announceSummary: {
+    fontSize: 13,
+    color: AppColors.grayDark,
+    marginTop: 4,
+    lineHeight: 18,
+  },
+  listingItem: {
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: AppColors.grayLight,
+  },
+  listingTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: AppColors.black,
+  },
+  listingMeta: {
+    fontSize: 12,
+    color: AppColors.grayDark,
+    marginTop: 2,
+  },
 });
