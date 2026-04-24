@@ -139,19 +139,25 @@ export default function ProfileScreen() {
   const seasonal = snapshot?.seasonal || {};
   const pkgName = PACKAGES[pkg]?.name || 'Үнэгүй';
 
+  const performLogout = async () => {
+    try {
+      // Хоёулаа түлхүүрийг цэвэрлэнэ — done flag үлдвэл _layout guard
+      // буцаад tabs руу шилжүүлнэ, онбординг эхлэх боломжгүй болдог.
+      await AsyncStorage.multiRemove([ONBOARDING_DATA_KEY, ONBOARDING_DONE_KEY]);
+      // Local state-ээ мөн цэвэрлэнэ — screen re-render болоход empty state
+      // харагдаж, router navigation race-аас ангижирна.
+      setSnapshot(null);
+      setUser(null);
+      router.replace('/onboarding' as any);
+    } catch (e: any) {
+      Alert.alert('Алдаа', `Гарах үед алдаа гарлаа: ${e?.message || 'тодорхойгүй'}`);
+    }
+  };
+
   const handleLogout = () => {
     Alert.alert('Гарах', 'Бүртгэлээ цэвэрлээд онбординг-руу буцах уу?', [
-      { text: 'Болих' },
-      {
-        text: 'Тийм',
-        style: 'destructive',
-        onPress: async () => {
-          // Хоёулаа түлхүүрийг цэвэрлэнэ — done flag үлдвэл _layout guard
-          // буцаад tabs руу шилжүүлнэ, онбординг эхлэх боломжгүй болдог.
-          await AsyncStorage.multiRemove([ONBOARDING_DATA_KEY, ONBOARDING_DONE_KEY]);
-          router.replace('/onboarding' as any);
-        },
-      },
+      { text: 'Болих', style: 'cancel' },
+      { text: 'Тийм', style: 'destructive', onPress: performLogout },
     ]);
   };
 
