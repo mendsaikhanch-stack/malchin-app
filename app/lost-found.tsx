@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   View,
   Text,
@@ -8,29 +8,23 @@ import {
   TextInput,
   Modal,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Stack, useRouter } from 'expo-router';
 import { AppColors } from '@/constants/theme';
 import { ReportButton } from '@/components/report-button';
-
-type ListingType = 'lost' | 'found';
-
-type Listing = {
-  id: string;
-  type: ListingType;
-  species: string;
-  count: number;
-  color: string;
-  age: string;
-  brand: string;
-  earTag: string;
-  lastSeen: string;
-  phone: string;
-  reward?: string;
-  date: string;
-  status: 'active' | 'resolved';
-};
+import {
+  fetchLostFoundListings,
+  validateListing,
+  buildListing,
+  findPotentialMatches,
+  countActive,
+  filterByType,
+  sortByDateDesc,
+  type Listing,
+  type ListingType,
+} from '@/services/lost-found-data';
 
 const SPECIES = [
   { id: 'horse', label: 'Адуу', emoji: '🐎' },
@@ -44,58 +38,14 @@ const COLORS = [
   'Хээр', 'Зээрд', 'Хул', 'Цагаан', 'Хар', 'Бор', 'Алаг', 'Шар',
 ];
 
-// Одоогоор mock data. Backend нэмэгдсэний дараа marketApi (category: lost_animal/found_animal) руу шилжих.
-const MOCK_LISTINGS: Listing[] = [
-  {
-    id: '1',
-    type: 'lost',
-    species: 'horse',
-    count: 2,
-    color: 'Хээр',
-    age: '5-7 настай',
-    brand: 'Зүүн гуянд "Х"',
-    earTag: '',
-    lastSeen: 'Алтанбулаг сумын 3-р баг, Хүрэн-Овоо',
-    phone: '9911****',
-    reward: '200,000₮',
-    date: '2026-04-22',
-    status: 'active',
-  },
-  {
-    id: '2',
-    type: 'found',
-    species: 'cow',
-    count: 1,
-    color: 'Алаг',
-    age: '3 настай',
-    brand: 'Баруун гуянд "Б"',
-    earTag: 'MN-12345',
-    lastSeen: 'Заамар сумын төвд',
-    phone: '8822****',
-    date: '2026-04-21',
-    status: 'active',
-  },
-  {
-    id: '3',
-    type: 'lost',
-    species: 'sheep',
-    count: 15,
-    color: 'Цагаан',
-    age: 'Хуц бухтай',
-    brand: 'Тэмдэггүй',
-    earTag: '',
-    lastSeen: 'Баянчандмань сумын 2-р баг',
-    phone: '9955****',
-    reward: 'Хэлэлцье',
-    date: '2026-04-20',
-    status: 'active',
-  },
-];
+// Listing data нь services/lost-found-data.ts — fetchLostFoundListings()
+// (одоогоор mock, backend endpoint бэлэн болмогц 1 газар солино).
 
 export default function LostFoundScreen() {
   const router = useRouter();
   const [tab, setTab] = useState<ListingType>('lost');
-  const [listings, setListings] = useState<Listing[]>(MOCK_LISTINGS);
+  const [listings, setListings] = useState<Listing[]>([]);
+  const [loading, setLoading] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
   const [form, setForm] = useState<Partial<Listing>>({
     type: 'lost',
@@ -104,7 +54,22 @@ export default function LostFoundScreen() {
   });
   const [detailModal, setDetailModal] = useState<Listing | null>(null);
 
-  const filtered = listings.filter((l) => l.type === tab);
+  useEffect(() => {
+    fetchLostFoundListings()
+      .then(setListings)
+      .finally(() => setLoading(false));
+  }, []);
+
+  const filtered = useMemo(
+    () => sortByDateDesc(filterByType(listings, tab)),
+    [listings, tab]
+  );
+
+  // Detail modal-д боломжит тохиролцоо (lost ↔ found)
+  const potentialMatches = useMemo(() => {
+    if (!detailModal) return [];
+    return findPotentialMatches(detailModal, listings, 0.5).slice(0, 3);
+  }, [detailModal, listings]);
 
   const openForm = (type: ListingType) => {
     setForm({ type, species: 'horse', color: 'Хээр', count: 1 });
@@ -112,25 +77,23 @@ export default function LostFoundScreen() {
   };
 
   const submitForm = () => {
-    if (!form.species || !form.lastSeen || !form.phone) {
-      Alert.alert('Алдаа', 'Төрөл, байршил, утас заавал шаардлагатай');
+    const result = validateListing(form);
+    if (!result.ok) {
+      Alert.alert('Алдаа', result.errors.map((e) => e.message).join('\n'));
       return;
     }
-    const next: Listing = {
-      id: Date.now().toString(),
+    const next = buildListing({
       type: form.type || 'lost',
-      species: form.species,
+      species: form.species!,
       count: form.count || 1,
       color: form.color || '',
       age: form.age || '',
       brand: form.brand || '',
       earTag: form.earTag || '',
-      lastSeen: form.lastSeen,
-      phone: form.phone,
+      lastSeen: form.lastSeen!,
+      phone: form.phone!,
       reward: form.reward,
-      date: new Date().toISOString().slice(0, 10),
-      status: 'active',
-    };
+    });
     setListings([next, ...listings]);
     setModalVisible(false);
     Alert.alert(
@@ -177,7 +140,7 @@ export default function LostFoundScreen() {
           onPress={() => setTab('lost')}
         >
           <Text style={[styles.tabText, tab === 'lost' && styles.tabTextActive]}>
-            🔍 Алдсан ({listings.filter((l) => l.type === 'lost' && l.status === 'active').length})
+            🔍 Алдсан ({countActive(listings, 'lost')})
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
@@ -185,14 +148,18 @@ export default function LostFoundScreen() {
           onPress={() => setTab('found')}
         >
           <Text style={[styles.tabText, tab === 'found' && styles.tabTextActive]}>
-            ✅ Олдсон ({listings.filter((l) => l.type === 'found' && l.status === 'active').length})
+            ✅ Олдсон ({countActive(listings, 'found')})
           </Text>
         </TouchableOpacity>
       </View>
 
       {/* List */}
       <ScrollView contentContainerStyle={styles.list}>
-        {filtered.length === 0 ? (
+        {loading ? (
+          <View style={{ marginTop: 40, alignItems: 'center' }}>
+            <ActivityIndicator color={AppColors.primary} />
+          </View>
+        ) : filtered.length === 0 ? (
           <Text style={styles.empty}>Одоогоор зарлал байхгүй</Text>
         ) : (
           filtered.map((l) => {
@@ -376,6 +343,43 @@ export default function LostFoundScreen() {
                 <Detail k="Утас" v={detailModal.phone} />
                 {detailModal.reward ? <Detail k="Шагнал" v={detailModal.reward} /> : null}
 
+                {/* Боломжит тохироо (lost↔found) */}
+                {potentialMatches.length > 0 && (
+                  <View style={styles.matchBox}>
+                    <Text style={styles.matchTitle}>
+                      🎯 Боломжит тохироо ({potentialMatches.length})
+                    </Text>
+                    {potentialMatches.map((m) => {
+                      const sp = speciesOf(m.listing.species);
+                      const pct = Math.round(m.score * 100);
+                      return (
+                        <TouchableOpacity
+                          key={m.listing.id}
+                          style={styles.matchRow}
+                          onPress={() => setDetailModal(m.listing)}
+                        >
+                          <Text style={styles.matchEmoji}>{sp.emoji}</Text>
+                          <View style={{ flex: 1 }}>
+                            <Text style={styles.matchHeader}>
+                              {m.listing.type === 'lost' ? 'Алдсан' : 'Олдсон'} · {m.listing.count} {sp.label}
+                            </Text>
+                            <Text style={styles.matchLoc} numberOfLines={1}>
+                              📍 {m.listing.lastSeen}
+                            </Text>
+                          </View>
+                          <View style={[
+                            styles.matchBadge,
+                            pct >= 80 && { backgroundColor: AppColors.success },
+                            pct >= 60 && pct < 80 && { backgroundColor: AppColors.warning },
+                          ]}>
+                            <Text style={styles.matchPct}>{pct}%</Text>
+                          </View>
+                        </TouchableOpacity>
+                      );
+                    })}
+                  </View>
+                )}
+
                 <View style={styles.modalActions}>
                   <TouchableOpacity
                     style={[styles.btn, styles.btnSecondary]}
@@ -498,4 +502,36 @@ const styles = StyleSheet.create({
   },
   detailKey: { flex: 1, fontSize: 14, color: AppColors.grayDark },
   detailValue: { flex: 2, fontSize: 14, color: AppColors.black, fontWeight: '600' },
+  matchBox: {
+    marginTop: 16,
+    padding: 12,
+    backgroundColor: '#F0FFF4',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#C6F6D5',
+  },
+  matchTitle: {
+    fontSize: 14,
+    fontWeight: '800',
+    color: AppColors.primaryDark,
+    marginBottom: 10,
+  },
+  matchRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 8,
+    gap: 10,
+    borderTopWidth: 1,
+    borderTopColor: '#D4E8D4',
+  },
+  matchEmoji: { fontSize: 24 },
+  matchHeader: { fontSize: 13, fontWeight: '700', color: AppColors.black },
+  matchLoc: { fontSize: 11, color: AppColors.grayDark, marginTop: 2 },
+  matchBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 10,
+    backgroundColor: AppColors.gray,
+  },
+  matchPct: { color: AppColors.white, fontSize: 12, fontWeight: '800' },
 });
