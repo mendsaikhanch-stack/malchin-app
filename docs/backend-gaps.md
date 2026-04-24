@@ -267,7 +267,7 @@ Data-layer `fetch*()` функцүүд дээрх api method-ыг эхэнд д�
 
 ## 9. Status snapshot (2026-04-24)
 
-- Тест: **372/372**, 27 test suite.
+- Тест: **379/379**, 28 test suite.
 - Backend-тэй 7 card бүгд SWR StaleBadge-тэй (weather, alerts, health,
   sum_announcement, market_prices, nearby_listings, daily_tip). Үлдсэн
   2 home card (daily_tasks, migration_advice) нь pure rule engine —
@@ -278,8 +278,9 @@ Data-layer `fetch*()` функцүүд дээрх api method-ыг эхэнд д�
   advisory (3/сар) & listings (3 active) cap UI wired.
 - Elder capability: profile flag opt-in/disable UX wired.
 - Offline sync queue (`services/sync-queue.ts`): queueChange / flushQueue /
-  pullChanges / autoSync + `syncApi` backend contract (`/sync/push`,
-  `/sync/pull`) бэлэн, 19 test-тэй. **Gap:** бүртгэлийн create/update
-  flow-уудад `queueChange()` call алга — одоогоор зөвхөн `request<T>()`
-  шууд дуудаж, сүлжээгүй үед write алдагдана. Phase 2-д animals, listings,
-  elder-content submit-ийн flow дотор wire хэрэгтэй.
+  pullChanges / autoSync / **queueOnFailure** + `syncApi` backend contract.
+  Market listings create/update нь `queueOnFailure`-оор wrap-сан — offline
+  үед "Сүлжээгүй — дараа илгээгдэнэ" alert-тай queue-д хадгалагдана.
+  `useAutoSync()` hook root layout-д mount-тай, network false→true
+  шилжилт дээр автоматаар flush. **Үлдсэн wire:** animals (livestockApi.add),
+  elder-content submit — ижил pattern.

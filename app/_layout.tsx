@@ -8,6 +8,7 @@ import 'react-native-reanimated';
 
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useNetwork } from '@/hooks/use-network';
+import { useAutoSync } from '@/hooks/use-auto-sync';
 import { OfflineBanner } from '@/components/offline-banner';
 
 const ONBOARDING_KEY = '@malchin_onboarding_done';
@@ -19,6 +20,7 @@ export const unstable_settings = {
 export default function RootLayout() {
   const colorScheme = useColorScheme();
   const isConnected = useNetwork();
+  useAutoSync(); // Сүлжээ сэргэх бүрд queue-г flush хийнэ
   const router = useRouter();
   const segments = useSegments();
   const [checkingOnboarding, setCheckingOnboarding] = useState(true);

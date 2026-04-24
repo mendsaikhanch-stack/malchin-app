@@ -182,6 +182,31 @@ export async function getLastSyncTime(): Promise<string | null> {
 }
 
 /**
+ * Write endpoint wrapper: API call хийж, fail үед queue-т push хийнэ.
+ * Callsite-д try/catch давтах хэрэггүй болгоно.
+ *
+ * Buцаадаг:
+ *   { synced: true, data } — real API амжилттай, cache-д шууд available
+ *   { synced: false, queued: true } — сүлжээгүй/backend унасан, queue-т орсон.
+ *                                      UI-д "дараа илгээгдэнэ" message харуулна
+ */
+export async function queueOnFailure<T>(
+  primary: () => Promise<T>,
+  fallback: Omit<QueuedChange, 'id' | 'created_at'>
+): Promise<
+  | { synced: true; data: T; queued: false }
+  | { synced: false; queued: true; entry: QueuedChange }
+> {
+  try {
+    const data = await primary();
+    return { synced: true, data, queued: false };
+  } catch {
+    const entry = await queueChange(fallback);
+    return { synced: false, queued: true, entry };
+  }
+}
+
+/**
  * Auto-sync: call periodically with current connectivity status.
  * If connected and queue has items, flushes the queue first, then pulls changes.
  * Returns sync result or null if offline / nothing to do.

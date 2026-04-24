@@ -241,6 +241,42 @@ describe('sync-queue / autoSync', () => {
   });
 });
 
+describe('sync-queue / queueOnFailure', () => {
+  it('primary амжилттай үед queue-д хадгалахгүй + data буцаана', async () => {
+    const primary = jest.fn().mockResolvedValue({ id: 42, ok: true });
+    const result = await syncQueue.queueOnFailure(primary, {
+      table_name: 'listings',
+      action: 'INSERT',
+      record_id: 0,
+      data: { x: 1 },
+    });
+    expect(result.synced).toBe(true);
+    if (result.synced) {
+      expect(result.data).toEqual({ id: 42, ok: true });
+      expect(result.queued).toBe(false);
+    }
+    expect(primary).toHaveBeenCalledTimes(1);
+    expect(await syncQueue.getQueueCount()).toBe(0);
+  });
+
+  it('primary fail үед queue-д push хийж, entry буцаана', async () => {
+    const primary = jest.fn().mockRejectedValue(new Error('offline'));
+    const result = await syncQueue.queueOnFailure(primary, {
+      table_name: 'listings',
+      action: 'INSERT',
+      record_id: 0,
+      data: { x: 1 },
+    });
+    expect(result.synced).toBe(false);
+    expect(result.queued).toBe(true);
+    if (result.queued) {
+      expect(result.entry.table_name).toBe('listings');
+      expect(result.entry.id).toMatch(/^[0-9a-f-]+$/);
+    }
+    expect(await syncQueue.getQueueCount()).toBe(1);
+  });
+});
+
 describe('sync-queue / clearQueue', () => {
   it('queue-г хоосолно', async () => {
     await syncQueue.queueChange({

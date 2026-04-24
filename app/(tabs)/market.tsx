@@ -21,6 +21,7 @@ import { ReportButton } from '@/components/report-button';
 import { useRouter } from 'expo-router';
 import { useQuota } from '@/hooks/use-quota';
 import { UpgradePrompt } from '@/components/feature-gate';
+import { queueOnFailure } from '@/services/sync-queue';
 
 const tabs = ['Ханш', 'Түүхий эд', 'Зарууд', 'Миний зар'];
 
@@ -174,16 +175,27 @@ export default function MarketScreen() {
       );
       return;
     }
-    try {
-      const payload = { user_id: userId, title: title.trim(), description: description.trim(), animal_type: selectedAnimal, quantity: parseInt(quantity) || 0, price: parseInt(price) || 0, location: location.trim(), phone: phone.trim(), image_url: imageUrl.trim() || undefined };
-      if (editingId) {
-        await marketApi.update(editingId, payload);
-      } else {
-        await marketApi.create(payload);
+    const payload = { user_id: userId, title: title.trim(), description: description.trim(), animal_type: selectedAnimal, quantity: parseInt(quantity) || 0, price: parseInt(price) || 0, location: location.trim(), phone: phone.trim(), image_url: imageUrl.trim() || undefined };
+
+    const result = await queueOnFailure(
+      () => editingId ? marketApi.update(editingId, payload) : marketApi.create(payload),
+      {
+        table_name: 'listings',
+        action: editingId ? 'UPDATE' : 'INSERT',
+        record_id: editingId ?? 0,
+        data: payload,
       }
-      setShowModal(false); resetForm();
+    );
+
+    setShowModal(false); resetForm();
+    if (result.synced) {
       loadListings(); if (activeTab === 3) loadMyListings();
-    } catch { Alert.alert('Алдаа', editingId ? 'Зар засахад алдаа гарлаа' : 'За�� нэмэхэд алдаа гарлаа'); }
+    } else {
+      Alert.alert(
+        'Сүлжээгүй',
+        'Зар локал хадгалагдлаа. Сүлжээнд холбогдох үед автоматаар илгээгдэнэ.'
+      );
+    }
   };
 
   const handleEdit = (item: any) => {
