@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -8,35 +8,21 @@ import {
   Modal,
   TextInput,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Stack, useRouter } from 'expo-router';
 import { AppColors } from '@/constants/theme';
-
-type BagStat = {
-  id: string;
-  name: string;
-  households: number;
-  animals: number;
-  active: number; // active users last 7d
-  risky: number;
-  otor: number;
-  readPct: number;
-};
-
-const MOCK_BAGS: BagStat[] = [
-  { id: '1', name: '1-р баг (Хараат)', households: 72, animals: 18400, active: 58, risky: 4, otor: 12, readPct: 82 },
-  { id: '2', name: '2-р баг (Баян-Улаан)', households: 65, animals: 15200, active: 52, risky: 6, otor: 8, readPct: 76 },
-  { id: '3', name: '3-р баг (Цагаан-Овоо)', households: 58, animals: 13800, active: 47, risky: 3, otor: 15, readPct: 88 },
-  { id: '4', name: '4-р баг (Хөх-Гол)', households: 49, animals: 11500, active: 35, risky: 8, otor: 5, readPct: 60 },
-  { id: '5', name: '5-р баг (Цэнгэг)', households: 62, animals: 14700, active: 51, risky: 4, otor: 10, readPct: 81 },
-];
-
-const MOCK_EVENTS = [
-  { id: '1', title: 'Хаврын тоолго', date: '2026-04-25', participation: 68 },
-  { id: '2', title: 'Вакцинжуулалт', date: '2026-05-10', participation: 92 },
-  { id: '3', title: 'Бэлчээр ашиглалтын хурал', date: '2026-05-15', participation: 45 },
-];
+import {
+  fetchSumBags,
+  fetchSumEvents,
+  computeSumStats,
+  rankBags,
+  sortEventsByDate,
+  type BagStat,
+  type SumEvent,
+  type SumStats,
+} from '@/services/sum-dashboard-data';
 
 export default function SumDashboard() {
   const router = useRouter();
@@ -44,23 +30,31 @@ export default function SumDashboard() {
   const [scope, setScope] = useState<'all' | string>('all');
   const [bTitle, setBTitle] = useState('');
   const [bBody, setBBody] = useState('');
+  const [bags, setBags] = useState<BagStat[]>([]);
+  const [events, setEvents] = useState<SumEvent[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const totalHH = MOCK_BAGS.reduce((s, b) => s + b.households, 0);
-  const totalAnimals = MOCK_BAGS.reduce((s, b) => s + b.animals, 0);
-  const totalRisky = MOCK_BAGS.reduce((s, b) => s + b.risky, 0);
-  const totalOtor = MOCK_BAGS.reduce((s, b) => s + b.otor, 0);
-  const avgRead = Math.round(MOCK_BAGS.reduce((s, b) => s + b.readPct, 0) / MOCK_BAGS.length);
-  const totalActive = MOCK_BAGS.reduce((s, b) => s + b.active, 0);
-  const engagementPct = Math.round((totalActive / totalHH) * 100);
+  useEffect(() => {
+    Promise.all([fetchSumBags(), fetchSumEvents()])
+      .then(([b, e]) => {
+        setBags(b);
+        setEvents(sortEventsByDate(e));
+      })
+      .finally(() => setLoading(false));
+  }, []);
 
-  const sorted = [...MOCK_BAGS].sort((a, b) => b.readPct - a.readPct);
+  const stats: SumStats = computeSumStats(bags);
+  const sorted = rankBags(bags, 'readPct');
 
   const sendBroadcast = () => {
     if (!bTitle || !bBody) {
       Alert.alert('Алдаа', 'Гарчиг болон агуулгаа бичнэ үү');
       return;
     }
-    const target = scope === 'all' ? `бүх ${totalHH} өрх` : `${MOCK_BAGS.find((b) => b.id === scope)?.name}`;
+    const target =
+      scope === 'all'
+        ? `бүх ${stats.totalHouseholds} өрх`
+        : `${bags.find((b) => b.id === scope)?.name}`;
     Alert.alert('Илгээгдлээ', `${target}-д мэдэгдэл илгээлээ.`);
     setBroadcastModal(false);
     setBTitle('');
@@ -81,23 +75,29 @@ export default function SumDashboard() {
         </View>
       </View>
 
+      {loading ? (
+        <View style={styles.loading}>
+          <ActivityIndicator color={AppColors.primary} />
+          <Text style={styles.loadingText}>Сумын мэдээлэл ачааллаж байна...</Text>
+        </View>
+      ) : (
       <ScrollView contentContainerStyle={styles.body}>
         {/* Том үзүүлэлт */}
         <View style={styles.heroRow}>
-          <HeroCard label="Нийт өрх" value={totalHH} sub={`${MOCK_BAGS.length} баг`} />
-          <HeroCard label="Нийт мал" value={totalAnimals} sub="бодотой" fmt />
+          <HeroCard label="Нийт өрх" value={stats.totalHouseholds} sub={`${stats.bagCount} баг`} />
+          <HeroCard label="Нийт мал" value={stats.totalAnimals} sub="бодотой" fmt />
         </View>
         <View style={styles.heroRow}>
-          <HeroCard label="Эрсдэлт" value={totalRisky} sub="өрх" color={AppColors.danger} />
-          <HeroCard label="Отор" value={totalOtor} sub="өрх" color={AppColors.accent} />
+          <HeroCard label="Эрсдэлт" value={stats.totalRisky} sub="өрх" color={AppColors.danger} />
+          <HeroCard label="Отор" value={stats.totalOtor} sub="өрх" color={AppColors.accent} />
         </View>
 
         {/* Engagement */}
         <View style={styles.card}>
           <Text style={styles.cardTitle}>📊 Идэвхи ба хүрэлцээ</Text>
-          <KpiRow label="Эрэлтэй хэрэглэгч (7 хоног)" value={`${engagementPct}%`} sub={`${totalActive}/${totalHH}`} />
-          <KpiRow label="Мэдэгдлийн уншилт" value={`${avgRead}%`} sub="дундаж" />
-          <KpiRow label="7 хоногийн шинэ бүртгэл" value="14" sub="өрх" />
+          <KpiRow label="Эрэлтэй хэрэглэгч (7 хоног)" value={`${stats.engagementPct}%`} sub={`${stats.totalActive}/${stats.totalHouseholds}`} />
+          <KpiRow label="Мэдэгдлийн уншилт" value={`${stats.avgReadPct}%`} sub="дундаж" />
+          <KpiRow label="Бага уншилттай баг" value={String(stats.lowReadBags)} sub="<60%" />
         </View>
 
         {/* Эрсдэлийн зураг */}
@@ -142,7 +142,7 @@ export default function SumDashboard() {
         {/* Арга хэмжээ */}
         <View style={styles.card}>
           <Text style={styles.cardTitle}>📅 Арга хэмжээний оролцоо</Text>
-          {MOCK_EVENTS.map((e) => (
+          {events.map((e) => (
             <View key={e.id} style={styles.eventRow}>
               <View style={{ flex: 1 }}>
                 <Text style={styles.eventTitle}>{e.title}</Text>
@@ -180,6 +180,7 @@ export default function SumDashboard() {
 
         <View style={{ height: 40 }} />
       </ScrollView>
+      )}
 
       {/* Broadcast modal */}
       <Modal visible={broadcastModal} animationType="slide" transparent>
@@ -195,10 +196,10 @@ export default function SumDashboard() {
                   onPress={() => setScope('all')}
                 >
                   <Text style={[styles.chipText, scope === 'all' && styles.chipTextActive]}>
-                    Бүх баг ({totalHH})
+                    Бүх баг ({stats.totalHouseholds})
                   </Text>
                 </TouchableOpacity>
-                {MOCK_BAGS.map((b) => (
+                {bags.map((b) => (
                   <TouchableOpacity
                     key={b.id}
                     style={[styles.chip, scope === b.id && styles.chipActive]}
@@ -284,6 +285,8 @@ const styles = StyleSheet.create({
   headerTitle: { fontSize: 17, fontWeight: '700', color: AppColors.black },
   headerSubtitle: { fontSize: 12, color: AppColors.grayDark, marginTop: 2 },
   body: { padding: 16 },
+  loading: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 12 },
+  loadingText: { fontSize: 13, color: AppColors.grayDark },
   heroRow: { flexDirection: 'row', gap: 10, marginBottom: 10 },
   hero: {
     flex: 1, backgroundColor: AppColors.white, borderRadius: 14, padding: 14,
