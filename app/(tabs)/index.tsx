@@ -90,11 +90,10 @@ export default function HomeScreen() {
   const [livestock, setLivestock] = useState<any[]>([]);
   const [totalAnimals, setTotalAnimals] = useState(0);
   const [weather, setWeather] = useState<NormalizedWeather | null>(null);
-  const [weatherMeta, setWeatherMeta] = useState<CacheMeta>({
-    fromCache: false,
-    offline: false,
-    expired: false,
-  });
+  const emptyMeta: CacheMeta = { fromCache: false, offline: false, expired: false };
+  const [weatherMeta, setWeatherMeta] = useState<CacheMeta>(emptyMeta);
+  const [alertsMeta, setAlertsMeta] = useState<CacheMeta>(emptyMeta);
+  const [announcementMeta, setAnnouncementMeta] = useState<CacheMeta>(emptyMeta);
   const [alerts, setAlerts] = useState<any[]>([]);
   const [tip, setTip] = useState('');
   const [finance, setFinance] = useState<any>(null);
@@ -121,13 +120,13 @@ export default function HomeScreen() {
       ] = await Promise.allSettled([
         livestockApi.getStats(userId),
         weatherApi.getByAimagWithMeta(userAimag || 'Төв'),
-        alertsApi.getAll(userAimag || undefined),
+        alertsApi.getAllWithMeta(userAimag || undefined),
         aiApi.getTip(),
         financeApi.getSummary(),
         pricesApi.getSummary(),
         marketApi.getAll(userAimag ? { location: userAimag } : undefined),
         healthApi.getStats(),
-        newsApi.getAll(),
+        newsApi.getAllWithMeta(),
       ]);
 
       // Backend-ээс ирсэн тоо эсвэл онбординг data-аас fallback
@@ -154,7 +153,11 @@ export default function HomeScreen() {
           expired: wr.expired,
         });
       }
-      if (alertsRes.status === 'fulfilled') setAlerts((alertsRes.value || []).slice(0, 3));
+      if (alertsRes.status === 'fulfilled') {
+        const ar = alertsRes.value;
+        setAlerts((ar.data || []).slice(0, 3));
+        setAlertsMeta({ fromCache: ar.fromCache, offline: ar.offline, expired: ar.expired });
+      }
       if (tipRes.status === 'fulfilled') setTip(tipRes.value.tip || '');
       if (financeRes.status === 'fulfilled') setFinance(financeRes.value);
       if (pricesRes.status === 'fulfilled') setMarketPrices(pricesRes.value);
@@ -166,10 +169,13 @@ export default function HomeScreen() {
       }
       if (healthRes.status === 'fulfilled') setHealthStats(healthRes.value);
       if (newsRes.status === 'fulfilled') {
-        const arr = Array.isArray(newsRes.value)
-          ? newsRes.value
-          : newsRes.value?.items || newsRes.value?.data || [];
+        const nr = newsRes.value;
+        const payload = nr.data;
+        const arr = Array.isArray(payload)
+          ? payload
+          : payload?.items || payload?.data || [];
         setAnnouncement(arr[0] || null);
+        setAnnouncementMeta({ fromCache: nr.fromCache, offline: nr.offline, expired: nr.expired });
       }
     } catch {
       // show what we can
@@ -350,7 +356,10 @@ export default function HomeScreen() {
         {/* Сэрэмжлүүлэг — rule engine: preferences.alerts (risk card) */}
         {alerts.length > 0 && visibleCards.has('risk') && (
           <View style={styles.card}>
-            <Text style={styles.cardTitle}>🚨 Сэрэмжлүүлэг</Text>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Text style={styles.cardTitle}>🚨 Сэрэмжлүүлэг</Text>
+              <StaleBadge {...alertsMeta} compact />
+            </View>
             {alerts.map((alert: any) => (
               <View key={alert.id} style={[styles.alertItem, { borderLeftColor: severityColor(alert.severity) }]}>
                 <Text style={styles.alertTitle}>{alert.title}</Text>
@@ -450,7 +459,10 @@ export default function HomeScreen() {
         {/* Сумын шинэ мэдэгдэл — rule engine: sum_announcement (аймаг тодорхой бол) */}
         {announcement && visibleCards.has('sum_announcement') && (
           <TouchableOpacity style={styles.card} onPress={() => router.push('/(tabs)/news')}>
-            <Text style={styles.cardTitle}>📢 Сумын шинэ мэдэгдэл</Text>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Text style={styles.cardTitle}>📢 Сумын шинэ мэдэгдэл</Text>
+              <StaleBadge {...announcementMeta} compact />
+            </View>
             <Text style={styles.announceTitle} numberOfLines={2}>
               {announcement.title || announcement.name || '—'}
             </Text>

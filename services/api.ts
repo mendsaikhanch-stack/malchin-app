@@ -231,6 +231,8 @@ export const marketApi = {
 export const alertsApi = {
   getAll: (region?: string) =>
     cachedRequest<any>(`/alerts${region ? `?region=${encodeURIComponent(region)}` : ''}`, 'alerts'),
+  getAllWithMeta: (region?: string) =>
+    cachedRequestWithMeta<any>(`/alerts${region ? `?region=${encodeURIComponent(region)}` : ''}`, 'alerts'),
 };
 
 // Transport
@@ -267,6 +269,8 @@ export const mapApi = {
 export const newsApi = {
   getAll: (category?: string) =>
     cachedRequest<any>(`/news${category ? `?category=${category}` : ''}`, 'news'),
+  getAllWithMeta: (category?: string) =>
+    cachedRequestWithMeta<any>(`/news${category ? `?category=${category}` : ''}`, 'news'),
   getPrograms: (category?: string) =>
     cachedRequest<any>(`/news/programs${category ? `?category=${category}` : ''}`, 'news'),
   getIntlPrices: () => cachedRequest<any>('/news/intl-prices', 'prices'),
