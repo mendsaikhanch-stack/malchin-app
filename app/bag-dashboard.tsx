@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -8,51 +8,49 @@ import {
   Modal,
   TextInput,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Stack, useRouter } from 'expo-router';
 import { AppColors } from '@/constants/theme';
+import {
+  fetchBagHouseholds,
+  computeBagStats,
+  filterRisky,
+  RISK_LABEL,
+  type Household,
+  type BagStats,
+} from '@/services/bag-dashboard-data';
 
-type Household = {
-  id: string;
-  head: string;
-  phone: string;
-  members: number;
-  animals: number;
-  location: string;
-  lastActive: string;
-  risk: 'low' | 'medium' | 'high';
-  otor: boolean;
+const RISK_COLOR = {
+  low: AppColors.success,
+  medium: AppColors.warning,
+  high: AppColors.danger,
 };
-
-const MOCK_HOUSEHOLDS: Household[] = [
-  { id: '1', head: 'Батбаяр.Б', phone: '9911****', members: 5, animals: 280, location: '3-р баг, Хүрэн-Овоо', lastActive: 'Өнөөдөр', risk: 'low', otor: false },
-  { id: '2', head: 'Оюунтуяа.Д', phone: '8822****', members: 4, animals: 180, location: '3-р баг, Цагаан-Овоо', lastActive: '2 өдрийн өмнө', risk: 'medium', otor: false },
-  { id: '3', head: 'Дорж.Т', phone: '9955****', members: 3, animals: 420, location: 'Отор — Баянжаргалан', lastActive: '5 өдрийн өмнө', risk: 'high', otor: true },
-  { id: '4', head: 'Насанбат.Ц', phone: '9966****', members: 6, animals: 310, location: '3-р баг, Хар-Ус', lastActive: 'Өнөөдөр', risk: 'low', otor: false },
-  { id: '5', head: 'Сарангэрэл.Э', phone: '9977****', members: 4, animals: 150, location: '3-р баг, Төмөр-Овоо', lastActive: '1 өдрийн өмнө', risk: 'low', otor: false },
-];
-
-const RISK_COLOR = { low: AppColors.success, medium: AppColors.warning, high: AppColors.danger };
-const RISK_LABEL = { low: 'Хэвийн', medium: 'Анхаарах', high: 'Эрсдэлтэй' };
 
 export default function BagDashboard() {
   const router = useRouter();
   const [broadcastModal, setBroadcastModal] = useState(false);
   const [broadcastTitle, setBroadcastTitle] = useState('');
   const [broadcastBody, setBroadcastBody] = useState('');
+  const [households, setHouseholds] = useState<Household[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const total = MOCK_HOUSEHOLDS.length;
-  const totalAnimals = MOCK_HOUSEHOLDS.reduce((s, h) => s + h.animals, 0);
-  const riskyCount = MOCK_HOUSEHOLDS.filter((h) => h.risk !== 'low').length;
-  const otorCount = MOCK_HOUSEHOLDS.filter((h) => h.otor).length;
+  useEffect(() => {
+    fetchBagHouseholds()
+      .then(setHouseholds)
+      .finally(() => setLoading(false));
+  }, []);
+
+  const stats: BagStats = computeBagStats(households);
+  const risky = filterRisky(households);
 
   const sendBroadcast = () => {
     if (!broadcastTitle || !broadcastBody) {
       Alert.alert('Алдаа', 'Гарчиг болон агуулгаа бичнэ үү');
       return;
     }
-    Alert.alert('Илгээгдлээ', `${total} өрхөд мэдэгдэл илгээлээ.`);
+    Alert.alert('Илгээгдлээ', `${stats.totalHouseholds} өрхөд мэдэгдэл илгээлээ.`);
     setBroadcastModal(false);
     setBroadcastTitle('');
     setBroadcastBody('');
@@ -73,13 +71,19 @@ export default function BagDashboard() {
         </View>
       </View>
 
+      {loading ? (
+        <View style={styles.loading}>
+          <ActivityIndicator color={AppColors.primary} />
+          <Text style={styles.loadingText}>Өрхийн мэдээлэл ачааллаж байна...</Text>
+        </View>
+      ) : (
       <ScrollView contentContainerStyle={styles.body}>
         {/* Тоон үзүүлэлт */}
         <View style={styles.statsRow}>
-          <Stat emoji="👪" label="Өрх" value={total} />
-          <Stat emoji="🐑" label="Мал" value={totalAnimals} />
-          <Stat emoji="⚠" label="Эрсдэлт" value={riskyCount} color={AppColors.warning} />
-          <Stat emoji="🚶" label="Отор" value={otorCount} color={AppColors.accent} />
+          <Stat emoji="👪" label="Өрх" value={stats.totalHouseholds} />
+          <Stat emoji="🐑" label="Мал" value={stats.totalAnimals} />
+          <Stat emoji="⚠" label="Эрсдэлт" value={stats.riskyCount} color={AppColors.warning} />
+          <Stat emoji="🚶" label="Отор" value={stats.otorCount} color={AppColors.accent} />
         </View>
 
         {/* Шуурхай үйлдэл */}
@@ -118,30 +122,33 @@ export default function BagDashboard() {
         </View>
 
         {/* Эрсдэлт өрх */}
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>⚠ Эрсдэлт өрх ({riskyCount})</Text>
-          {MOCK_HOUSEHOLDS.filter((h) => h.risk !== 'low').map((h) => (
-            <HouseholdRow key={h.id} h={h} onPress={() => Alert.alert(h.head, h.location)} />
-          ))}
-        </View>
+        {risky.length > 0 && (
+          <View style={styles.card}>
+            <Text style={styles.cardTitle}>⚠ Эрсдэлт өрх ({risky.length})</Text>
+            {risky.map((h) => (
+              <HouseholdRow key={h.id} h={h} onPress={() => Alert.alert(h.head, h.location)} />
+            ))}
+          </View>
+        )}
 
         {/* Өрхийн жагсаалт */}
         <View style={styles.card}>
-          <Text style={styles.cardTitle}>👪 Бүх өрх ({total})</Text>
-          {MOCK_HOUSEHOLDS.map((h) => (
+          <Text style={styles.cardTitle}>👪 Бүх өрх ({stats.totalHouseholds})</Text>
+          {households.map((h) => (
             <HouseholdRow key={h.id} h={h} onPress={() => Alert.alert(h.head, h.location)} />
           ))}
         </View>
 
         <View style={{ height: 40 }} />
       </ScrollView>
+      )}
 
       {/* Broadcast modal */}
       <Modal visible={broadcastModal} animationType="slide" transparent>
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Мэдэгдэл илгээх</Text>
-            <Text style={styles.modalHint}>3-р багийн {total} өрхөд хүрнэ</Text>
+            <Text style={styles.modalHint}>3-р багийн {stats.totalHouseholds} өрхөд хүрнэ</Text>
 
             <Text style={styles.label}>Гарчиг</Text>
             <TextInput
@@ -238,6 +245,8 @@ const styles = StyleSheet.create({
   headerTitle: { fontSize: 17, fontWeight: '700', color: AppColors.black },
   headerSubtitle: { fontSize: 12, color: AppColors.grayDark, marginTop: 2 },
   body: { padding: 16 },
+  loading: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 12 },
+  loadingText: { fontSize: 13, color: AppColors.grayDark },
   statsRow: { flexDirection: 'row', gap: 8, marginBottom: 12 },
   stat: {
     flex: 1, backgroundColor: AppColors.white, borderRadius: 12, padding: 10, alignItems: 'center',
