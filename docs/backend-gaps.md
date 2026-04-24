@@ -279,8 +279,14 @@ Data-layer `fetch*()` функцүүд дээрх api method-ыг эхэнд д�
 - Elder capability: profile flag opt-in/disable UX wired.
 - Offline sync queue (`services/sync-queue.ts`): queueChange / flushQueue /
   pullChanges / autoSync / **queueOnFailure** + `syncApi` backend contract.
-  Market listings create/update нь `queueOnFailure`-оор wrap-сан — offline
-  үед "Сүлжээгүй — дараа илгээгдэнэ" alert-тай queue-д хадгалагдана.
+  Wire хийгдсэн callsite:
+  - market listings create/update (`app/(tabs)/market.tsx`)
+  - livestock нэгдсэн бүртгэл + үйл явдал (`app/(tabs)/livestock.tsx`
+    handleAdd + handleEvent)
+  - animals бие даасан бүртгэл (animalsApi.create/update — livestock.tsx
+    AnimalFormModal)
+  - Онбординг мал тоо upload (`app/onboarding/done.tsx`) — сүлжээгүй
+    үед мал тоо алдагдахгүй
   `useAutoSync()` hook root layout-д mount-тай, network false→true
-  шилжилт дээр автоматаар flush. **Үлдсэн wire:** animals (livestockApi.add),
-  elder-content submit — ижил pattern.
+  шилжилт дээр автоматаар flush. **Үлдсэн wire:** elder-content submit,
+  bag/sum broadcast-ууд — ижил pattern.

@@ -17,6 +17,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { AppColors } from '@/constants/theme';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { animalsApi, livestockApi } from '@/services/api';
+import { queueOnFailure } from '@/services/sync-queue';
 
 const ONBOARDING_DATA_KEY = '@malchin_onboarding_data';
 
@@ -485,17 +486,24 @@ function AddEditAnimalModal({
       father_id: fatherId ? parseInt(fatherId) : undefined,
       notes: notes.trim() || undefined,
     };
-    try {
-      if (isEdit) {
-        await animalsApi.update(animal.id, data);
-      } else {
-        await animalsApi.create(data);
+    const result = await queueOnFailure(
+      () => isEdit ? animalsApi.update(animal.id, data) : animalsApi.create(data),
+      {
+        table_name: 'animals',
+        action: isEdit ? 'UPDATE' : 'INSERT',
+        record_id: isEdit ? animal.id : 0,
+        data,
       }
+    );
+    setSaving(false);
+    if (result.synced) {
       onSaved();
-    } catch {
-      Alert.alert('Алдаа', isEdit ? 'Засахад алдаа гарлаа' : 'Бүртгэхэд алдаа гарлаа');
-    } finally {
-      setSaving(false);
+    } else {
+      Alert.alert(
+        'Сүлжээгүй',
+        (isEdit ? 'Засвар' : 'Бүртгэл') + ' локал хадгалагдлаа. Сүлжээнд холбогдох үед автоматаар илгээгдэнэ.'
+      );
+      onSaved(); // Optimistic — UI-д локал data-аар үргэлжилнэ
     }
   };
 
@@ -1022,13 +1030,20 @@ function AggregateTab() {
       Alert.alert('Алдаа', 'Тоо оруулна уу');
       return;
     }
-    try {
-      await livestockApi.add({ user_id: userId, animal_type: selectedAnimal, total_count: num });
-      setShowAddModal(false);
-      setCount('');
+    const payload = { user_id: userId, animal_type: selectedAnimal, total_count: num };
+    const result = await queueOnFailure(
+      () => livestockApi.add(payload),
+      { table_name: 'livestock', action: 'INSERT', record_id: 0, data: payload }
+    );
+    setShowAddModal(false);
+    setCount('');
+    if (result.synced) {
       loadData();
-    } catch {
-      Alert.alert('Алдаа', 'Мал нэмэхэд алдаа гарлаа');
+    } else {
+      Alert.alert(
+        'Сүлжээгүй',
+        'Мал локал хадгалагдлаа. Сүлжээнд холбогдох үед автоматаар илгээгдэнэ.'
+      );
     }
   };
 
@@ -1038,20 +1053,27 @@ function AggregateTab() {
       Alert.alert('Алдаа', 'Тоо оруулна уу');
       return;
     }
-    try {
-      await livestockApi.addEvent({
-        user_id: userId,
-        animal_type: selectedAnimal,
-        event_type: selectedEvent,
-        quantity: num,
-        note: eventNote,
-      });
-      setShowEventModal(false);
-      setEventQuantity('');
-      setEventNote('');
+    const payload = {
+      user_id: userId,
+      animal_type: selectedAnimal,
+      event_type: selectedEvent,
+      quantity: num,
+      note: eventNote,
+    };
+    const result = await queueOnFailure(
+      () => livestockApi.addEvent(payload),
+      { table_name: 'livestock_events', action: 'INSERT', record_id: 0, data: payload }
+    );
+    setShowEventModal(false);
+    setEventQuantity('');
+    setEventNote('');
+    if (result.synced) {
       loadData();
-    } catch {
-      Alert.alert('Алдаа', 'Үйл явдал бүртгэхэд алдаа гарлаа');
+    } else {
+      Alert.alert(
+        'Сүлжээгүй',
+        'Үйл явдал локал хадгалагдлаа. Сүлжээнд холбогдох үед автоматаар илгээгдэнэ.'
+      );
     }
   };
 

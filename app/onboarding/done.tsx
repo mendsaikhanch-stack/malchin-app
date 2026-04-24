@@ -12,6 +12,7 @@ import { AppColors } from '@/constants/theme';
 import { PrimaryButton } from './_components';
 import { useOnboarding } from './_layout';
 import { userApi, livestockApi, setToken } from '@/services/api';
+import { queueOnFailure } from '@/services/sync-queue';
 
 // reset() дуудахгүй — ингэснээр онбординг дууссаны дараа ч
 // @malchin_onboarding_data түлхүүрт малчны мэдээлэл үлдэнэ.
@@ -54,15 +55,17 @@ export default function DoneScreen() {
           ];
           for (const [type, count] of counts) {
             if (count > 0) {
-              try {
-                await livestockApi.add({
-                  user_id: res.user.id,
-                  animal_type: type,
-                  total_count: count,
-                });
-              } catch {
-                // backend unavailable — onboarding data still in storage
-              }
+              const payload = {
+                user_id: res.user.id,
+                animal_type: type,
+                total_count: count,
+              };
+              // queueOnFailure — onboarding дуусаагүй байхад сүлжээгүй үед
+              // мал тоо алдагдахгүй. Reconnect үед useAutoSync flush.
+              await queueOnFailure(
+                () => livestockApi.add(payload),
+                { table_name: 'livestock', action: 'INSERT', record_id: 0, data: payload }
+              );
             }
           }
         }
