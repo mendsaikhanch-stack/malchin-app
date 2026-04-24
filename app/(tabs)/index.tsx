@@ -23,6 +23,10 @@ import {
   healthApi,
   newsApi,
 } from '@/services/api';
+import {
+  parseOnboardingSnapshot,
+  toLivestockStats,
+} from '@/services/onboarding-fallback';
 import { AdBanner, AdBannerLarge } from '@/components/ad-banner';
 import { useLocation } from '@/hooks/use-location';
 import { useUserRole, ROLE_LABEL, ROLE_EMOJI } from '@/hooks/use-user-role';
@@ -38,18 +42,11 @@ const animalNames: Record<string, string> = {
 const ONBOARDING_DATA_KEY = '@malchin_onboarding_data';
 
 // Онбординг-д бүртгэсэн малын тоог backend-ийн format руу хөрвүүлэх
-async function loadLivestockFromOnboarding(): Promise<{ livestock: any[]; total_animals: number } | null> {
+// (pure logic нь services/onboarding-fallback.ts-д; энд зөвхөн AsyncStorage уншина)
+async function loadLivestockFromOnboarding() {
   try {
     const raw = await AsyncStorage.getItem(ONBOARDING_DATA_KEY);
-    if (!raw) return null;
-    const d = JSON.parse(raw);
-    if (!d?.livestock) return null;
-    const types = ['horse', 'cow', 'sheep', 'goat', 'camel'] as const;
-    const items = types
-      .filter((t) => (d.livestock[t] || 0) > 0)
-      .map((t) => ({ animal_type: t, total_count: d.livestock[t] }));
-    const total = items.reduce((s, i) => s + i.total_count, 0);
-    return items.length > 0 ? { livestock: items, total_animals: total } : null;
+    return toLivestockStats(parseOnboardingSnapshot(raw));
   } catch {
     return null;
   }

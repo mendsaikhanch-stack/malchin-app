@@ -14,6 +14,11 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AppColors } from '@/constants/theme';
 import { userApi } from '@/services/api';
 import { clearCache, getCacheSize } from '@/services/offline';
+import {
+  parseOnboardingSnapshot,
+  toUserFallback,
+  matchUserFallbackByPhone,
+} from '@/services/onboarding-fallback';
 import { useNetwork } from '@/hooks/use-network';
 
 const ONBOARDING_DATA_KEY = '@malchin_onboarding_data';
@@ -42,17 +47,9 @@ export default function ProfileScreen() {
     if (isLoggedIn) return;
     try {
       const raw = await AsyncStorage.getItem(ONBOARDING_DATA_KEY);
-      if (!raw) return;
-      const d = JSON.parse(raw);
-      if (!d?.phone) return;
-      setUser({
-        phone: d.phone,
-        name: `${d.lastName || ''} ${d.firstName || ''}`.trim(),
-        aimag: d.aimag,
-        sum: d.sum,
-        bag: d.bag,
-        role: d.role,
-      });
+      const u = toUserFallback(parseOnboardingSnapshot(raw));
+      if (!u) return;
+      setUser(u);
       setIsLoggedIn(true);
     } catch {
       // ignore
@@ -82,20 +79,11 @@ export default function ProfileScreen() {
     // Fallback: AsyncStorage-аас тухайн дугаараар нэвтрэх
     try {
       const raw = await AsyncStorage.getItem(ONBOARDING_DATA_KEY);
-      if (raw) {
-        const d = JSON.parse(raw);
-        if (d?.phone === phone) {
-          setUser({
-            phone: d.phone,
-            name: `${d.lastName || ''} ${d.firstName || ''}`.trim(),
-            aimag: d.aimag,
-            sum: d.sum,
-            bag: d.bag,
-            role: d.role,
-          });
-          setIsLoggedIn(true);
-          return;
-        }
+      const matched = matchUserFallbackByPhone(parseOnboardingSnapshot(raw), phone);
+      if (matched) {
+        setUser(matched);
+        setIsLoggedIn(true);
+        return;
       }
     } catch {
       // ignore
