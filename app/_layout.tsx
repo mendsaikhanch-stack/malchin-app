@@ -80,6 +80,8 @@ export default function RootLayout() {
         <Stack.Screen name="vet-booking" options={{ headerShown: false }} />
         <Stack.Screen name="wisdom-feed" options={{ headerShown: false }} />
         <Stack.Screen name="inbox" options={{ headerShown: false }} />
+        <Stack.Screen name="advisory" options={{ headerShown: false }} />
+        <Stack.Screen name="pricing" options={{ headerShown: false }} />
       </Stack>
       <StatusBar style="auto" />
     </ThemeProvider>
