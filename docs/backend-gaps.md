@@ -208,9 +208,39 @@ client-д бууруулах шаардлагатай.
 
 ---
 
-## 7. Status snapshot (2026-04-24)
+## 7. Owner dashboard (web-only, Sprint 7)
 
-- Тест: **212/212** (pure 190 + rn 22), 13 test suite.
+Frontend: `services/owner-dashboard-data.ts` (pure data layer, mobile route
+БАЙХГҮЙ — locked web-only). 8 хэсэгт орсон pure aggregator + mock.
+
+**Шаардлагатай:**
+
+```
+GET  /owner/snapshot
+     → OwnerSnapshot
+     { asOf, growth, revenue, productUsage, geography,
+       organizations, billing, moderation, contentOps }
+
+// (Нэмэгдэл / веб-ээс хайлттай хэрэгцээ үүсмэгц)
+GET  /owner/growth?from=&to=
+GET  /owner/revenue?month=
+GET  /owner/moderation?status=open
+```
+
+Single-glance 6 асуулт (CLAUDE.md §4):
+Хэн? (growth.totalUsers) · Хаанаас? (geography.topAimag) ·
+Яаж? (productUsage.topFeature) · Хэн төлж? (revenue.activeSubscribers) ·
+Аль модуль үнэтэй? (revenue.byPackage top) · Аль сум идэвхтэй? (aimag level).
+
+Endpoint гарсан үед `fetchOwnerSnapshot()` нэг мөр солино — aggregator,
+digest helper-уудад өөрчлөлт орохгүй.
+
+---
+
+## 8. Status snapshot (2026-04-24)
+
+- Тест: **280/280** (pure 256 + rn 24), 19 test suite.
 - 6/9 home card SWR StaleBadge-тэй.
-- 3 pure data layer + mock provider (bag, sum, lost-found) — backend ready
-  болмогц 1 файлд `fetch*` implementation-г солих.
+- 4 pure data layer + mock provider (bag, sum, lost-found, owner) —
+  backend ready болмогц 1 файлд `fetch*` implementation-г солино.
+- Pricing flag service (pure, 21 test) — UI gating wired биш.
