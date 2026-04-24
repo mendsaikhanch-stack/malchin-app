@@ -108,7 +108,7 @@ Home (Өнөөдөр)         — briefing, weather, shortcuts
 9. Elder advice basic (аудио/видео/зураг карт)
 10. Lost/found animals (тусгай UX)
 11. Hay/feed/transport listings
-12. Bag darga dashboard basic
+12. Bag darga + sum admin dashboard basic
 13. Owner dashboard basic
 14. Package/pricing/billing basic + offline sync
 
@@ -122,7 +122,7 @@ Home (Өнөөдөр)         — briefing, weather, shortcuts
 - Family & education module
 - Cooperative commerce
 - Verified provider + rating + захиалга
-- Sum admin dashboard full
+- Sum admin dashboard full (basic нь MVP #12-д)
 - Advanced analytics
 
 **Phase 3 (6–12 сар)**
@@ -142,7 +142,7 @@ Home (Өнөөдөр)         — briefing, weather, shortcuts
 3. **Weather + sum announcements** — API, alert types, push
 4. **Smart advisory v1** — 15 template + answer renderer + history
 5. **Lost/found + listings + chat 1:1**
-6. **Bag darga dashboard + elder advice cards**
+6. **Bag darga + sum admin dashboard + elder advice cards**
 7. **Owner dashboard + pricing flags + billing stub**
 
 ---
