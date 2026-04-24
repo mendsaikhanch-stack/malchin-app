@@ -42,8 +42,8 @@
 | Сумын ажилтан | `sum_admin` |
 | Хоршоо | `khorshoo` |
 | Үйлчилгээ үзүүлэгч | `service_provider` |
-| Ахмад / контент бүтээгч | (MVP scope-д role сонголт биш — profile flag Phase 2) |
-| Owner / Admin | (web-only, mobile-д тавигдаагүй) |
+| Ахмад / контент бүтээгч | Role биш — profile flag `elder_contributor: bool` (2026-04-24 locked). 5 role-ийн аль нь ч идэвхжүүлж болно → `/elder-content` screen нээгдэнэ (draft→review→published moderation). |
+| Owner / Admin | Web-only — mobile role picker-т огт харагдахгүй. |
 
 ---
 

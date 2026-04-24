@@ -27,13 +27,24 @@
 
 ## 3. User Roles
 
-- Малчин
-- Багийн дарга
-- Сумын удирдлага
-- Хоршоо
-- Үйлчилгээ үзүүлэгч
-- Ахмад / контент бүтээгч
-- Owner / Admin (web)
+**Primary roles (5 — mobile onboarding picker)**
+
+- Малчин (`malchin`)
+- Багийн дарга (`bag_darga`)
+- Сумын удирдлага (`sum_admin`)
+- Хоршоо (`khorshoo`)
+- Үйлчилгээ үзүүлэгч (`service_provider`)
+
+**Profile capability (role-ээс хамааралгүй toggle)**
+
+- Ахмад / контент бүтээгч (`elder_contributor: bool`) — дээрх 5 role-ийн
+  аль нэг нь идэвхжүүлж болно. "Ахмадын ухаан оруулах" screen-ийг
+  нээдэг. Draft → review → published moderation pipeline.
+
+**Web-only (mobile-д байхгүй)**
+
+- Owner / Admin — web admin dashboard-д нэвтрэх эрх. Mobile onboarding
+  role picker-д харагдахгүй.
 
 ---
 
