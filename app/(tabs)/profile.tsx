@@ -26,6 +26,7 @@ import { usePackage } from '@/hooks/use-package';
 import { PACKAGES } from '@/services/pricing';
 
 const ONBOARDING_DATA_KEY = '@malchin_onboarding_data';
+const ONBOARDING_DONE_KEY = '@malchin_onboarding_done';
 
 const roleLabels: Record<string, string> = {
   malchin: 'Малчин',
@@ -121,7 +122,11 @@ export default function ProfileScreen() {
           </Text>
           <TouchableOpacity
             style={styles.emptyBtn}
-            onPress={() => router.replace('/onboarding' as any)}
+            onPress={async () => {
+              // Done flag үлдвэл layout guard буцаана — зайлуулж дараа нь шилжинэ
+              await AsyncStorage.removeItem(ONBOARDING_DONE_KEY);
+              router.replace('/onboarding' as any);
+            }}
           >
             <Text style={styles.emptyBtnText}>Бүртгэл үргэлжлүүлэх</Text>
           </TouchableOpacity>
@@ -141,7 +146,9 @@ export default function ProfileScreen() {
         text: 'Тийм',
         style: 'destructive',
         onPress: async () => {
-          await AsyncStorage.removeItem(ONBOARDING_DATA_KEY);
+          // Хоёулаа түлхүүрийг цэвэрлэнэ — done flag үлдвэл _layout guard
+          // буцаад tabs руу шилжүүлнэ, онбординг эхлэх боломжгүй болдог.
+          await AsyncStorage.multiRemove([ONBOARDING_DATA_KEY, ONBOARDING_DONE_KEY]);
           router.replace('/onboarding' as any);
         },
       },
