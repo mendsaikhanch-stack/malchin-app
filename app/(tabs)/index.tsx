@@ -27,6 +27,10 @@ import {
   parseOnboardingSnapshot,
   toLivestockStats,
 } from '@/services/onboarding-fallback';
+import {
+  normalizeBackendWeather,
+  type NormalizedWeather,
+} from '@/services/weather-provider';
 import { AdBanner, AdBannerLarge } from '@/components/ad-banner';
 import { useLocation } from '@/hooks/use-location';
 import { useUserRole, ROLE_LABEL, ROLE_EMOJI } from '@/hooks/use-user-role';
@@ -52,21 +56,8 @@ async function loadLivestockFromOnboarding() {
   }
 }
 
-const conditionMn = (condition: string) => {
-  const c = (condition || '').toLowerCase();
-  if (c.includes('clear') || c.includes('sunny')) return 'Цэлмэг';
-  if (c.includes('cloud')) return 'Үүлэрхэг';
-  if (c.includes('rain')) return 'Бороотой';
-  if (c.includes('snow')) return 'Цастай';
-  if (c.includes('wind')) return 'Салхитай';
-  return condition;
-};
-
-const dzudMn = (risk: string) => {
-  if (risk === 'high') return 'Өндөр';
-  if (risk === 'medium') return 'Дунд';
-  return 'Бага';
-};
+// conditionMn/dzudMn logic нь services/weather-provider.ts-д pure хэлбэрээр
+// (conditionLabel, dzudLabel). Home нь normalizeBackendWeather()-оор дамжина.
 
 const animalEmojis: Record<string, string> = {
   sheep: '🐑', goat: '🐐', cattle: '🐂',
@@ -96,7 +87,7 @@ export default function HomeScreen() {
   const [loading, setLoading] = useState(true);
   const [livestock, setLivestock] = useState<any[]>([]);
   const [totalAnimals, setTotalAnimals] = useState(0);
-  const [weather, setWeather] = useState<any>(null);
+  const [weather, setWeather] = useState<NormalizedWeather | null>(null);
   const [alerts, setAlerts] = useState<any[]>([]);
   const [tip, setTip] = useState('');
   const [finance, setFinance] = useState<any>(null);
@@ -147,7 +138,9 @@ export default function HomeScreen() {
         setLivestock(items);
         setTotalAnimals(stats.total_animals || 0);
       }
-      if (weatherRes.status === 'fulfilled') setWeather(weatherRes.value);
+      if (weatherRes.status === 'fulfilled') {
+        setWeather(normalizeBackendWeather(weatherRes.value));
+      }
       if (alertsRes.status === 'fulfilled') setAlerts((alertsRes.value || []).slice(0, 3));
       if (tipRes.status === 'fulfilled') setTip(tipRes.value.tip || '');
       if (financeRes.status === 'fulfilled') setFinance(financeRes.value);
@@ -181,8 +174,8 @@ export default function HomeScreen() {
       month: new Date().getMonth() + 1,
       role,
       hasLivestock: totalAnimals > 0,
-      weatherTemp: weather?.temp,
-      dzudRisk: weather?.dzud_risk,
+      weatherTemp: weather?.temp ?? undefined,
+      dzudRisk: weather?.dzudRisk === 'unknown' ? undefined : weather?.dzudRisk,
       hasHighAlert: alerts.some((a: any) => a.severity === 'high'),
     });
     setDailyTasks(tasks);
@@ -190,8 +183,8 @@ export default function HomeScreen() {
     setMigrationAdvice(
       getMigrationAdvice({
         month: new Date().getMonth() + 1,
-        weatherTemp: weather?.temp,
-        dzudRisk: weather?.dzud_risk,
+        weatherTemp: weather?.temp ?? undefined,
+        dzudRisk: weather?.dzudRisk === 'unknown' ? undefined : weather?.dzudRisk,
       })
     );
   }, [role, totalAnimals, weather, alerts]);
@@ -299,10 +292,10 @@ export default function HomeScreen() {
           <Text style={styles.cardTitle}>⛅ Цаг агаар - {weather?.aimag || 'Төв'}</Text>
           {weather ? (
             <View style={styles.weatherRow}>
-              <Text style={styles.weatherTemp}>{weather.temp}°C</Text>
-              <Text style={styles.weatherCondition}>{conditionMn(weather.condition)}</Text>
-              <View style={[styles.dzudBadge, { backgroundColor: dzudColor(weather.dzud_risk) }]}>
-                <Text style={styles.dzudText}>Зуд: {dzudMn(weather.dzud_risk)}</Text>
+              <Text style={styles.weatherTemp}>{weather.temp ?? '—'}°C</Text>
+              <Text style={styles.weatherCondition}>{weather.conditionLabel}</Text>
+              <View style={[styles.dzudBadge, { backgroundColor: dzudColor(weather.dzudRisk) }]}>
+                <Text style={styles.dzudText}>Зуд: {weather.dzudLabel}</Text>
               </View>
             </View>
           ) : (
