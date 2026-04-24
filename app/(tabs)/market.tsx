@@ -18,6 +18,9 @@ import { AppColors } from '@/constants/theme';
 import { marketApi, pricesApi } from '@/services/api';
 import { AdBanner } from '@/components/ad-banner';
 import { ReportButton } from '@/components/report-button';
+import { useRouter } from 'expo-router';
+import { useQuota } from '@/hooks/use-quota';
+import { UpgradePrompt } from '@/components/feature-gate';
 
 const tabs = ['Ханш', 'Түүхий эд', 'Зарууд', 'Миний зар'];
 
@@ -68,6 +71,7 @@ const animalTypes = [
 const animalInfo = (t: string) => animalTypes.find(a => a.key === t) || { label: t, emoji: '\uD83D\uDC3E' };
 
 export default function MarketScreen() {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState(0);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -85,6 +89,8 @@ export default function MarketScreen() {
   // Зарууд
   const [listings, setListings] = useState<any[]>([]);
   const [myListings, setMyListings] = useState<any[]>([]);
+  const activeListings = myListings.filter((l: any) => l.status === 'active').length;
+  const quota = useQuota('listings_create_basic', activeListings);
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [title, setTitle] = useState('');
@@ -156,6 +162,18 @@ export default function MarketScreen() {
 
   const handleCreate = async () => {
     if (!title.trim()) { Alert.alert('Алдаа', 'Гарчиг оруулна уу'); return; }
+    // Зөвхөн шинэ зар дээр cap шалгана (засах үед хамаарахгүй)
+    if (!editingId && !quota.allowed) {
+      Alert.alert(
+        'Хязгаарт хүрсэн',
+        `Үнэгүй багц 3 идэвхтэй зар хүртэл. Илүү багтаамжийн тулд багцаа шинэчлэнэ үү.`,
+        [
+          { text: 'Хаах', style: 'cancel' },
+          { text: 'Багц харах', onPress: () => router.push('/pricing' as any) },
+        ]
+      );
+      return;
+    }
     try {
       const payload = { user_id: userId, title: title.trim(), description: description.trim(), animal_type: selectedAnimal, quantity: parseInt(quantity) || 0, price: parseInt(price) || 0, location: location.trim(), phone: phone.trim(), image_url: imageUrl.trim() || undefined };
       if (editingId) {
@@ -463,7 +481,23 @@ export default function MarketScreen() {
 
   const renderMyListings = () => (
     <>
-      <TouchableOpacity style={styles.addListingBtn} onPress={() => { resetForm(); setShowModal(true); }}>
+      {!quota.unlimited ? (
+        quota.allowed ? (
+          <View style={styles.quotaRow}>
+            <Text style={styles.quotaText}>
+              Идэвхтэй зар: {quota.used}/{quota.limit}
+            </Text>
+          </View>
+        ) : (
+          <View style={{ paddingHorizontal: 16, paddingTop: 10 }}>
+            <UpgradePrompt feature="listings_create_unlimited" compact />
+          </View>
+        )
+      ) : null}
+      <TouchableOpacity
+        style={[styles.addListingBtn, !quota.allowed && styles.addListingBtnDisabled]}
+        onPress={() => { resetForm(); setShowModal(true); }}
+      >
         <Text style={styles.addListingText}>+ Шинэ зар нэмэх</Text>
       </TouchableOpacity>
       {myListings.length === 0 ? (
@@ -591,7 +625,19 @@ const styles = StyleSheet.create({
   emptyText: { fontSize: 14, color: AppColors.gray, fontStyle: 'italic', textAlign: 'center', paddingVertical: 40 },
   // Listings
   addListingBtn: { backgroundColor: AppColors.primary, marginHorizontal: 16, marginTop: 12, padding: 14, borderRadius: 12, alignItems: 'center' },
+  addListingBtnDisabled: { backgroundColor: AppColors.gray },
   addListingText: { color: AppColors.white, fontSize: 15, fontWeight: '700' },
+  quotaRow: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    backgroundColor: '#F1F8E9',
+    marginHorizontal: 16,
+    marginTop: 10,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#DCEDC8',
+  },
+  quotaText: { fontSize: 12, color: AppColors.grayDark, fontWeight: '600' },
   emptyCard: { alignItems: 'center', paddingVertical: 50, marginHorizontal: 16, backgroundColor: AppColors.white, borderRadius: 16, marginTop: 16 },
   emptyTitle: { fontSize: 16, fontWeight: '700', color: AppColors.grayDark, marginTop: 8 },
   listingCard: { backgroundColor: AppColors.white, marginHorizontal: 16, marginTop: 10, borderRadius: 16, padding: 14, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.06, shadowRadius: 8, elevation: 3 },

@@ -30,6 +30,7 @@ module.exports = {
       testMatch: [
         '<rootDir>/components/__tests__/**/*.test.tsx',
         '<rootDir>/app/__tests__/**/*.test.tsx',
+        '<rootDir>/hooks/__tests__/**/*.test.tsx',
       ],
       setupFiles: ['<rootDir>/jest.setup.rn.ts'],
       moduleNameMapper: {
