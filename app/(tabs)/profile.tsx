@@ -35,6 +35,40 @@ const roleLabels: Record<string, string> = {
   service_provider: 'Үйлчилгээ үзүүлэгч',
 };
 
+// Role-оос хамаарсан хяналтын самбарын маршрут
+const roleDashboard: Record<string, { route: string; emoji: string; title: string; desc: string }> = {
+  malchin: {
+    route: '/(tabs)/manage',
+    emoji: '⚙️',
+    title: 'Миний удирдлага',
+    desc: 'Сануулга, бүртгэл, санхүү',
+  },
+  bag_darga: {
+    route: '/bag-dashboard',
+    emoji: '👥',
+    title: 'Багийн даргын самбар',
+    desc: 'Өрхийн жагсаалт, мэдэгдэл, эрсдэл',
+  },
+  sum_admin: {
+    route: '/sum-dashboard',
+    emoji: '🏛️',
+    title: 'Сумын удирдлагын самбар',
+    desc: 'Багуудын тайлан, тооллого, broadcast',
+  },
+  khorshoo: {
+    route: '/coop-dashboard',
+    emoji: '🤝',
+    title: 'Хоршооны самбар',
+    desc: 'Гишүүд, бараа, худалдаа',
+  },
+  service_provider: {
+    route: '/service-dashboard',
+    emoji: '🛠️',
+    title: 'Үйлчилгээний самбар',
+    desc: 'Захиалга, хуваарь, орлого',
+  },
+};
+
 const animalMeta: Array<{ key: keyof NonNullable<OnboardingSnapshot['livestock']>; emoji: string; label: string }> = [
   { key: 'horse', emoji: '🐎', label: 'Адуу' },
   { key: 'cow', emoji: '🐂', label: 'Үхэр' },
@@ -140,6 +174,21 @@ export default function ProfileScreen() {
             </Text>
           </View>
         </View>
+
+        {/* Хяналтын самбар — role-оос хамаарна */}
+        {roleDashboard[user.role] && (
+          <TouchableOpacity
+            style={styles.dashboardCard}
+            onPress={() => router.push(roleDashboard[user.role].route as any)}
+          >
+            <Text style={styles.dashboardEmoji}>{roleDashboard[user.role].emoji}</Text>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.dashboardTitle}>{roleDashboard[user.role].title}</Text>
+              <Text style={styles.dashboardDesc}>{roleDashboard[user.role].desc}</Text>
+            </View>
+            <Text style={styles.dashboardArrow}>{'›'}</Text>
+          </TouchableOpacity>
+        )}
 
         {/* Малын тоо */}
         {livestockStats && livestockStats.total_animals > 0 && (
@@ -305,6 +354,18 @@ const styles = StyleSheet.create({
   pkgBadgePremium: { backgroundColor: '#FFF3E0' },
   pkgBadgeText: { fontSize: 11, fontWeight: '600', color: AppColors.grayDark },
   pkgBadgeTextPremium: { color: '#E65100', fontWeight: '700' },
+  // Dashboard card (role-оос хамаарсан)
+  dashboardCard: {
+    flexDirection: 'row', alignItems: 'center',
+    marginHorizontal: 16, marginTop: 12, marginBottom: 4,
+    padding: 16, borderRadius: 14,
+    backgroundColor: AppColors.primary,
+    shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.12, shadowRadius: 6, elevation: 3,
+  },
+  dashboardEmoji: { fontSize: 32, marginRight: 14 },
+  dashboardTitle: { fontSize: 15, fontWeight: '800', color: AppColors.white },
+  dashboardDesc: { fontSize: 12, color: AppColors.white, opacity: 0.85, marginTop: 3 },
+  dashboardArrow: { fontSize: 24, color: AppColors.white, fontWeight: '600' },
   // Cards
   card: {
     backgroundColor: AppColors.white, marginHorizontal: 16, marginTop: 12,
