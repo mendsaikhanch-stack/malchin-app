@@ -94,6 +94,9 @@ export default function HomeScreen() {
   const [weatherMeta, setWeatherMeta] = useState<CacheMeta>(emptyMeta);
   const [alertsMeta, setAlertsMeta] = useState<CacheMeta>(emptyMeta);
   const [announcementMeta, setAnnouncementMeta] = useState<CacheMeta>(emptyMeta);
+  const [marketPricesMeta, setMarketPricesMeta] = useState<CacheMeta>(emptyMeta);
+  const [listingsMeta, setListingsMeta] = useState<CacheMeta>(emptyMeta);
+  const [healthMeta, setHealthMeta] = useState<CacheMeta>(emptyMeta);
   const [alerts, setAlerts] = useState<any[]>([]);
   const [tip, setTip] = useState('');
   const [finance, setFinance] = useState<any>(null);
@@ -123,9 +126,9 @@ export default function HomeScreen() {
         alertsApi.getAllWithMeta(userAimag || undefined),
         aiApi.getTip(),
         financeApi.getSummary(),
-        pricesApi.getSummary(),
-        marketApi.getAll(userAimag ? { location: userAimag } : undefined),
-        healthApi.getStats(),
+        pricesApi.getSummaryWithMeta(),
+        marketApi.getAllWithMeta(userAimag ? { location: userAimag } : undefined),
+        healthApi.getStatsWithMeta(),
         newsApi.getAllWithMeta(),
       ]);
 
@@ -160,14 +163,25 @@ export default function HomeScreen() {
       }
       if (tipRes.status === 'fulfilled') setTip(tipRes.value.tip || '');
       if (financeRes.status === 'fulfilled') setFinance(financeRes.value);
-      if (pricesRes.status === 'fulfilled') setMarketPrices(pricesRes.value);
-      if (listingsRes.status === 'fulfilled') {
-        const arr = Array.isArray(listingsRes.value)
-          ? listingsRes.value
-          : listingsRes.value?.items || listingsRes.value?.data || [];
-        setListings(arr.slice(0, 3));
+      if (pricesRes.status === 'fulfilled') {
+        const pr = pricesRes.value;
+        setMarketPrices(pr.data);
+        setMarketPricesMeta({ fromCache: pr.fromCache, offline: pr.offline, expired: pr.expired });
       }
-      if (healthRes.status === 'fulfilled') setHealthStats(healthRes.value);
+      if (listingsRes.status === 'fulfilled') {
+        const lr = listingsRes.value;
+        const payload = lr.data;
+        const arr = Array.isArray(payload)
+          ? payload
+          : payload?.items || payload?.data || [];
+        setListings(arr.slice(0, 3));
+        setListingsMeta({ fromCache: lr.fromCache, offline: lr.offline, expired: lr.expired });
+      }
+      if (healthRes.status === 'fulfilled') {
+        const hr = healthRes.value;
+        setHealthStats(hr.data);
+        setHealthMeta({ fromCache: hr.fromCache, offline: hr.offline, expired: hr.expired });
+      }
       if (newsRes.status === 'fulfilled') {
         const nr = newsRes.value;
         const payload = nr.data;
@@ -432,7 +446,10 @@ export default function HomeScreen() {
         {/* Малын эрүүл мэндийн дохио — rule engine: livestock_health (мал бүртгэлтэй бол) */}
         {healthStats && visibleCards.has('livestock_health') && (
           <TouchableOpacity style={styles.card} onPress={() => router.push('/(tabs)/health')}>
-            <Text style={styles.cardTitle}>🩺 Малын эрүүл мэнд</Text>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Text style={styles.cardTitle}>🩺 Малын эрүүл мэнд</Text>
+              <StaleBadge {...healthMeta} compact />
+            </View>
             <View style={styles.miniStatsRow}>
               <View style={styles.miniStat}>
                 <Text style={styles.miniStatValue}>
@@ -477,7 +494,10 @@ export default function HomeScreen() {
         {/* Зах зээлийн товч үнэ — rule engine: market_prices (preferences.market) */}
         {marketPrices && visibleCards.has('market_prices') && (
           <TouchableOpacity style={styles.card} onPress={() => router.push('/(tabs)/market')}>
-            <Text style={styles.cardTitle}>💹 Зах зээлийн үнэ</Text>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Text style={styles.cardTitle}>💹 Зах зээлийн үнэ</Text>
+              <StaleBadge {...marketPricesMeta} compact />
+            </View>
             <View style={styles.miniStatsRow}>
               {(Array.isArray(marketPrices)
                 ? marketPrices
@@ -501,7 +521,10 @@ export default function HomeScreen() {
         {/* Ойролцоох хэрэгтэй зар — rule engine: nearby_listings (preferences.listings) */}
         {listings.length > 0 && visibleCards.has('nearby_listings') && (
           <TouchableOpacity style={styles.card} onPress={() => router.push('/(tabs)/market')}>
-            <Text style={styles.cardTitle}>📣 Ойролцоох зар</Text>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Text style={styles.cardTitle}>📣 Ойролцоох зар</Text>
+              <StaleBadge {...listingsMeta} compact />
+            </View>
             {listings.map((l: any, i: number) => (
               <View key={l.id ?? i} style={styles.listingItem}>
                 <Text style={styles.listingTitle} numberOfLines={1}>

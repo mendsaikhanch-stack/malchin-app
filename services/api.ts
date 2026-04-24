@@ -209,11 +209,19 @@ export const insuranceApi = {
 };
 
 // Market
+function buildMarketQs(params?: { animal_type?: string; search?: string; min_price?: number; max_price?: number; location?: string; sort?: string }) {
+  return params
+    ? '?' + Object.entries(params)
+        .filter(([, v]) => v !== undefined && v !== '')
+        .map(([k, v]) => `${k}=${encodeURIComponent(String(v))}`)
+        .join('&')
+    : '';
+}
 export const marketApi = {
-  getAll: (params?: { animal_type?: string; search?: string; min_price?: number; max_price?: number; location?: string; sort?: string }) => {
-    const qs = params ? '?' + Object.entries(params).filter(([, v]) => v !== undefined && v !== '').map(([k, v]) => `${k}=${encodeURIComponent(String(v))}`).join('&') : '';
-    return request<any>(`/market${qs}`);
-  },
+  getAll: (params?: { animal_type?: string; search?: string; min_price?: number; max_price?: number; location?: string; sort?: string }) =>
+    cachedRequest<any>(`/market${buildMarketQs(params)}`, 'market'),
+  getAllWithMeta: (params?: { animal_type?: string; search?: string; min_price?: number; max_price?: number; location?: string; sort?: string }) =>
+    cachedRequestWithMeta<any>(`/market${buildMarketQs(params)}`, 'market'),
   getById: (id: number) => request<any>(`/market/${id}`),
   getByUser: (userId: number) => request<any>(`/market/user/${userId}`),
   create: (data: any) =>
@@ -405,7 +413,8 @@ export const healthApi = {
   },
   getByAnimal: (animalId: number) => request<any>(`/health/animal/${animalId}`),
   getById: (id: number) => request<any>(`/health/${id}`),
-  getStats: () => request<any>('/health/stats'),
+  getStats: () => cachedRequest<any>('/health/stats', 'health'),
+  getStatsWithMeta: () => cachedRequestWithMeta<any>('/health/stats', 'health'),
   create: (data: { animal_id: number; record_type: string; title: string; record_date: string; diagnosis?: string; treatment?: string; medication?: string; dosage?: string; vet_name?: string; cost?: number; severity?: string; next_checkup?: string }) =>
     request<any>('/health', { method: 'POST', body: JSON.stringify(data) }),
   update: (id: number, data: any) =>
@@ -510,5 +519,6 @@ export const pricesApi = {
     request<any>(`/prices/markets${aimag ? `?aimag=${encodeURIComponent(aimag)}` : ''}`),
   getRawMaterials: (type?: string) =>
     request<any>(`/prices/raw-materials${type ? `?type=${type}` : ''}`),
-  getSummary: () => request<any>('/prices/summary'),
+  getSummary: () => cachedRequest<any>('/prices/summary', 'prices'),
+  getSummaryWithMeta: () => cachedRequestWithMeta<any>('/prices/summary', 'prices'),
 };
