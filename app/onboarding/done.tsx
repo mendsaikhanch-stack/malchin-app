@@ -11,7 +11,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AppColors } from '@/constants/theme';
 import { PrimaryButton } from './_components';
 import { useOnboarding } from './_layout';
-import { userApi, livestockApi, setToken } from '@/services/api';
+import { userApi, livestockApi, setAuthTokens } from '@/services/api';
 import { queueOnFailure } from '@/services/sync-queue';
 
 // reset() дуудахгүй — ингэснээр онбординг дууссаны дараа ч
@@ -43,7 +43,7 @@ export default function DoneScreen() {
           seasonal: data.seasonal,
           preferences: data.preferences,
         });
-        if (res?.token) await setToken(res.token);
+        await setAuthTokens(res);
 
         if (res?.user?.id) {
           const counts: Array<[string, number]> = [

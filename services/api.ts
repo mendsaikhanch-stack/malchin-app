@@ -2,6 +2,12 @@ import { cachedFetch, cacheSet } from './offline';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { fetchOpenWeather } from './openweather-client';
 import { getAimagCenter } from './mongolia-geo';
+import {
+  getAccessToken,
+  setTokens,
+  clearTokens,
+  refreshAccessToken,
+} from './auth-token';
 // Type-only imports (circular safe — erased at runtime)
 import type { Household } from './bag-dashboard-data';
 import type { BagStat, SumEvent } from './sum-dashboard-data';
@@ -16,39 +22,63 @@ export const API_BASE = ENV_API && ENV_API.length > 0
   ? ENV_API
   : (__DEV__ ? `http://${DEV_IP}:5000` : 'https://api.malchin.mn');
 
-let _token: string | null = null;
-
+// Backward-compat: хуучин done.tsx `setToken(res.token)` дуудаж байна. Access token-ийг л хадгална.
 export async function setToken(token: string | null) {
-  _token = token;
-  if (token) await AsyncStorage.setItem('@malchin_token', token);
-  else await AsyncStorage.removeItem('@malchin_token');
+  await setTokens({ access: token });
 }
 
+// Login/create response-оос хоёр token-ийг нэг дор хадгалах helper
+export async function setAuthTokens(res: { token?: string; refreshToken?: string } | null | undefined) {
+  if (!res?.token) return;
+  await setTokens({ access: res.token, refresh: res.refreshToken ?? null });
+}
+
+// Backward-compat
 export async function getToken(): Promise<string | null> {
-  if (!_token) _token = await AsyncStorage.getItem('@malchin_token');
-  return _token;
+  return getAccessToken();
+}
+
+// Logout цэвэрлэлт — profile.tsx-аас дуудна
+export async function clearAuthTokens() {
+  await clearTokens();
 }
 
 const REQUEST_TIMEOUT_MS = 8000; // 8 сек. Backend унасан үед хурдан fallback хийнэ.
 
-async function request<T>(endpoint: string, options?: RequestInit): Promise<T> {
-  const token = await getToken();
+async function doFetch(endpoint: string, token: string | null, options?: RequestInit) {
   const headers: Record<string, string> = { 'Content-Type': 'application/json' };
   if (token) headers['Authorization'] = `Bearer ${token}`;
+  // User-д өгөгдсөн headers-ийг давхар нэгтгэнэ
+  if (options?.headers) Object.assign(headers, options.headers as Record<string, string>);
 
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
   try {
-    const res = await fetch(`${API_BASE}${endpoint}`, {
+    return await fetch(`${API_BASE}${endpoint}`, {
+      ...options,
       headers,
       signal: controller.signal,
-      ...options,
     });
-    if (!res.ok) throw new Error(`API error: ${res.status}`);
-    return res.json();
   } finally {
     clearTimeout(timer);
   }
+}
+
+async function request<T>(endpoint: string, options?: RequestInit): Promise<T> {
+  const token = await getAccessToken();
+  let res = await doFetch(endpoint, token, options);
+
+  // 401 үед нэг удаа refresh оролдоод дахин явуулна. /auth/refresh өөрөө
+  // 401 буцсан ч recursion үүсгэхгүй — тэнд шууд throw.
+  if (res.status === 401 && !endpoint.startsWith('/auth/refresh')) {
+    const newToken = await refreshAccessToken(API_BASE);
+    if (newToken) {
+      res = await doFetch(endpoint, newToken, options);
+    }
+  }
+
+  if (!res.ok) throw new Error(`API error: ${res.status}`);
+  return res.json();
 }
 
 // Оффлайн cache-тэй GET request

@@ -15,7 +15,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AppColors } from '@/constants/theme';
 import { StepHeader, PrimaryButton } from './_components';
 import { useOnboarding } from './_layout';
-import { userApi, setToken } from '@/services/api';
+import { userApi, setAuthTokens } from '@/services/api';
 
 const ONBOARDING_DATA_KEY = '@malchin_onboarding_data';
 const ONBOARDING_DONE_KEY = '@malchin_onboarding_done';
@@ -74,7 +74,7 @@ export default function OtpScreen() {
     try {
       const loginRes = await userApi.login(data.phone);
       if (loginRes?.user) {
-        if (loginRes.token) await setToken(loginRes.token);
+        await setAuthTokens(loginRes);
         const u = loginRes.user;
         const fullName: string = u.name || '';
         const [lastName = '', firstName = ''] = fullName.trim().split(/\s+/, 2);

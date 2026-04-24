@@ -20,6 +20,7 @@ import {
   type OnboardingSnapshot,
   type UserFallback,
 } from '@/services/onboarding-fallback';
+import { clearAuthTokens } from '@/services/api';
 import { useNetwork } from '@/hooks/use-network';
 import { useElderFlag } from '@/hooks/use-elder-flag';
 import { usePackage } from '@/hooks/use-package';
@@ -141,11 +142,13 @@ export default function ProfileScreen() {
 
   const performLogout = async () => {
     try {
-      // Хоёулаа түлхүүрийг цэвэрлэнэ — done flag үлдвэл _layout guard
-      // буцаад tabs руу шилжүүлнэ, онбординг эхлэх боломжгүй болдог.
-      await AsyncStorage.multiRemove([ONBOARDING_DATA_KEY, ONBOARDING_DONE_KEY]);
-      // Local state-ээ мөн цэвэрлэнэ — screen re-render болоход empty state
-      // харагдаж, router navigation race-аас ангижирна.
+      // AsyncStorage + in-memory token cache цэвэрлэнэ. Хэрэв зөвхөн онбординг
+      // key-ийг устгаад token үлдвэл дараагийн нэвтрэлтэд хуучин token-оор
+      // 401 гарах эрсдэлтэй.
+      await Promise.all([
+        AsyncStorage.multiRemove([ONBOARDING_DATA_KEY, ONBOARDING_DONE_KEY]),
+        clearAuthTokens(),
+      ]);
       setSnapshot(null);
       setUser(null);
       router.replace('/onboarding' as any);
