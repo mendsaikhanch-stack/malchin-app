@@ -8,10 +8,12 @@ import {
   TextInput,
   Modal,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Stack, useRouter } from 'expo-router';
 import { AppColors } from '@/constants/theme';
+import { useElderFlag } from '@/hooks/use-elder-flag';
 
 type ContentType = 'text' | 'audio' | 'video' | 'card';
 type Status = 'draft' | 'review' | 'published' | 'archived';
@@ -104,6 +106,7 @@ const SPECIES = [
 
 export default function ElderContent() {
   const router = useRouter();
+  const { enabled, loading: flagLoading, toggle } = useElderFlag();
   const [content, setContent] = useState<ContentItem[]>(MOCK_CONTENT);
   const [modalVisible, setModalVisible] = useState(false);
   const [form, setForm] = useState<Partial<ContentItem>>({
@@ -113,6 +116,54 @@ export default function ElderContent() {
     topic: 'traditional',
   });
   const [detailItem, setDetailItem] = useState<ContentItem | null>(null);
+
+  // Flag loading
+  if (flagLoading) {
+    return (
+      <SafeAreaView style={styles.container} edges={['top']}>
+        <Stack.Screen options={{ headerShown: false }} />
+        <View style={styles.optIn}>
+          <ActivityIndicator color={AppColors.primary} />
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  // elder_contributor flag-гүй үед opt-in screen
+  if (!enabled) {
+    return (
+      <SafeAreaView style={styles.container} edges={['top']}>
+        <Stack.Screen options={{ headerShown: false }} />
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => router.back()} style={styles.backBtn}>
+            <Text style={styles.backIcon}>‹</Text>
+          </TouchableOpacity>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.headerTitle}>Ахмадын ухаан</Text>
+            <Text style={styles.headerSubtitle}>Контент бүтээгчийн capability</Text>
+          </View>
+        </View>
+        <View style={styles.optIn}>
+          <Text style={styles.optInEmoji}>👴</Text>
+          <Text style={styles.optInTitle}>Ахмад/контент бүтээгч</Text>
+          <Text style={styles.optInText}>
+            Та ахмадын туршлага, малчдын ухааныг бусадтай хуваалцах хүсэлтэй
+            бол энэ capability-г идэвхжүүлнэ. Role-ээ солих шаардлагагүй —
+            одоогийн профайлтайгаа хамт идэвхжинэ. Хэзээ ч унтраах боломжтой.
+          </Text>
+          <Text style={styles.optInPipeline}>
+            Пайплайн: Ноорог → Хянаж байна → Нийтлэгдсэн (1–3 хоногт)
+          </Text>
+          <TouchableOpacity
+            style={styles.optInBtn}
+            onPress={() => toggle(true)}
+          >
+            <Text style={styles.optInBtnText}>Идэвхжүүлэх</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   const submitNew = () => {
     if (!form.title || !form.body) {
@@ -376,6 +427,40 @@ const styles = StyleSheet.create({
   backIcon: { fontSize: 30, color: AppColors.black, lineHeight: 30 },
   headerTitle: { fontSize: 17, fontWeight: '700', color: AppColors.black },
   headerSubtitle: { fontSize: 12, color: AppColors.grayDark, marginTop: 2 },
+  optIn: {
+    flex: 1,
+    padding: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 12,
+  },
+  optInEmoji: { fontSize: 64 },
+  optInTitle: {
+    fontSize: 20,
+    fontWeight: '800',
+    color: AppColors.black,
+    textAlign: 'center',
+  },
+  optInText: {
+    fontSize: 14,
+    color: AppColors.grayDark,
+    textAlign: 'center',
+    lineHeight: 22,
+  },
+  optInPipeline: {
+    fontSize: 12,
+    color: AppColors.gray,
+    textAlign: 'center',
+    marginTop: 4,
+  },
+  optInBtn: {
+    marginTop: 12,
+    backgroundColor: AppColors.primary,
+    paddingVertical: 12,
+    paddingHorizontal: 28,
+    borderRadius: 12,
+  },
+  optInBtnText: { color: AppColors.white, fontSize: 15, fontWeight: '700' },
   verifiedBadge: { paddingHorizontal: 8, paddingVertical: 4, borderRadius: 8, backgroundColor: AppColors.success },
   verifiedText: { color: AppColors.white, fontSize: 10, fontWeight: '700' },
   stats: { flexDirection: 'row', gap: 8, padding: 12, backgroundColor: AppColors.white },

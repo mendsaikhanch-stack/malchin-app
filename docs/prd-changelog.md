@@ -162,7 +162,7 @@ backend-аас ирэх weather contract primary эх сурвалж хэвээ�
 | Listings cap enforcement | advisory 3/сар cap `services/quota.ts` + `hooks/use-quota.ts` pattern-аар implemented (328 тест). listings_create_basic 3 active нь `active` period-тай ч UI wiring дутуу | Marketplace create screen-д active listing тоог тоолж `useQuota('listings_create_basic', activeCount)` дамжуулах |
 | Owner dashboard UI | `services/owner-dashboard-data.ts` pure бэлэн (20 test) | Web front-end (mobile-д нэмэхгүй — web-only locked) |
 | API endpoint contract (wired) | `api.ts` 4 typed namespace + data-layer real→mock fallback | Backend implementation per contract (no client change needed) |
-| `elder_contributor` flag gating | Flag decision locked, `/elder-content` access бүх role-д нээлттэй | Profile toggle UI + route guard (implementation step) |
+| Elder capability disable UI | Opt-in + route guard бэлэн (`/elder-content` opt-in screen, 4 test), `useElderFlag` hook | Capability-г хүссэн үедээ унтраах (settings toggle). Одоо opt-in only — disable нь AsyncStorage clear-ээр л бололцоотой |
 
 ---
 
