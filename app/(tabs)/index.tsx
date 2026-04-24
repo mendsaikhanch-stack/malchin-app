@@ -259,7 +259,8 @@ export default function HomeScreen() {
           </View>
         </TouchableOpacity>
 
-        {/* Цаг агаар */}
+        {/* Цаг агаар — rule engine: preferences.weather */}
+        {visibleCards.has('weather') && (
         <TouchableOpacity style={styles.card} onPress={() => router.push('/(tabs)/weather')}>
           <Text style={styles.cardTitle}>⛅ Цаг агаар - {weather?.aimag || 'Төв'}</Text>
           {weather ? (
@@ -274,12 +275,13 @@ export default function HomeScreen() {
             <Text style={styles.emptyText}>Цаг агаарын мэдээ ачааллаж чадсангүй</Text>
           )}
         </TouchableOpacity>
+        )}
 
         {/* Сурталчилгаа */}
         <AdBanner placement="home" />
 
-        {/* Өнөөдөр хийх 3 ажил */}
-        {dailyTasks.length > 0 && (
+        {/* Өнөөдөр хийх 3 ажил — rule engine: бүгдэд харагдана */}
+        {dailyTasks.length > 0 && visibleCards.has('daily_tasks') && (
           <View style={styles.card}>
             <Text style={styles.cardTitle}>✅ Өнөөдөр хийх 3 ажил</Text>
             {dailyTasks.map((t, i) => (
@@ -302,8 +304,8 @@ export default function HomeScreen() {
           </View>
         )}
 
-        {/* Сэрэмжлүүлэг */}
-        {alerts.length > 0 && (
+        {/* Сэрэмжлүүлэг — rule engine: preferences.alerts (risk card) */}
+        {alerts.length > 0 && visibleCards.has('risk') && (
           <View style={styles.card}>
             <Text style={styles.cardTitle}>🚨 Сэрэмжлүүлэг</Text>
             {alerts.map((alert: any) => (
@@ -356,8 +358,8 @@ export default function HomeScreen() {
           </View>
         )}
 
-        {/* Өдрийн зөвлөгөө */}
-        {tip ? (
+        {/* Өдрийн зөвлөгөө — rule engine: elder_wisdom card (ахмадын/өдрийн зөвлөгөө) */}
+        {tip && visibleCards.has('elder_wisdom') ? (
           <TouchableOpacity style={[styles.card, styles.tipCard]} onPress={() => router.push('/(tabs)/ai-advisor')}>
             <Text style={styles.cardTitle}>💡 Өдрийн зөвлөгөө</Text>
             <Text style={styles.tipText}>{tip}</Text>
