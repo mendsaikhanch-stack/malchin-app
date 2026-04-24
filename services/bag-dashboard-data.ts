@@ -1,15 +1,8 @@
 // Багийн даргын dashboard-ийн data layer (pure).
 //
-// Статус (2026-04-24): Backend дээр "багийн бүх өрх" endpoint одоогоор байхгүй
-// (householdApi.getMy + getStats зөвхөн бие даасан өрх). Иймд client тал дээр
-// mock data-тай ажиллана. Backend team тухайн endpoint-ийг үүсгэсний дараа
-// энэ файлын `fetchBagHouseholds()` implementation-ыг л солино — UI
-// component-д өөрчлөлт орохгүй.
-//
-// Backend ойрхон ирэх endpoint (санал):
-//   GET /households/bag/:bagId → Household[]
-//   GET /households/bag/:bagId/stats → BagStats
-//   POST /households/bag/:bagId/broadcast → { recipients: number, sent_at }
+// Contract freeze: `bagDashboardApi` (services/api.ts), endpoint shape
+// docs/backend-gaps.md §1.1-д. Backend бэлэн болсон үед UI-д өөрчлөлт
+// орохгүй — fetchBagHouseholds() real→mock fallback-тай бэлэн.
 
 export type RiskLevel = 'low' | 'medium' | 'high';
 

@@ -1,11 +1,8 @@
 // Сумын удирдлагын dashboard-ийн data layer (pure).
 //
-// Статус (2026-04-24): Backend дээр "нийт сумын баг + статистик" aggregated
-// endpoint байхгүй. Client тал mock-тай ажиллана. Backend team-д санал:
-//   GET /sums/:sumId/bags → BagStat[]
-//   GET /sums/:sumId/stats → SumStats
-//   GET /sums/:sumId/events → SumEvent[]
-//   POST /sums/:sumId/broadcast → { recipients, sent_at }
+// Contract freeze: `sumDashboardApi` (services/api.ts), endpoint shape
+// docs/backend-gaps.md §1.2-д. Stats нь client-side `computeSumStats()`
+// — backend precomputed дохио ирэх хүртэл pure бодолт.
 
 export type BagStat = {
   id: string;

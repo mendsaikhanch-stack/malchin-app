@@ -1,20 +1,14 @@
 // Owner dashboard-ийн data layer (pure).
 //
-// Статус (2026-04-24): Locked decision (CLAUDE.md §3) — Owner/Admin нь
-// WEB-ONLY. Энэ файлд mobile route нэмэхгүй. Data layer зөвхөн pure —
-// веб front-end ирэхэд шууд ашиглагдана, mobile bundle-д import хийсэн ч
-// тойрог буцна (side effect үгүй).
+// Locked (CLAUDE.md §3): Owner/Admin нь WEB-ONLY. Mobile route нэмэхгүй.
+// Contract freeze: `ownerApi` (services/api.ts), shape docs/backend-gaps.md §7.
 //
-// Locked 8 хэсэг (CLAUDE.md §4):
+// 8 хэсэг (CLAUDE.md §4):
 //   Growth · Revenue · Product usage · Geography · Organizations ·
 //   Payments & billing · Moderation & trust · Content operations
 //
-// Single-glance асуулт (§4):
-//   Хэн? Хаанаас? Яаж? Хэн төлж? Аль модуль үнэтэй? Аль сум идэвхтэй?
-//
-// Backend endpoint санал (backend-gaps.md-д нэмэх):
-//   GET /owner/snapshot → OwnerSnapshot
-//   GET /owner/growth, /owner/revenue, ... (хэсэг тус бүр хайлттай)
+// Single-glance (§4): Хэн? Хаанаас? Яаж? Хэн төлж? Аль модуль үнэтэй?
+// Аль сум идэвхтэй? → `singleGlanceDigest()`.
 
 import type { PackageId } from './pricing';
 

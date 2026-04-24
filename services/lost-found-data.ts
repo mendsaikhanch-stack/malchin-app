@@ -1,8 +1,8 @@
 // Алдсан / Олдсон малын data layer (pure).
 //
 // PRD: Lost/found нь marketplace-ийн тусгай UX-тэй хэсэг.
-// Backend endpoint (санал): marketApi.getAll({category: 'lost_animal'|'found_animal'})
-// эсвэл тусгай /lost-found/*.
+// Contract freeze: `lostFoundApi` (services/api.ts), endpoint shape
+// docs/backend-gaps.md §1.3-д (dedicated /lost-found/* path, marketApi биш).
 //
 // Энэ файлын үүрэг:
 // 1. Типийг тодорхойлох (Listing, ListingType)
@@ -10,7 +10,7 @@
 // 3. Lost vs Found хоорондын боломжит match detection (жишээ: "2 хээр адуу алдсан"
 //    + "1 хээр адуу олдсон" → 70% магадлал)
 // 4. Filter / sort helpers
-// 5. Mock provider + backend swap point
+// 5. fetchLostFoundListings real→mock fallback
 
 export type ListingType = 'lost' | 'found';
 export type ListingStatus = 'active' | 'resolved' | 'pending';
