@@ -33,7 +33,7 @@ const SEASONAL_TASKS: Record<string, DailyTask[]> = {
     { id: 'w5', emoji: '🔥', title: 'Галын бэлтгэл шалгах', detail: 'Түлш, аргал хангалттай эсэх', priority: 'low' },
   ],
   spring: [
-    { id: 's1', emoji: '🤱', title: 'Төллөлтөд бэлтгэх', detail: 'Хээл авсан мал, тусгай байр, халуун ус', priority: 'high' },
+    { id: 's1', emoji: '🐑', title: 'Төллөлтөд бэлтгэх', detail: 'Хээл авсан мал, тусгай байр, халуун ус', priority: 'high' },
     { id: 's2', emoji: '🚶', title: 'Хаваржаанд нүүх төлөвлөгөө', detail: 'Бэлчээр, зам, тээвэр', priority: 'high' },
     { id: 's3', emoji: '🐐', title: 'Ямааны савалгаа', detail: 'Улирлын тогтмол үйл ажил', priority: 'medium' },
     { id: 's4', emoji: '💉', title: 'Вакцинжуулалт шалгах', detail: 'Сумын хуваариар', priority: 'medium' },
