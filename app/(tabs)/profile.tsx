@@ -250,6 +250,14 @@ export default function ProfileScreen() {
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.menuItem}
+            onPress={() => router.push('/pricing' as any)}
+          >
+            <Text style={styles.menuIcon}>{'💳'}</Text>
+            <Text style={styles.menuText}>Багц ба үнэ</Text>
+            <Text style={styles.menuArrow}>{'›'}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.menuItem}
             onPress={() => router.push('/privacy-settings' as any)}
           >
             <Text style={styles.menuIcon}>{'🔒'}</Text>
