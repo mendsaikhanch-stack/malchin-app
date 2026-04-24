@@ -96,8 +96,9 @@ export default function WeatherScreen() {
           <Text style={styles.title}>{'\u26C5'} Цаг агаар</Text>
         </View>
 
-        {/* Аймаг сонгох */}
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.aimagScroll} contentContainerStyle={styles.aimagScrollContent}>
+        {/* Аймаг сонгох — wrap (2+ эгнээ) */}
+        <Text style={styles.sectionLabel}>Аймаг</Text>
+        <View style={styles.aimagWrap}>
           {aimags.map((aimag) => (
             <TouchableOpacity
               key={aimag}
@@ -109,28 +110,26 @@ export default function WeatherScreen() {
               </Text>
             </TouchableOpacity>
           ))}
-        </ScrollView>
+        </View>
 
-        {/* Сум сонгох (харилцааны түвшинд) */}
+        {/* Сум сонгох — wrap */}
         {sums.length > 0 && (
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            style={styles.sumScroll}
-            contentContainerStyle={styles.sumScrollContent}
-          >
-            {sums.map((sum) => (
-              <TouchableOpacity
-                key={sum}
-                style={[styles.sumChip, selectedSum === sum && styles.sumChipActive]}
-                onPress={() => setSelectedSum(selectedSum === sum ? null : sum)}
-              >
-                <Text style={[styles.sumChipText, selectedSum === sum && styles.sumChipTextActive]}>
-                  {sum}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
+          <>
+            <Text style={styles.sectionLabel}>Сум</Text>
+            <View style={styles.sumWrap}>
+              {sums.map((sum) => (
+                <TouchableOpacity
+                  key={sum}
+                  style={[styles.sumChip, selectedSum === sum && styles.sumChipActive]}
+                  onPress={() => setSelectedSum(selectedSum === sum ? null : sum)}
+                >
+                  <Text style={[styles.sumChipText, selectedSum === sum && styles.sumChipTextActive]}>
+                    {sum}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </>
         )}
 
         {selectedSum && (
@@ -233,19 +232,28 @@ const styles = StyleSheet.create({
   loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#F8F9FA' },
   header: { paddingHorizontal: 20, paddingTop: 16, paddingBottom: 8 },
   title: { fontSize: 24, fontWeight: '800', color: AppColors.black },
-  aimagScroll: { marginTop: 8, flexGrow: 0 },
-  aimagScrollContent: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, gap: 8 },
+  sectionLabel: {
+    fontSize: 12, fontWeight: '700', color: AppColors.gray,
+    paddingHorizontal: 16, marginTop: 12, marginBottom: 6,
+    textTransform: 'uppercase', letterSpacing: 0.5,
+  },
+  aimagWrap: {
+    flexDirection: 'row', flexWrap: 'wrap',
+    paddingHorizontal: 16, gap: 8,
+  },
   aimagChip: {
-    paddingHorizontal: 16, paddingVertical: 8, borderRadius: 20,
+    paddingHorizontal: 14, paddingVertical: 7, borderRadius: 18,
     backgroundColor: AppColors.white, borderWidth: 1.5, borderColor: AppColors.grayMedium,
   },
   aimagChipActive: { backgroundColor: AppColors.primary, borderColor: AppColors.primary },
   aimagChipText: { fontSize: 13, fontWeight: '600', color: AppColors.grayDark },
   aimagChipTextActive: { color: AppColors.white },
-  sumScroll: { marginTop: 6, flexGrow: 0 },
-  sumScrollContent: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, gap: 6 },
+  sumWrap: {
+    flexDirection: 'row', flexWrap: 'wrap',
+    paddingHorizontal: 16, gap: 6,
+  },
   sumChip: {
-    paddingHorizontal: 12, paddingVertical: 6, borderRadius: 16,
+    paddingHorizontal: 12, paddingVertical: 6, borderRadius: 14,
     backgroundColor: AppColors.white, borderWidth: 1, borderColor: AppColors.grayMedium,
   },
   sumChipActive: { backgroundColor: AppColors.accent, borderColor: AppColors.accent },
