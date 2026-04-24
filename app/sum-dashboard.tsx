@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Stack, useRouter } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AppColors } from '@/constants/theme';
 import {
   fetchSumBags,
@@ -26,8 +27,13 @@ import {
 import { FeatureGate } from '@/components/feature-gate';
 import { sumDashboardApi } from '@/services/api';
 import { queueOnFailure } from '@/services/sync-queue';
+import {
+  parseOnboardingSnapshot,
+  toUserFallback,
+} from '@/services/onboarding-fallback';
+import { slugifySum } from '@/services/bag-id';
 
-const SUM_ID = 'altanbulag';
+const ONBOARDING_DATA_KEY = '@malchin_onboarding_data';
 
 export default function SumDashboard() {
   const router = useRouter();
@@ -38,14 +44,30 @@ export default function SumDashboard() {
   const [bags, setBags] = useState<BagStat[]>([]);
   const [events, setEvents] = useState<SumEvent[]>([]);
   const [loading, setLoading] = useState(true);
+  const [sumId, setSumId] = useState<string | null>(null);
+  const [sumLabel, setSumLabel] = useState('—');
+  const [aimagLabel, setAimagLabel] = useState('—');
 
   useEffect(() => {
-    Promise.all([fetchSumBags(), fetchSumEvents()])
-      .then(([b, e]) => {
-        setBags(b);
-        setEvents(sortEventsByDate(e));
-      })
-      .finally(() => setLoading(false));
+    (async () => {
+      try {
+        const raw = await AsyncStorage.getItem(ONBOARDING_DATA_KEY);
+        const user = toUserFallback(parseOnboardingSnapshot(raw));
+        if (user?.sum) {
+          setSumId(slugifySum(user.sum));
+          setSumLabel(user.sum);
+        }
+        if (user?.aimag) setAimagLabel(user.aimag);
+      } catch {
+        // ignore
+      }
+      Promise.all([fetchSumBags(), fetchSumEvents()])
+        .then(([b, e]) => {
+          setBags(b);
+          setEvents(sortEventsByDate(e));
+        })
+        .finally(() => setLoading(false));
+    })();
   }, []);
 
   const stats: SumStats = computeSumStats(bags);
@@ -56,18 +78,22 @@ export default function SumDashboard() {
       Alert.alert('Алдаа', 'Гарчиг болон агуулгаа бичнэ үү');
       return;
     }
+    if (!sumId) {
+      Alert.alert('Алдаа', 'Таны сум тодорхойгүй байна. Профайлаас байршлаа шалгана уу.');
+      return;
+    }
     const target =
       scope === 'all'
         ? `бүх ${stats.totalHouseholds} өрх`
         : `${bags.find((b) => b.id === scope)?.name}`;
     const payload = { title: bTitle, body: bBody, scope };
     const result = await queueOnFailure(
-      () => sumDashboardApi.broadcast(SUM_ID, payload),
+      () => sumDashboardApi.broadcast(sumId, payload),
       {
         table_name: 'sum_broadcasts',
         action: 'INSERT',
         record_id: 0,
-        data: { sum_id: SUM_ID, ...payload },
+        data: { sum_id: sumId, ...payload },
       }
     );
     setBroadcastModal(false);
@@ -91,7 +117,7 @@ export default function SumDashboard() {
         </TouchableOpacity>
         <View style={{ flex: 1 }}>
           <Text style={styles.headerTitle}>Сумын хяналтын самбар</Text>
-          <Text style={styles.headerSubtitle}>Төв аймаг · Алтанбулаг сум</Text>
+          <Text style={styles.headerSubtitle}>{aimagLabel} аймаг · {sumLabel} сум</Text>
         </View>
       </View>
 

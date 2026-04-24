@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Stack, useRouter } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AppColors } from '@/constants/theme';
 import {
   fetchBagHouseholds,
@@ -23,9 +24,13 @@ import {
 } from '@/services/bag-dashboard-data';
 import { bagDashboardApi } from '@/services/api';
 import { queueOnFailure } from '@/services/sync-queue';
+import {
+  parseOnboardingSnapshot,
+  toUserFallback,
+} from '@/services/onboarding-fallback';
+import { parseBagId, bagDisplayLabel, slugifySum } from '@/services/bag-id';
 
-// Одоогоор hardcoded bagId — Phase 2-т useUserRole()-оос авах.
-const BAG_ID = '3';
+const ONBOARDING_DATA_KEY = '@malchin_onboarding_data';
 
 const RISK_COLOR = {
   low: AppColors.success,
@@ -40,11 +45,28 @@ export default function BagDashboard() {
   const [broadcastBody, setBroadcastBody] = useState('');
   const [households, setHouseholds] = useState<Household[]>([]);
   const [loading, setLoading] = useState(true);
+  const [bagId, setBagId] = useState<string | null>(null);
+  const [bagLabel, setBagLabel] = useState('—');
+  const [sumLabel, setSumLabel] = useState('—');
 
   useEffect(() => {
-    fetchBagHouseholds()
-      .then(setHouseholds)
-      .finally(() => setLoading(false));
+    // Онбординг-оос хэрэглэгчийн өөрийн баг/сум-ыг уншина
+    (async () => {
+      try {
+        const raw = await AsyncStorage.getItem(ONBOARDING_DATA_KEY);
+        const user = toUserFallback(parseOnboardingSnapshot(raw));
+        if (user?.bag) {
+          setBagId(parseBagId(user.bag));
+          setBagLabel(bagDisplayLabel(user.bag));
+        }
+        if (user?.sum) setSumLabel(user.sum);
+      } catch {
+        // ignore — null bagId → fetch нь fallback-руу унана
+      }
+      fetchBagHouseholds()
+        .then(setHouseholds)
+        .finally(() => setLoading(false));
+    })();
   }, []);
 
   const stats: BagStats = computeBagStats(households);
@@ -55,14 +77,18 @@ export default function BagDashboard() {
       Alert.alert('Алдаа', 'Гарчиг болон агуулгаа бичнэ үү');
       return;
     }
+    if (!bagId) {
+      Alert.alert('Алдаа', 'Таны баг тодорхойгүй байна. Профайлаас байршлаа шалгана уу.');
+      return;
+    }
     const payload = { title: broadcastTitle, body: broadcastBody };
     const result = await queueOnFailure(
-      () => bagDashboardApi.broadcast(BAG_ID, payload),
+      () => bagDashboardApi.broadcast(bagId, payload),
       {
         table_name: 'bag_broadcasts',
         action: 'INSERT',
         record_id: 0,
-        data: { bag_id: BAG_ID, ...payload },
+        data: { bag_id: bagId, sum: slugifySum(sumLabel), ...payload },
       }
     );
     setBroadcastModal(false);
@@ -87,7 +113,9 @@ export default function BagDashboard() {
         </TouchableOpacity>
         <View style={{ flex: 1 }}>
           <Text style={styles.headerTitle}>Багийн даргын самбар</Text>
-          <Text style={styles.headerSubtitle}>Алтанбулаг сум, 3-р баг</Text>
+          <Text style={styles.headerSubtitle}>
+            {sumLabel} сум, {bagLabel}
+          </Text>
         </View>
       </View>
 
@@ -168,7 +196,7 @@ export default function BagDashboard() {
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Мэдэгдэл илгээх</Text>
-            <Text style={styles.modalHint}>3-р багийн {stats.totalHouseholds} өрхөд хүрнэ</Text>
+            <Text style={styles.modalHint}>{bagLabel}-ийн {stats.totalHouseholds} өрхөд хүрнэ</Text>
 
             <Text style={styles.label}>Гарчиг</Text>
             <TextInput

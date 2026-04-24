@@ -22,6 +22,7 @@ import {
   getSumsByAimag,
   findNearestSum,
 } from '@/services/mongolia-geo';
+import { DEFAULT_BAG_OPTIONS } from '@/services/bag-id';
 
 export default function LocationScreen() {
   const router = useRouter();
@@ -142,11 +143,29 @@ export default function LocationScreen() {
           ) : null}
 
           <Text style={styles.label}>Баг (заавал биш)</Text>
+          <View style={styles.chipsWrap}>
+            {DEFAULT_BAG_OPTIONS.map((b) => (
+              <TouchableOpacity
+                key={b}
+                style={[styles.chip, bag === b && styles.chipActive]}
+                onPress={() => setBag(bag === b ? '' : b)}
+              >
+                <Text
+                  style={[
+                    styles.chipText,
+                    bag === b && styles.chipTextActive,
+                  ]}
+                >
+                  {b}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
           <TextInput
-            style={styles.input}
-            placeholder="Жишээ: 1-р баг"
+            style={[styles.input, { marginTop: 10 }]}
+            placeholder="Бусад (жишээ: Найрамдал)"
             placeholderTextColor={AppColors.gray}
-            value={bag}
+            value={DEFAULT_BAG_OPTIONS.includes(bag) ? '' : bag}
             onChangeText={setBag}
           />
         </ScrollView>

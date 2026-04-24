@@ -1,5 +1,6 @@
 import React from 'react';
 import { render, waitFor, fireEvent } from '@testing-library/react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import SumDashboard from '../sum-dashboard';
 
 jest.mock('expo-router', () => ({
@@ -13,11 +14,27 @@ jest.mock('expo-router', () => ({
   },
 }));
 
+beforeEach(async () => {
+  await AsyncStorage.clear();
+  await AsyncStorage.setItem(
+    '@malchin_onboarding_data',
+    JSON.stringify({
+      phone: '99001122',
+      lastName: 'Дорж',
+      firstName: 'Болд',
+      role: 'sum_admin',
+      aimag: 'Төв',
+      sum: 'Алтанбулаг',
+      bag: '',
+    })
+  );
+});
+
 describe('SumDashboard', () => {
-  it('header render хийгдэнэ', () => {
-    const { getByText } = render(<SumDashboard />);
+  it('header render хийгдэнэ (онбординг-оос аймаг/сум унших)', async () => {
+    const { getByText, findByText } = render(<SumDashboard />);
     expect(getByText('Сумын хяналтын самбар')).toBeTruthy();
-    expect(getByText(/Алтанбулаг сум/)).toBeTruthy();
+    expect(await findByText(/Төв аймаг · Алтанбулаг сум/)).toBeTruthy();
   });
 
   it('loading state эхлээд харагдана', () => {

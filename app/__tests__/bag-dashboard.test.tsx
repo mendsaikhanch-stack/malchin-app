@@ -1,5 +1,6 @@
 import React from 'react';
 import { render, waitFor, fireEvent } from '@testing-library/react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import BagDashboard from '../bag-dashboard';
 
 // expo-router mock
@@ -14,11 +15,28 @@ jest.mock('expo-router', () => ({
   },
 }));
 
+// Онбординг snapshot — dashboard нь хэрэглэгчийн бодит баг/сум-аас уншина
+beforeEach(async () => {
+  await AsyncStorage.clear();
+  await AsyncStorage.setItem(
+    '@malchin_onboarding_data',
+    JSON.stringify({
+      phone: '99001122',
+      lastName: 'Баатарын',
+      firstName: 'Батболд',
+      role: 'bag_darga',
+      aimag: 'Төв',
+      sum: 'Алтанбулаг',
+      bag: '3-р баг',
+    })
+  );
+});
+
 describe('BagDashboard', () => {
-  it('header render хийгдэнэ', async () => {
-    const { getByText } = render(<BagDashboard />);
+  it('header render хийгдэнэ (онбординг-оос сум/баг унших)', async () => {
+    const { getByText, findByText } = render(<BagDashboard />);
     expect(getByText('Багийн даргын самбар')).toBeTruthy();
-    expect(getByText(/Алтанбулаг сум/)).toBeTruthy();
+    expect(await findByText(/Алтанбулаг сум, 3-р баг/)).toBeTruthy();
   });
 
   it('loading state эхлээд харагдана', () => {
