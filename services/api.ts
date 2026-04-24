@@ -153,7 +153,9 @@ export const aiApi = {
   ask: (question: string) =>
     request<any>('/ai/ask', { method: 'POST', body: JSON.stringify({ question }) }),
   getTip: () =>
-    request<any>('/ai/tips'),
+    cachedRequest<any>('/ai/tips', 'default'),
+  getTipWithMeta: () =>
+    cachedRequestWithMeta<any>('/ai/tips', 'default'),
   diagnose: (data: { animal_type: string; symptoms: string; age?: string; description?: string }) =>
     request<any>('/ai/diagnose', { method: 'POST', body: JSON.stringify(data) }),
   diagnoseImage: (data: { image_base64: string; animal_type?: string; description?: string }) =>

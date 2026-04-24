@@ -98,6 +98,7 @@ export default function HomeScreen() {
   const [marketPricesMeta, setMarketPricesMeta] = useState<CacheMeta>(emptyMeta);
   const [listingsMeta, setListingsMeta] = useState<CacheMeta>(emptyMeta);
   const [healthMeta, setHealthMeta] = useState<CacheMeta>(emptyMeta);
+  const [tipMeta, setTipMeta] = useState<CacheMeta>(emptyMeta);
   const [alerts, setAlerts] = useState<any[]>([]);
   const [tip, setTip] = useState('');
   const [finance, setFinance] = useState<any>(null);
@@ -125,7 +126,7 @@ export default function HomeScreen() {
         livestockApi.getStats(userId),
         weatherApi.getByAimagWithMeta(userAimag || 'Төв'),
         alertsApi.getAllWithMeta(userAimag || undefined),
-        aiApi.getTip(),
+        aiApi.getTipWithMeta(),
         financeApi.getSummary(),
         pricesApi.getSummaryWithMeta(),
         marketApi.getAllWithMeta(userAimag ? { location: userAimag } : undefined),
@@ -166,7 +167,11 @@ export default function HomeScreen() {
         setAlerts((ar.data || []).slice(0, 3));
         setAlertsMeta({ fromCache: ar.fromCache, offline: ar.offline, expired: ar.expired });
       }
-      if (tipRes.status === 'fulfilled') setTip(tipRes.value.tip || '');
+      if (tipRes.status === 'fulfilled') {
+        const tr = tipRes.value;
+        setTip(tr.data?.tip || '');
+        setTipMeta({ fromCache: tr.fromCache, offline: tr.offline, expired: tr.expired });
+      }
       if (financeRes.status === 'fulfilled') setFinance(financeRes.value);
       if (pricesRes.status === 'fulfilled') {
         const pr = pricesRes.value;
@@ -433,7 +438,10 @@ export default function HomeScreen() {
         {visibleCards.has('elder_wisdom') ? (
           <TouchableOpacity style={[styles.card, styles.tipCard]} onPress={() => router.push('/advisory' as any)}>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-              <Text style={styles.cardTitle}>💡 Өдрийн зөвлөгөө</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                <Text style={styles.cardTitle}>💡 Өдрийн зөвлөгөө</Text>
+                <StaleBadge {...tipMeta} compact />
+              </View>
               <View style={styles.advisoryCountBadge}>
                 <Text style={styles.advisoryCountText}>15 асуулт</Text>
               </View>
