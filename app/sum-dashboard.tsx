@@ -23,6 +23,7 @@ import {
   type SumEvent,
   type SumStats,
 } from '@/services/sum-dashboard-data';
+import { FeatureGate } from '@/components/feature-gate';
 
 export default function SumDashboard() {
   const router = useRouter();
@@ -100,22 +101,24 @@ export default function SumDashboard() {
           <KpiRow label="Бага уншилттай баг" value={String(stats.lowReadBags)} sub="<60%" />
         </View>
 
-        {/* Эрсдэлийн зураг */}
-        <View style={styles.card}>
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Text style={styles.cardTitle}>🗺 Эрсдэлийн зураг</Text>
-            <TouchableOpacity onPress={() => router.push('/(tabs)/map-view' as any)}>
-              <Text style={styles.linkText}>Газрын зураг ›</Text>
-            </TouchableOpacity>
+        {/* Эрсдэлийн зураг — advanced (sum_license gate) */}
+        <FeatureGate feature="sum_dashboard_full">
+          <View style={styles.card}>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Text style={styles.cardTitle}>🗺 Эрсдэлийн зураг</Text>
+              <TouchableOpacity onPress={() => router.push('/(tabs)/map-view' as any)}>
+                <Text style={styles.linkText}>Газрын зураг ›</Text>
+              </TouchableOpacity>
+            </View>
+            <View style={styles.mapPlaceholder}>
+              <Text style={styles.mapPlaceholderIcon}>🗺️</Text>
+              <Text style={styles.mapPlaceholderText}>
+                Heatmap — эрсдэлт бүс, отор чиглэл, усны эх үүсвэр
+              </Text>
+              <Text style={styles.mapPlaceholderHint}>(Phase 2: NDVI + эрсдэлийн layer)</Text>
+            </View>
           </View>
-          <View style={styles.mapPlaceholder}>
-            <Text style={styles.mapPlaceholderIcon}>🗺️</Text>
-            <Text style={styles.mapPlaceholderText}>
-              Heatmap — эрсдэлт бүс, отор чиглэл, усны эх үүсвэр
-            </Text>
-            <Text style={styles.mapPlaceholderHint}>(Phase 2: NDVI + эрсдэлийн layer)</Text>
-          </View>
-        </View>
+        </FeatureGate>
 
         {/* Баг харьцуулалт */}
         <View style={styles.card}>
