@@ -14,6 +14,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Stack, useRouter } from 'expo-router';
 import { AppColors } from '@/constants/theme';
 import { useElderFlag } from '@/hooks/use-elder-flag';
+import { elderContentApi, type ElderContentSubmit } from '@/services/api';
+import { queueOnFailure } from '@/services/sync-queue';
 
 type ContentType = 'text' | 'audio' | 'video' | 'card';
 type Status = 'draft' | 'review' | 'published' | 'archived';
@@ -165,28 +167,40 @@ export default function ElderContent() {
     );
   }
 
-  const submitNew = () => {
+  const submitNew = async () => {
     if (!form.title || !form.body) {
       Alert.alert('Алдаа', 'Гарчиг болон агуулгаа бичнэ үү');
       return;
     }
-    const next: ContentItem = {
-      id: Date.now().toString(),
+    const payload: ElderContentSubmit = {
       type: form.type || 'text',
       title: form.title,
       body: form.body,
       season: form.season || 'any',
       species: form.species || ['all'],
       topic: form.topic || 'traditional',
+    };
+    // Backend endpoint (POST /elder/content) хараахан байхгүй — fail үед
+    // queue-д push. Локал мөрөө UI-д шууд харуулна (optimistic).
+    const result = await queueOnFailure(
+      () => elderContentApi.create(payload),
+      { table_name: 'elder_content', action: 'INSERT', record_id: 0, data: payload }
+    );
+
+    const local: ContentItem = {
+      id: result.synced ? result.data.id : Date.now().toString(),
+      ...payload,
       status: 'review',
       submittedAt: new Date().toISOString().slice(0, 10),
     };
-    setContent([next, ...content]);
+    setContent([local, ...content]);
     setModalVisible(false);
     setForm({ type: 'text', season: 'any', species: ['all'], topic: 'traditional' });
     Alert.alert(
-      'Хүлээн авлаа',
-      'Контентыг редактор 1-3 хоногт хянаж нийтлэх эсвэл санал ирүүлнэ.'
+      result.synced ? 'Хүлээн авлаа' : 'Локал хадгалагдлаа',
+      result.synced
+        ? 'Контентыг редактор 1-3 хоногт хянаж нийтлэх эсвэл санал ирүүлнэ.'
+        : 'Сүлжээнд холбогдох үед автоматаар редакторт илгээгдэнэ.'
     );
   };
 

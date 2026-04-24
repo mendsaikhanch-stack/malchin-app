@@ -111,6 +111,38 @@ GET  /lost-found/:id/matches
 
 ---
 
+### 1.4 Ахмадын контент moderation
+
+Frontend: `app/elder-content.tsx` submit pipeline. Одоогоор submit нь
+`queueOnFailure(elderContentApi.create, ...)`-ээр wrap — endpoint
+хэрэгжтэл бүх submission queue-д хуримтлагдана, reconnect үед push.
+
+**Шаардлагатай:**
+
+```
+POST /elder/content
+     Body: ElderContentSubmit
+       { type: 'text'|'audio'|'video'|'card',
+         title, body,
+         season: 'winter'|'spring'|'summer'|'autumn'|'any',
+         species: string[],     // ['all'] эсвэл ['sheep','goat']
+         topic: string }
+     → { id: string, status: 'review', submittedAt: string }
+
+GET  /elder/content?status=draft|review|published|archived
+     → ContentItem[]       // одоогоор MOCK_CONTENT, backend ирвэл swap
+
+PUT  /elder/content/:id/status
+     Body: { status: 'published'|'archived', reviewerNote?: string }
+     → ContentItem        // admin panel-аас хийнэ
+```
+
+Client-д status pipeline (draft/review/published/archived) UI бэлэн,
+review deadline "1-3 хоног" гэж хэрэглэгч рүү тайлбарласан — backend
+SLA үүнд нийцэх шаардлагатай.
+
+---
+
 ## 2. Priority 1 — Stale-while-revalidate + weather
 
 ### 2.1 Weather provider (backend дотор)
@@ -285,8 +317,8 @@ Data-layer `fetch*()` функцүүд дээрх api method-ыг эхэнд д�
     handleAdd + handleEvent)
   - animals бие даасан бүртгэл (animalsApi.create/update — livestock.tsx
     AnimalFormModal)
-  - Онбординг мал тоо upload (`app/onboarding/done.tsx`) — сүлжээгүй
-    үед мал тоо алдагдахгүй
+  - Онбординг мал тоо upload (`app/onboarding/done.tsx`)
+  - Ахмадын контент submit (`app/elder-content.tsx` submitNew)
   `useAutoSync()` hook root layout-д mount-тай, network false→true
-  шилжилт дээр автоматаар flush. **Үлдсэн wire:** elder-content submit,
-  bag/sum broadcast-ууд — ижил pattern.
+  шилжилт дээр автоматаар flush. **Үлдсэн wire:** bag/sum broadcast —
+  ижил pattern.

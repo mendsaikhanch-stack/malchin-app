@@ -632,3 +632,23 @@ export const lostFoundApi = {
 export const ownerApi = {
   snapshot: () => cachedRequest<OwnerSnapshot>('/owner/snapshot', 'default'),
 };
+
+// Elder content moderation pipeline — backend-gaps.md §1.4
+// Draft → review → published → archived state-machine server-side.
+// Client submit нь `status: 'review'`-тэй ирнэ.
+export type ElderContentSubmit = {
+  type: 'text' | 'audio' | 'video' | 'card';
+  title: string;
+  body: string;
+  season: 'winter' | 'spring' | 'summer' | 'autumn' | 'any';
+  species: string[];
+  topic: string;
+};
+
+export const elderContentApi = {
+  create: (data: ElderContentSubmit) =>
+    request<{ id: string; status: 'review'; submittedAt: string }>(
+      '/elder/content',
+      { method: 'POST', body: JSON.stringify(data) }
+    ),
+};
