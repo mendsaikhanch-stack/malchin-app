@@ -24,33 +24,33 @@ export default function RootLayout() {
   const router = useRouter();
   const segments = useSegments();
   const [checkingOnboarding, setCheckingOnboarding] = useState(true);
-  const [onboardingDone, setOnboardingDone] = useState(false);
 
+  // Segments солигдох бүрд AsyncStorage-ээс flag-г дахин уншина —
+  // done.tsx-аас /(tabs) руу replace хийх үед state шинэчлэгдсэн байх
+  // ёстой тул mount-д нэг л удаа уншсанаар алхам хоорондын гүйлт
+  // алдагддаг байлаа (done=true set хийсний дараа state хуучин false
+  // хэвээр тул буцаагаад /onboarding руу redirect хийж loop үүсдэг).
   useEffect(() => {
-    const checkOnboarding = async () => {
+    let cancelled = false;
+    const checkAndRedirect = async () => {
       try {
-        const done = await AsyncStorage.getItem(ONBOARDING_KEY);
-        setOnboardingDone(done === 'true');
-      } catch {
-        setOnboardingDone(false);
-      } finally {
+        const done = (await AsyncStorage.getItem(ONBOARDING_KEY)) === 'true';
+        if (cancelled) return;
         setCheckingOnboarding(false);
+
+        const inOnboarding = segments[0] === 'onboarding';
+        if (!done && !inOnboarding) {
+          router.replace('/onboarding');
+        } else if (done && inOnboarding) {
+          router.replace('/(tabs)');
+        }
+      } catch {
+        if (!cancelled) setCheckingOnboarding(false);
       }
     };
-    checkOnboarding();
-  }, []);
-
-  useEffect(() => {
-    if (checkingOnboarding) return;
-
-    const inOnboarding = segments[0] === 'onboarding';
-
-    if (!onboardingDone && !inOnboarding) {
-      router.replace('/onboarding');
-    } else if (onboardingDone && inOnboarding) {
-      router.replace('/(tabs)');
-    }
-  }, [checkingOnboarding, onboardingDone, segments]);
+    checkAndRedirect();
+    return () => { cancelled = true; };
+  }, [segments]);
 
   if (checkingOnboarding) {
     return (

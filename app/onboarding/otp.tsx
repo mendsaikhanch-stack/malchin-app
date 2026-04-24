@@ -11,10 +11,14 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AppColors } from '@/constants/theme';
 import { StepHeader, PrimaryButton } from './_components';
 import { useOnboarding } from './_layout';
-import { userApi } from '@/services/api';
+import { userApi, setToken } from '@/services/api';
+
+const ONBOARDING_DATA_KEY = '@malchin_onboarding_data';
+const ONBOARDING_DONE_KEY = '@malchin_onboarding_done';
 
 const OTP_LENGTH = 4;
 
@@ -56,13 +60,49 @@ export default function OtpScreen() {
       // TODO: remove when /auth/verify-otp endpoint is live.
       verified = true;
     }
-    setLoading(false);
-    if (verified) {
-      update({ otpVerified: true });
-      router.push('/onboarding/name' as any);
-    } else {
+
+    if (!verified) {
+      setLoading(false);
       Alert.alert('Алдаа', 'Код буруу байна. Дахин оролдоно уу.');
+      return;
     }
+
+    update({ otpVerified: true });
+
+    // Уг дугаар backend-д бүртгэлтэй бол шууд "Нэвтрэх" горимд home руу
+    // шилжүүлнэ. Шинэ хэрэглэгч бол үргэлжлүүлэн нэр + byршил алхмууд руу.
+    try {
+      const loginRes = await userApi.login(data.phone);
+      if (loginRes?.user) {
+        if (loginRes.token) await setToken(loginRes.token);
+        const u = loginRes.user;
+        const fullName: string = u.name || '';
+        const [lastName = '', firstName = ''] = fullName.trim().split(/\s+/, 2);
+        const snapshot = {
+          phone: u.phone || data.phone,
+          otpVerified: true,
+          lastName,
+          firstName: firstName || lastName, // нэр нэг үгтэй бол нэр болгоно
+          role: u.role || 'malchin',
+          aimag: u.aimag || '',
+          sum: u.sum || '',
+          bag: u.bag || '',
+          seasonal: u.seasonal || {},
+          livestock: u.livestock || {},
+          preferences: u.preferences || {},
+        };
+        await AsyncStorage.setItem(ONBOARDING_DATA_KEY, JSON.stringify(snapshot));
+        await AsyncStorage.setItem(ONBOARDING_DONE_KEY, 'true');
+        setLoading(false);
+        router.replace('/(tabs)' as any);
+        return;
+      }
+    } catch {
+      // backend байхгүй эсвэл хэрэглэгч олдоогүй — шинэ бүртгэл гэж үзнэ
+    }
+
+    setLoading(false);
+    router.push('/onboarding/name' as any);
   };
 
   const handleResend = async () => {

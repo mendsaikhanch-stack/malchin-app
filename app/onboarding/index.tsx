@@ -98,9 +98,17 @@ export default function WelcomeScreen() {
 
       <View style={styles.bottomContainer}>
         {isLastPage ? (
-          <TouchableOpacity style={styles.startButton} onPress={handleStart}>
-            <Text style={styles.startButtonText}>Бүртгүүлэх</Text>
-          </TouchableOpacity>
+          <>
+            <TouchableOpacity style={styles.startButton} onPress={handleStart}>
+              <Text style={styles.startButtonText}>Шинээр бүртгүүлэх</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.loginButton} onPress={handleStart}>
+              <Text style={styles.loginButtonText}>Нэвтрэх</Text>
+            </TouchableOpacity>
+            <Text style={styles.loginNote}>
+              Нэвтрэхийн тулд утасны дугаараа оруулж код авна.
+            </Text>
+          </>
         ) : (
           <TouchableOpacity style={styles.nextButton} onPress={goNext}>
             <Text style={styles.nextButtonText}>Дараах</Text>
@@ -163,4 +171,20 @@ const styles = StyleSheet.create({
     elevation: 6,
   },
   startButtonText: { color: '#FFFFFF', fontSize: 20, fontWeight: '800' },
+  loginButton: {
+    marginTop: 10,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    paddingVertical: 16,
+    alignItems: 'center',
+    borderWidth: 1.5,
+    borderColor: '#2d5016',
+  },
+  loginButtonText: { color: '#2d5016', fontSize: 17, fontWeight: '700' },
+  loginNote: {
+    fontSize: 11,
+    color: '#7A7A7A',
+    textAlign: 'center',
+    marginTop: 8,
+  },
 });
