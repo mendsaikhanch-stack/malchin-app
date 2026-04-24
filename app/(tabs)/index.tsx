@@ -31,6 +31,8 @@ import {
   normalizeBackendWeather,
   type NormalizedWeather,
 } from '@/services/weather-provider';
+import { StaleBadge } from '@/components/stale-badge';
+import type { CacheMeta } from '@/services/cache-state';
 import { AdBanner, AdBannerLarge } from '@/components/ad-banner';
 import { useLocation } from '@/hooks/use-location';
 import { useUserRole, ROLE_LABEL, ROLE_EMOJI } from '@/hooks/use-user-role';
@@ -88,6 +90,11 @@ export default function HomeScreen() {
   const [livestock, setLivestock] = useState<any[]>([]);
   const [totalAnimals, setTotalAnimals] = useState(0);
   const [weather, setWeather] = useState<NormalizedWeather | null>(null);
+  const [weatherMeta, setWeatherMeta] = useState<CacheMeta>({
+    fromCache: false,
+    offline: false,
+    expired: false,
+  });
   const [alerts, setAlerts] = useState<any[]>([]);
   const [tip, setTip] = useState('');
   const [finance, setFinance] = useState<any>(null);
@@ -113,7 +120,7 @@ export default function HomeScreen() {
         pricesRes, listingsRes, healthRes, newsRes,
       ] = await Promise.allSettled([
         livestockApi.getStats(userId),
-        weatherApi.getByAimag(userAimag || 'Төв'),
+        weatherApi.getByAimagWithMeta(userAimag || 'Төв'),
         alertsApi.getAll(userAimag || undefined),
         aiApi.getTip(),
         financeApi.getSummary(),
@@ -139,7 +146,13 @@ export default function HomeScreen() {
         setTotalAnimals(stats.total_animals || 0);
       }
       if (weatherRes.status === 'fulfilled') {
-        setWeather(normalizeBackendWeather(weatherRes.value));
+        const wr = weatherRes.value;
+        setWeather(normalizeBackendWeather(wr.data));
+        setWeatherMeta({
+          fromCache: wr.fromCache,
+          offline: wr.offline,
+          expired: wr.expired,
+        });
       }
       if (alertsRes.status === 'fulfilled') setAlerts((alertsRes.value || []).slice(0, 3));
       if (tipRes.status === 'fulfilled') setTip(tipRes.value.tip || '');
@@ -289,7 +302,10 @@ export default function HomeScreen() {
         {/* Цаг агаар — rule engine: preferences.weather */}
         {visibleCards.has('weather') && (
         <TouchableOpacity style={styles.card} onPress={() => router.push('/(tabs)/weather')}>
-          <Text style={styles.cardTitle}>⛅ Цаг агаар - {weather?.aimag || 'Төв'}</Text>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Text style={styles.cardTitle}>⛅ Цаг агаар - {weather?.aimag || 'Төв'}</Text>
+            <StaleBadge {...weatherMeta} compact />
+          </View>
           {weather ? (
             <View style={styles.weatherRow}>
               <Text style={styles.weatherTemp}>{weather.temp ?? '—'}°C</Text>

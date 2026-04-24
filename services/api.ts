@@ -54,6 +54,21 @@ async function cachedRequest<T>(endpoint: string, category?: string): Promise<T>
   return result.data;
 }
 
+// Cache meta-тай хувилбар — UI-д StaleBadge харуулахад ашиглана
+export type CachedResult<T> = {
+  data: T;
+  fromCache: boolean;
+  offline: boolean;
+  expired: boolean;
+};
+
+async function cachedRequestWithMeta<T>(
+  endpoint: string,
+  category?: string
+): Promise<CachedResult<T>> {
+  return cachedFetch<T>(endpoint, () => request<T>(endpoint), category);
+}
+
 // Users
 export const userApi = {
   sendOtp: (phone: string) =>
@@ -93,6 +108,8 @@ export const livestockApi = {
 export const weatherApi = {
   getByAimag: (aimag: string) =>
     cachedRequest<any>(`/weather/${encodeURIComponent(aimag)}`, 'weather'),
+  getByAimagWithMeta: (aimag: string) =>
+    cachedRequestWithMeta<any>(`/weather/${encodeURIComponent(aimag)}`, 'weather'),
   getAll: () =>
     cachedRequest<any>('/weather', 'weather'),
 };
