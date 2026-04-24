@@ -23,7 +23,7 @@ const TYPES: { key: SpeciesKey; label: string; emoji: string }[] = [
 const SUBTYPES: { key: SubKey; label: string; emoji: string }[] = [
   { key: 'young', label: 'Төл', emoji: '🐣' },
   { key: 'milk', label: 'Саалийн', emoji: '🥛' },
-  { key: 'pregnant', label: 'Хээлтэй', emoji: '🤰' },
+  { key: 'pregnant', label: 'Хээлтэй', emoji: '🐄' },
   { key: 'weak', label: 'Сул дорой', emoji: '🩹' },
 ];
 

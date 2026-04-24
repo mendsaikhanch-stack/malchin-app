@@ -307,8 +307,8 @@ export default function ScannerScreen() {
               <Text style={styles.quickActionLabel}>Эрүүл мэнд</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.quickActionBtn} onPress={() => router.push('/(tabs)/breeding')}>
-              <Text style={styles.quickActionEmoji}>🤰</Text>
-              <Text style={styles.quickActionLabel}>Үржил</Text>
+              <Text style={styles.quickActionEmoji}>🐑</Text>
+              <Text style={styles.quickActionLabel}>Малын үржил</Text>
             </TouchableOpacity>
           </View>
         )}

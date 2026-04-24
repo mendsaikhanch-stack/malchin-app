@@ -71,7 +71,7 @@ const quickActionItems = [
   { emoji: '🐑', label: 'Мал бүртгэл', route: '/livestock' },
   { emoji: '🔍', label: 'Алдсан/Олдсон', route: '/lost-found' },
   { emoji: '🩺', label: 'Мал эмч', route: '/vet-booking' },
-  { emoji: '🤰', label: 'Хээлтүүлэг', route: '/breeding' },
+  { emoji: '🐑', label: 'Мал хээлтүүлэг', route: '/breeding' },
   { emoji: '🏥', label: 'Эрүүл мэнд', route: '/health' },
   { emoji: '🌿', label: 'Бэлчээр', route: '/pasture' },
   { emoji: '📰', label: 'Мэдээ', route: '/news' },

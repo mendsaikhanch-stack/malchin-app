@@ -24,7 +24,7 @@ const CATEGORY_EMOJI: Record<AdvisoryCategory, string> = {
   migration: '🚶',
   feed: '🌾',
   health: '🩺',
-  reproduction: '🤰',
+  reproduction: '🐑',
   processing: '🧈',
   emergency: '⚠️',
 };
