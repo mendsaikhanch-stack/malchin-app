@@ -94,6 +94,7 @@ export default function AdvisoryScreen() {
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
+        style={styles.filterScroll}
         contentContainerStyle={styles.filterRow}
       >
         <FilterPill
@@ -324,7 +325,13 @@ const styles = StyleSheet.create({
     color: AppColors.grayDark,
     fontWeight: '600',
   },
+  filterScroll: {
+    flexGrow: 0,
+    flexShrink: 0,
+  },
   filterRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
     paddingHorizontal: 16,
     paddingVertical: 10,
     gap: 8,

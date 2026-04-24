@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   View,
   Text,
@@ -11,18 +11,19 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { AppColors } from '@/constants/theme';
 import { weatherApi } from '@/services/api';
+import { getAimagList, getSumsByAimag } from '@/services/mongolia-geo';
 
-const aimags = [
-  'Төв', 'Увс', 'Ховд', 'Баян-Өлгий', 'Завхан', 'Архангай',
-  'Өвөрхангай', 'Дундговь', 'Өмнөговь', 'Дорнод', 'Хэнтий', 'Сүхбаатар', 'Булган',
-];
+const aimags = getAimagList();
 
 export default function WeatherScreen() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [selectedAimag, setSelectedAimag] = useState('Төв');
+  const [selectedSum, setSelectedSum] = useState<string | null>(null);
   const [weatherData, setWeatherData] = useState<any>(null);
   const [forecast, setForecast] = useState<any[]>([]);
+
+  const sums = useMemo(() => getSumsByAimag(selectedAimag), [selectedAimag]);
 
   const loadWeather = async (aimag: string) => {
     try {
@@ -39,6 +40,7 @@ export default function WeatherScreen() {
   };
 
   useEffect(() => { loadWeather(selectedAimag); }, [selectedAimag]);
+  useEffect(() => { setSelectedSum(null); }, [selectedAimag]);
 
   const onRefresh = () => { setRefreshing(true); loadWeather(selectedAimag); };
 
@@ -108,6 +110,36 @@ export default function WeatherScreen() {
             </TouchableOpacity>
           ))}
         </ScrollView>
+
+        {/* Сум сонгох (харилцааны түвшинд) */}
+        {sums.length > 0 && (
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={styles.sumScroll}
+            contentContainerStyle={styles.sumScrollContent}
+          >
+            {sums.map((sum) => (
+              <TouchableOpacity
+                key={sum}
+                style={[styles.sumChip, selectedSum === sum && styles.sumChipActive]}
+                onPress={() => setSelectedSum(selectedSum === sum ? null : sum)}
+              >
+                <Text style={[styles.sumChipText, selectedSum === sum && styles.sumChipTextActive]}>
+                  {sum}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        )}
+
+        {selectedSum && (
+          <View style={styles.sumBanner}>
+            <Text style={styles.sumBannerText}>
+              📍 {selectedAimag} / {selectedSum} · <Text style={styles.sumBannerNote}>Аймгийн ерөнхий мэдээ</Text>
+            </Text>
+          </View>
+        )}
 
         {weatherData ? (
           <>
@@ -201,8 +233,8 @@ const styles = StyleSheet.create({
   loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#F8F9FA' },
   header: { paddingHorizontal: 20, paddingTop: 16, paddingBottom: 8 },
   title: { fontSize: 24, fontWeight: '800', color: AppColors.black },
-  aimagScroll: { marginTop: 8 },
-  aimagScrollContent: { paddingHorizontal: 16, gap: 8 },
+  aimagScroll: { marginTop: 8, flexGrow: 0 },
+  aimagScrollContent: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, gap: 8 },
   aimagChip: {
     paddingHorizontal: 16, paddingVertical: 8, borderRadius: 20,
     backgroundColor: AppColors.white, borderWidth: 1.5, borderColor: AppColors.grayMedium,
@@ -210,6 +242,21 @@ const styles = StyleSheet.create({
   aimagChipActive: { backgroundColor: AppColors.primary, borderColor: AppColors.primary },
   aimagChipText: { fontSize: 13, fontWeight: '600', color: AppColors.grayDark },
   aimagChipTextActive: { color: AppColors.white },
+  sumScroll: { marginTop: 6, flexGrow: 0 },
+  sumScrollContent: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, gap: 6 },
+  sumChip: {
+    paddingHorizontal: 12, paddingVertical: 6, borderRadius: 16,
+    backgroundColor: AppColors.white, borderWidth: 1, borderColor: AppColors.grayMedium,
+  },
+  sumChipActive: { backgroundColor: AppColors.accent, borderColor: AppColors.accent },
+  sumChipText: { fontSize: 12, fontWeight: '600', color: AppColors.grayDark },
+  sumChipTextActive: { color: AppColors.white },
+  sumBanner: {
+    marginHorizontal: 16, marginTop: 8, padding: 10, borderRadius: 10,
+    backgroundColor: '#FFF8E1', borderWidth: 1, borderColor: '#FFE082',
+  },
+  sumBannerText: { fontSize: 12, color: '#6D4C00', fontWeight: '600' },
+  sumBannerNote: { fontWeight: '400', fontStyle: 'italic', color: '#8D6E00' },
   currentCard: {
     backgroundColor: AppColors.white, marginHorizontal: 16, marginTop: 16,
     borderRadius: 20, padding: 24, alignItems: 'center',
