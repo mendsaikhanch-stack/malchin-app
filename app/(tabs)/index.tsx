@@ -392,11 +392,22 @@ export default function HomeScreen() {
           </View>
         )}
 
-        {/* Өдрийн зөвлөгөө — rule engine: elder_wisdom card (ахмадын/өдрийн зөвлөгөө) */}
-        {tip && visibleCards.has('elder_wisdom') ? (
-          <TouchableOpacity style={[styles.card, styles.tipCard]} onPress={() => router.push('/(tabs)/ai-advisor')}>
-            <Text style={styles.cardTitle}>💡 Өдрийн зөвлөгөө</Text>
-            <Text style={styles.tipText}>{tip}</Text>
+        {/* Өдрийн зөвлөгөө + 15 бэлэн асуулт shortcut */}
+        {visibleCards.has('elder_wisdom') ? (
+          <TouchableOpacity style={[styles.card, styles.tipCard]} onPress={() => router.push('/advisory' as any)}>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Text style={styles.cardTitle}>💡 Өдрийн зөвлөгөө</Text>
+              <View style={styles.advisoryCountBadge}>
+                <Text style={styles.advisoryCountText}>15 асуулт</Text>
+              </View>
+            </View>
+            {tip ? (
+              <Text style={styles.tipText}>{tip}</Text>
+            ) : (
+              <Text style={styles.tipText}>
+                Хэзээ нүүх · Сульдсан малыг тордох · Зудын бэлтгэл... 👉
+              </Text>
+            )}
           </TouchableOpacity>
         ) : null}
 
@@ -699,6 +710,17 @@ const styles = StyleSheet.create({
   alertTitle: { fontSize: 14, fontWeight: '600', color: AppColors.black },
   alertRegion: { fontSize: 12, color: AppColors.grayDark, marginTop: 2 },
   tipCard: { backgroundColor: '#F0FFF4', borderWidth: 1, borderColor: '#C6F6D5' },
+  advisoryCountBadge: {
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    backgroundColor: AppColors.primary,
+    borderRadius: 10,
+  },
+  advisoryCountText: {
+    fontSize: 11,
+    color: AppColors.white,
+    fontWeight: '700',
+  },
   taskItem: {
     flexDirection: 'row', alignItems: 'flex-start', paddingVertical: 8, gap: 10,
   },
