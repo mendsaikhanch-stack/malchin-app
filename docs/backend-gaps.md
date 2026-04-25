@@ -297,9 +297,9 @@ Data-layer `fetch*()` функцүүд дээрх api method-ыг эхэнд д�
 
 ---
 
-## 9. Status snapshot (2026-04-24)
+## 9. Status snapshot (2026-04-25)
 
-- Тест: **443/443**, 36 test suite.
+- Тест: **575/575**, 44 test suite.
 - Backend-тэй 7 card бүгд SWR StaleBadge-тэй (weather, alerts, health,
   sum_announcement, market_prices, nearby_listings, daily_tip). Үлдсэн
   2 home card (daily_tasks, migration_advice) нь pure rule engine —
@@ -321,6 +321,7 @@ Data-layer `fetch*()` функцүүд дээрх api method-ыг эхэнд д�
   - Ахмадын контент submit (`app/elder-content.tsx` submitNew)
   - Bag broadcast (`app/bag-dashboard.tsx` sendBroadcast)
   - Sum broadcast (`app/sum-dashboard.tsx` sendBroadcast — scope-тай)
+  - Lost/found create + resolve (`app/lost-found.tsx` submitForm, markResolved)
   `useAutoSync()` hook root layout-д mount-тай, network false→true
   шилжилт дээр автоматаар flush. **MVP write path-уудын offline queue
-  бүрэн wired.**
+  бүрэн wired (8 callsite).**

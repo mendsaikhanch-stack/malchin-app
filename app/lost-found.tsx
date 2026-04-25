@@ -14,6 +14,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Stack, useRouter } from 'expo-router';
 import { AppColors } from '@/constants/theme';
 import { ReportButton } from '@/components/report-button';
+import { lostFoundApi } from '@/services/api';
+import { queueOnFailure } from '@/services/sync-queue';
 import {
   fetchLostFoundListings,
   validateListing,
@@ -76,7 +78,7 @@ export default function LostFoundScreen() {
     setModalVisible(true);
   };
 
-  const submitForm = () => {
+  const submitForm = async () => {
     const result = validateListing(form);
     if (!result.ok) {
       Alert.alert('Алдаа', result.errors.map((e) => e.message).join('\n'));
@@ -94,11 +96,19 @@ export default function LostFoundScreen() {
       phone: form.phone!,
       reward: form.reward,
     });
+    // Optimistic UI — сүлжээгүй үед queue-д орно, reconnect үед autoSync flush.
     setListings([next, ...listings]);
     setModalVisible(false);
+    const { id: _omit, status: _omit2, ...payload } = next;
+    const queued = await queueOnFailure(
+      () => lostFoundApi.create(payload),
+      { table_name: 'lost_found', action: 'INSERT', record_id: 0, data: payload }
+    );
     Alert.alert(
-      'Амжилттай',
-      'Зарлал илгээгдлээ. Багийн даргын баталгаажуулалтын дараа нийтлэгдэнэ.'
+      queued.synced ? 'Амжилттай' : 'Локал хадгалагдлаа',
+      queued.synced
+        ? 'Зарлал илгээгдлээ. Багийн даргын баталгаажуулалтын дараа нийтлэгдэнэ.'
+        : 'Сүлжээнд холбогдох үед автоматаар илгээгдэнэ.'
     );
   };
 
@@ -110,11 +120,15 @@ export default function LostFoundScreen() {
       { text: 'Үгүй', style: 'cancel' },
       {
         text: 'Тийм',
-        onPress: () => {
+        onPress: async () => {
           setListings((prev) =>
             prev.map((l) => (l.id === id ? { ...l, status: 'resolved' } : l))
           );
           setDetailModal(null);
+          await queueOnFailure(
+            () => lostFoundApi.resolve(id),
+            { table_name: 'lost_found', action: 'UPDATE', record_id: 0, data: { id, status: 'resolved' } }
+          );
         },
       },
     ]);
