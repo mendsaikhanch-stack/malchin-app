@@ -548,7 +548,7 @@ export default function AIAdvisorScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>{'🤖'} AI Зөвлөгч</Text>
+        <Text style={styles.title}>{'🤖'} Ухаалаг Зөвлөгч</Text>
         <Text style={styles.subtitle}>Мал аж ахуйн мэргэжлийн зөвлөгөө</Text>
       </View>
 

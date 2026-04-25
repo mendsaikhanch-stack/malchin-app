@@ -224,7 +224,7 @@ export default function DiagnoseScreen() {
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
           <Text style={styles.title}>{'\uD83E\uDE7A'} Мал өвчин оношлогч</Text>
-          <Text style={styles.subtitle}>AI-д суурилсан оношлогоо</Text>
+          <Text style={styles.subtitle}>Ухаалаг технологид суурилсан оношлогоо</Text>
         </View>
 
         {/* Mode toggle */}
@@ -307,7 +307,7 @@ export default function DiagnoseScreen() {
             {loading && (
               <View style={styles.loadingCard}>
                 <ActivityIndicator size="large" color={AppColors.primary} />
-                <Text style={styles.loadingText}>AI зургийг шинжилж байна...</Text>
+                <Text style={styles.loadingText}>Ухаалаг систем зургийг шинжилж байна...</Text>
               </View>
             )}
           </>
@@ -319,7 +319,7 @@ export default function DiagnoseScreen() {
             <View style={styles.resultHeader}>
               <Text style={styles.resultTitle}>{'\uD83E\uDE7A'} Оношлогоо</Text>
               <View style={styles.sourceBadge}>
-                <Text style={styles.sourceText}>{resultSource === 'ai' || resultSource === 'ai_vision' ? 'AI' : 'Мэдлэгийн сан'}</Text>
+                <Text style={styles.sourceText}>{resultSource === 'ai' || resultSource === 'ai_vision' ? 'Ухаалаг' : 'Мэдлэгийн сан'}</Text>
               </View>
             </View>
             <Text style={styles.resultText}>{result}</Text>

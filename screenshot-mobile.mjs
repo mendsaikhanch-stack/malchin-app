@@ -12,7 +12,7 @@ const screens = [
   { name: 'manage', path: '/manage', label: 'Удирдлага' },
   { name: 'finance', path: '/finance', label: 'Санхүү' },
   { name: 'weather', path: '/weather', label: 'Цаг агаар' },
-  { name: 'ai-advisor', path: '/ai-advisor', label: 'AI Зөвлөгч' },
+  { name: 'ai-advisor', path: '/ai-advisor', label: 'Ухаалаг Зөвлөгч' },
   { name: 'profile', path: '/profile', label: 'Профайл' },
 ];
 
