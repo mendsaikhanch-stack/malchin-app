@@ -407,7 +407,7 @@ export default function LostFoundScreen() {
                 </View>
 
                 <View style={{ marginTop: 14 }}>
-                  <ReportButton listingId={detailModal.id} />
+                  <ReportButton listingId={detailModal.id} kind="lost_found" />
                 </View>
               </ScrollView>
             </View>

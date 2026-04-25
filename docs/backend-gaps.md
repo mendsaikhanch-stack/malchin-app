@@ -309,9 +309,11 @@ Data-layer `fetch*()` функцүүд дээрх api method-ыг эхэнд д�
 
 ## 9. Status snapshot (2026-04-25)
 
-- Тест: **605/605**, 45 test suite.
+- Тест: **611/611**, 46 test suite.
 - Owner dashboard Expo Web route (`app/owner.tsx`) — web-only guard +
   8 section UI + single-glance ribbon + alarm box. Mobile-аас тэг entry.
+- Report flow queue wire — ReportButton kind='lost_found'|'market',
+  6 регресс тест.
 - Backend-тэй 7 card бүгд SWR StaleBadge-тэй (weather, alerts, health,
   sum_announcement, market_prices, nearby_listings, daily_tip). Үлдсэн
   2 home card (daily_tasks, migration_advice) нь pure rule engine —
@@ -334,6 +336,8 @@ Data-layer `fetch*()` функцүүд дээрх api method-ыг эхэнд д�
   - Bag broadcast (`app/bag-dashboard.tsx` sendBroadcast)
   - Sum broadcast (`app/sum-dashboard.tsx` sendBroadcast — scope-тай)
   - Lost/found create + resolve (`app/lost-found.tsx` submitForm, markResolved)
+  - Report submit — lost_found via lostFoundApi.report (`components/report-button.tsx`)
+  - Report submit — market via queueChange direct (endpoint TBD, queue-only)
   `useAutoSync()` hook root layout-д mount-тай, network false→true
   шилжилт дээр автоматаар flush. **MVP write path-уудын offline queue
-  бүрэн wired (8 callsite).**
+  бүрэн wired (10 callsite).**

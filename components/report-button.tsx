@@ -5,9 +5,10 @@ import {
   StyleSheet,
   TouchableOpacity,
   Modal,
-  Alert,
-} from 'react-native';
+  Alert } from 'react-native';
 import { AppColors } from '@/constants/theme';
+import { lostFoundApi } from '@/services/api';
+import { queueChange, queueOnFailure } from '@/services/sync-queue';
 
 type Reason = 'fake' | 'spam' | 'inappropriate' | 'wrong_info' | 'duplicate' | 'other';
 
@@ -20,19 +21,47 @@ const REASONS: { id: Reason; label: string; desc: string }[] = [
   { id: 'other', label: 'Бусад', desc: 'Бусад шалтгаан' },
 ];
 
+type ReportKind = 'lost_found' | 'market';
+
 type Props = {
   listingId: string | number;
+  kind?: ReportKind; // default 'lost_found'
   compact?: boolean;
   onReported?: (reason: Reason) => void;
 };
 
-export function ReportButton({ listingId, compact, onReported }: Props) {
+export function ReportButton({ listingId, kind = 'lost_found', compact, onReported }: Props) {
   const [visible, setVisible] = useState(false);
   const [selected, setSelected] = useState<Reason | null>(null);
+  const [submitting, setSubmitting] = useState(false);
 
-  const submit = () => {
-    if (!selected) return;
-    // Phase 2: POST /api/listings/:id/report { reason }
+  const submit = async () => {
+    if (!selected || submitting) return;
+    setSubmitting(true);
+
+    const data = { listing_id: listingId, reason: selected };
+
+    try {
+      if (kind === 'lost_found') {
+        // Backend бэлэн (lostFoundApi.report). Offline үед queue-д орно.
+        await queueOnFailure(
+          () => lostFoundApi.report(String(listingId), selected),
+          { table_name: 'lost_found_reports', action: 'INSERT', record_id: 0, data }
+        );
+      } else {
+        // marketApi.report endpoint хараахан байхгүй (docs/backend-gaps.md).
+        // Тиймээс шууд queue-д хадгална — backend бэлэн болоход autoSync flush.
+        await queueChange({
+          table_name: 'market_reports',
+          action: 'INSERT',
+          record_id: 0,
+          data,
+        });
+      }
+    } finally {
+      setSubmitting(false);
+    }
+
     Alert.alert(
       'Мэдэгдэл хүлээн авлаа',
       'Таны мэдэгдлийг багийн дарга шалгана. 3+ мэдэгдэлтэй зар автоматаар нуугдана.'
@@ -88,11 +117,11 @@ export function ReportButton({ listingId, compact, onReported }: Props) {
                 <Text style={styles.cancelText}>Цуцлах</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={[styles.actionBtn, styles.submitBtn, !selected && styles.submitDisabled]}
-                disabled={!selected}
+                style={[styles.actionBtn, styles.submitBtn, (!selected || submitting) && styles.submitDisabled]}
+                disabled={!selected || submitting}
                 onPress={submit}
               >
-                <Text style={styles.submitText}>Илгээх</Text>
+                <Text style={styles.submitText}>{submitting ? 'Илгээж байна...' : 'Илгээх'}</Text>
               </TouchableOpacity>
             </View>
           </View>

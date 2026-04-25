@@ -404,7 +404,7 @@ export default function MarketScreen() {
         {item.phone ? <Text style={styles.listingPhone}>📱 {item.phone}</Text> : null}
         {!showActions && (
           <View style={{ flexDirection: 'row', justifyContent: 'flex-end', marginTop: 8 }}>
-            <ReportButton listingId={item.id} compact />
+            <ReportButton listingId={item.id} kind="market" compact />
           </View>
         )}
         {showActions && (
