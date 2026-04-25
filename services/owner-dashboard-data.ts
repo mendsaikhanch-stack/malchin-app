@@ -162,6 +162,51 @@ export function totalUsersByGeo(geo: GeoSnapshot): number {
   return geo.byAimag.reduce((s, a) => s + a.users, 0);
 }
 
+// Section health helpers — pure (8 locked section-ийн "second glance" хариулт).
+// Eventual web UI alarm/health бэлэглэхэд ашиглана. Threshold-уудыг
+// `healthAlarms`-д lock хийсэн.
+
+export function churnRatePct(rev: RevenueSnapshot): number {
+  if (rev.activeSubscribers === 0) return 0;
+  return Math.round((rev.churnedThisMonth / rev.activeSubscribers) * 100);
+}
+
+export function dunningRatePct(
+  billing: BillingSnapshot,
+  rev: RevenueSnapshot
+): number {
+  if (rev.activeSubscribers === 0) return 0;
+  return Math.round((billing.dunningUsers / rev.activeSubscribers) * 100);
+}
+
+export function moderationResolutionRate(m: ModerationSnapshot): number {
+  const total = m.openReports + m.resolvedThisWeek;
+  // Нээлттэй ч, шийдсэн ч мэдэгдэлгүй үед "100%" — mathematical edge.
+  if (total === 0) return 100;
+  return Math.round((m.resolvedThisWeek / total) * 100);
+}
+
+export function coverageGapPct(geo: GeoSnapshot): number {
+  return Math.max(0, 100 - geo.coveragePct);
+}
+
+export function contentReviewBacklogHours(c: ContentOpsSnapshot): number {
+  return c.inReview * c.avgReviewHours;
+}
+
+// Aggregate alarm key-үүд — threshold-ууд locked.
+// 'churn' >= 10%, 'dunning' >= 5%, 'moderation' < 60% resolution,
+// 'coverage' >= 20% gap, 'review_backlog' >= 200 хүн-цаг.
+export function healthAlarms(snap: OwnerSnapshot): string[] {
+  const alarms: string[] = [];
+  if (churnRatePct(snap.revenue) >= 10) alarms.push('churn');
+  if (dunningRatePct(snap.billing, snap.revenue) >= 5) alarms.push('dunning');
+  if (moderationResolutionRate(snap.moderation) < 60) alarms.push('moderation');
+  if (coverageGapPct(snap.geography) >= 20) alarms.push('coverage');
+  if (contentReviewBacklogHours(snap.contentOps) >= 200) alarms.push('review_backlog');
+  return alarms;
+}
+
 // Single-glance digest — 6 locked асуулт (§4) дахь key answer
 export type SingleGlanceDigest = {
   who: number; // нийт хэрэглэгч
