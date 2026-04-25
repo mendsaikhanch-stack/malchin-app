@@ -13,7 +13,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import * as Location from 'expo-location';
 import { AppColors } from '@/constants/theme';
-import { StepHeader, PrimaryButton, SecondaryButton } from './_components';
+import { StepHeader, PrimaryButton, SecondaryButton } from '@/components/onboarding-ui';
 import { useOnboarding } from './_layout';
 
 type CampKey = 'winter' | 'spring' | 'summer' | 'autumn' | 'otor';

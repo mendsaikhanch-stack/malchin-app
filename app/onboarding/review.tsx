@@ -9,7 +9,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { AppColors } from '@/constants/theme';
-import { PrimaryButton } from './_components';
+import { PrimaryButton } from '@/components/onboarding-ui';
 import { useOnboarding, Role, SpeciesKey, Preferences } from './_layout';
 
 const ROLE_LABELS: Record<Role, string> = {

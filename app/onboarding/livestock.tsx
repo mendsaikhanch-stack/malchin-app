@@ -9,7 +9,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { AppColors } from '@/constants/theme';
-import { StepHeader, PrimaryButton, SecondaryButton } from './_components';
+import { StepHeader, PrimaryButton, SecondaryButton } from '@/components/onboarding-ui';
 import { useOnboarding, SpeciesKey, SubKey } from './_layout';
 
 const TYPES: { key: SpeciesKey; label: string; emoji: string }[] = [

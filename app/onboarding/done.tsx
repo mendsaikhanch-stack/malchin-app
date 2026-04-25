@@ -9,7 +9,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AppColors } from '@/constants/theme';
-import { PrimaryButton } from './_components';
+import { PrimaryButton } from '@/components/onboarding-ui';
 import { useOnboarding } from './_layout';
 import { userApi, livestockApi, setAuthTokens } from '@/services/api';
 import { queueOnFailure } from '@/services/sync-queue';

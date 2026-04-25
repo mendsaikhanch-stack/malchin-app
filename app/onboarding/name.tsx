@@ -12,7 +12,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { AppColors } from '@/constants/theme';
-import { StepHeader, PrimaryButton } from './_components';
+import { StepHeader, PrimaryButton } from '@/components/onboarding-ui';
 import { useOnboarding } from './_layout';
 
 export default function NameScreen() {
