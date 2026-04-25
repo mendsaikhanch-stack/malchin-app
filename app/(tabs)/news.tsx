@@ -7,8 +7,7 @@ import {
   TouchableOpacity,
   RefreshControl,
   ActivityIndicator,
-  Linking,
-} from 'react-native';
+  Linking } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { AppColors } from '@/constants/theme';
 import { newsApi } from '@/services/api';
@@ -20,16 +19,14 @@ const newsCatLabels: Record<string, { label: string; emoji: string; color: strin
   government: { label: 'Засгийн газар', emoji: '\uD83C\uDFDB\uFE0F', color: '#1565C0' },
   intl_market: { label: 'Гадаад зах зээл', emoji: '\uD83C\uDF0D', color: '#6A1B9A' },
   local: { label: 'Орон нутаг', emoji: '\uD83C\uDFD8\uFE0F', color: '#2E7D32' },
-  opportunity: { label: 'Боломж', emoji: '\uD83D\uDCA1', color: '#E65100' },
-};
+  opportunity: { label: 'Боломж', emoji: '\uD83D\uDCA1', color: '#E65100' } };
 
 const programCatLabels: Record<string, { label: string; emoji: string }> = {
   loan: { label: 'Зээл', emoji: '\uD83C\uDFE6' },
   grant: { label: 'Грант / Тусламж', emoji: '\uD83C\uDF81' },
   training: { label: 'Сургалт', emoji: '\uD83C\uDF93' },
   insurance: { label: 'Даатгал', emoji: '\uD83D\uDEE1\uFE0F' },
-  subsidy: { label: 'Урамшуулал', emoji: '\uD83D\uDCB0' },
-};
+  subsidy: { label: 'Урамшуулал', emoji: '\uD83D\uDCB0' } };
 
 function fmt(n: number) { return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
 function pct(cur: number, prev: number) {
@@ -257,7 +254,7 @@ const styles = StyleSheet.create({
   // Tabs
   tabBar: { flexDirection: 'row', marginHorizontal: 16, marginTop: 8, backgroundColor: '#EEEEEE', borderRadius: 12, padding: 3 },
   tab: { flex: 1, paddingVertical: 10, alignItems: 'center', borderRadius: 10 },
-  tabActive: { backgroundColor: AppColors.white, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.1, shadowRadius: 4, elevation: 2 },
+  tabActive: { backgroundColor: AppColors.white, boxShadow: '0px 1px 4px rgba(0,0,0,0.1)',     elevation: 2 },
   tabText: { fontSize: 12, fontWeight: '600', color: AppColors.grayDark },
   tabTextActive: { color: AppColors.primary, fontWeight: '700' },
   // Filter
@@ -268,7 +265,7 @@ const styles = StyleSheet.create({
   chipText: { fontSize: 12, fontWeight: '600', color: AppColors.grayDark },
   chipTextActive: { color: AppColors.white },
   // News
-  newsCard: { backgroundColor: AppColors.white, marginHorizontal: 16, marginTop: 10, borderRadius: 16, padding: 14, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.06, shadowRadius: 8, elevation: 3 },
+  newsCard: { backgroundColor: AppColors.white, marginHorizontal: 16, marginTop: 10, borderRadius: 16, padding: 14, boxShadow: '0px 2px 8px rgba(0,0,0,0.06)',     elevation: 3 },
   urgentBadge: { backgroundColor: '#FFF3E0', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 8, alignSelf: 'flex-start', marginBottom: 8 },
   urgentText: { fontSize: 11, fontWeight: '700', color: '#E65100' },
   newsHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 },
@@ -281,7 +278,7 @@ const styles = StyleSheet.create({
   sourceText: { fontSize: 11, color: AppColors.gray, fontWeight: '600' },
   regionBadgeText: { fontSize: 11, color: AppColors.accent },
   // Programs
-  programCard: { backgroundColor: AppColors.white, marginHorizontal: 16, marginTop: 10, borderRadius: 16, padding: 14, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.06, shadowRadius: 8, elevation: 3 },
+  programCard: { backgroundColor: AppColors.white, marginHorizontal: 16, marginTop: 10, borderRadius: 16, padding: 14, boxShadow: '0px 2px 8px rgba(0,0,0,0.06)',     elevation: 3 },
   programHeader: { flexDirection: 'row', alignItems: 'flex-start' },
   programEmoji: { fontSize: 28, marginRight: 10 },
   programCat: { fontSize: 11, color: AppColors.gray, fontWeight: '600' },
@@ -296,7 +293,7 @@ const styles = StyleSheet.create({
   contactBtn: { marginTop: 10, backgroundColor: AppColors.primary, paddingVertical: 10, borderRadius: 10, alignItems: 'center' },
   contactBtnText: { color: AppColors.white, fontSize: 13, fontWeight: '700' },
   // Intl prices
-  intlCard: { backgroundColor: AppColors.white, marginHorizontal: 16, marginTop: 12, borderRadius: 16, padding: 14, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.06, shadowRadius: 8, elevation: 3 },
+  intlCard: { backgroundColor: AppColors.white, marginHorizontal: 16, marginTop: 12, borderRadius: 16, padding: 14, boxShadow: '0px 2px 8px rgba(0,0,0,0.06)',     elevation: 3 },
   intlTitle: { fontSize: 15, fontWeight: '800', color: AppColors.black, marginBottom: 10 },
   tableHeader: { flexDirection: 'row', borderBottomWidth: 1.5, borderBottomColor: AppColors.grayMedium, paddingBottom: 6, marginBottom: 4 },
   th: { fontSize: 10, fontWeight: '700', color: AppColors.gray, textTransform: 'uppercase' },
@@ -307,5 +304,4 @@ const styles = StyleSheet.create({
   td: { fontSize: 12, color: AppColors.black },
   noteCard: { marginHorizontal: 16, marginTop: 10, padding: 12, backgroundColor: '#FFF8E1', borderRadius: 10 },
   noteText: { fontSize: 12, color: '#F57F17', lineHeight: 18 },
-  emptyText: { fontSize: 14, color: AppColors.gray, fontStyle: 'italic', textAlign: 'center', paddingVertical: 40 },
-});
+  emptyText: { fontSize: 14, color: AppColors.gray, fontStyle: 'italic', textAlign: 'center', paddingVertical: 40 } });

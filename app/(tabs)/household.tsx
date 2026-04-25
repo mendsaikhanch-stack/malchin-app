@@ -8,8 +8,7 @@ import {
   TextInput,
   Alert,
   ActivityIndicator,
-  RefreshControl,
-} from 'react-native';
+  RefreshControl } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as Clipboard from 'expo-clipboard';
 import { AppColors } from '@/constants/theme';
@@ -21,8 +20,7 @@ const ROLE_LABELS: Record<string, string> = {
   herder: 'Адуучин/Малчин',
   vet: 'Мал эмч',
   member: 'Гишүүн',
-  viewer: 'Зочин',
-};
+  viewer: 'Зочин' };
 
 const ROLE_COLORS: Record<string, string> = {
   owner: '#43A047',   // ногоон
@@ -39,8 +37,7 @@ const ROLE_TEXT_COLORS: Record<string, string> = {
   herder: '#1A1A1A',
   vet: '#FFFFFF',
   member: '#FFFFFF',
-  viewer: '#1A1A1A',
-};
+  viewer: '#1A1A1A' };
 
 const ALL_ROLES = ['owner', 'admin', 'herder', 'vet', 'member', 'viewer'];
 
@@ -122,8 +119,7 @@ export default function HouseholdScreen() {
         name: createName.trim(),
         aimag: createAimag.trim() || undefined,
         sum: createSum.trim() || undefined,
-        bag: createBag.trim() || undefined,
-      });
+        bag: createBag.trim() || undefined });
       setCreateName('');
       setCreateAimag('');
       setCreateSum('');
@@ -176,8 +172,7 @@ export default function HouseholdScreen() {
             } catch {
               Alert.alert('Алдаа', 'Код шинэчлэхэд алдаа гарлаа');
             }
-          },
-        },
+          } },
       ]
     );
   };
@@ -210,8 +205,7 @@ export default function HouseholdScreen() {
             } catch {
               Alert.alert('Алдаа', 'Гишүүн хасахад алдаа гарлаа');
             }
-          },
-        },
+          } },
       ]
     );
   };
@@ -235,8 +229,7 @@ export default function HouseholdScreen() {
             } catch {
               Alert.alert('Алдаа', 'Өрхөөс гарахад алдаа гарлаа');
             }
-          },
-        },
+          } },
       ]
     );
   };
@@ -466,8 +459,7 @@ export default function HouseholdScreen() {
                                   backgroundColor:
                                     memberRole === role
                                       ? ROLE_COLORS[role]
-                                      : '#F0F0F0',
-                                },
+                                      : '#F0F0F0' },
                               ]}
                               onPress={() => handleChangeRole(memberId, role)}
                             >
@@ -478,8 +470,7 @@ export default function HouseholdScreen() {
                                     color:
                                       memberRole === role
                                         ? ROLE_TEXT_COLORS[role]
-                                        : '#616161',
-                                  },
+                                        : '#616161' },
                                 ]}
                               >
                                 {ROLE_LABELS[role]}
@@ -564,43 +555,36 @@ const BG = '#f5f7f0';
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: BG,
-  },
+    backgroundColor: BG },
   scrollContent: {
     paddingHorizontal: 16,
-    paddingTop: 16,
-  },
+    paddingTop: 16 },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
-    alignItems: 'center',
-  },
+    alignItems: 'center' },
   loadingText: {
     marginTop: 12,
     fontSize: 15,
-    color: AppColors.grayDark,
-  },
+    color: AppColors.grayDark },
 
   // Header (no household)
   headerEmoji: {
     fontSize: 56,
     textAlign: 'center',
-    marginTop: 24,
-  },
+    marginTop: 24 },
   headerTitle: {
     fontSize: 28,
     fontWeight: '900',
     color: PRIMARY,
     textAlign: 'center',
-    marginTop: 12,
-  },
+    marginTop: 12 },
   headerSubtitle: {
     fontSize: 15,
     color: AppColors.grayDark,
     textAlign: 'center',
     marginTop: 8,
-    marginBottom: 24,
-  },
+    marginBottom: 24 },
 
   // Cards
   card: {
@@ -608,23 +592,17 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 20,
     marginBottom: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 2,
-  },
+    boxShadow: '0px 2px 8px rgba(0,0,0,0.06)',
+    elevation: 2 },
   cardTitle: {
     fontSize: 18,
     fontWeight: '800',
     color: PRIMARY,
-    marginBottom: 4,
-  },
+    marginBottom: 4 },
   cardDesc: {
     fontSize: 13,
     color: AppColors.grayDark,
-    marginBottom: 16,
-  },
+    marginBottom: 16 },
 
   // Form
   label: {
@@ -632,8 +610,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: AppColors.grayDark,
     marginBottom: 6,
-    marginTop: 12,
-  },
+    marginTop: 12 },
   input: {
     borderWidth: 1.5,
     borderColor: AppColors.grayMedium,
@@ -641,89 +618,72 @@ const styles = StyleSheet.create({
     padding: 14,
     fontSize: 16,
     color: AppColors.black,
-    backgroundColor: AppColors.white,
-  },
+    backgroundColor: AppColors.white },
   codeInput: {
     fontSize: 24,
     fontWeight: '700',
     letterSpacing: 8,
-    textAlign: 'center',
-  },
+    textAlign: 'center' },
   primaryBtn: {
     backgroundColor: PRIMARY,
     borderRadius: 12,
     padding: 16,
     alignItems: 'center',
-    marginTop: 20,
-  },
+    marginTop: 20 },
   primaryBtnText: {
     color: AppColors.white,
     fontSize: 16,
-    fontWeight: '700',
-  },
+    fontWeight: '700' },
 
   // Household header
   householdHeader: {
     alignItems: 'center',
-    paddingVertical: 24,
-  },
+    paddingVertical: 24 },
   householdEmoji: {
-    fontSize: 48,
-  },
+    fontSize: 48 },
   householdName: {
     fontSize: 24,
     fontWeight: '900',
     color: PRIMARY,
     marginTop: 8,
-    textAlign: 'center',
-  },
+    textAlign: 'center' },
   householdLocation: {
     fontSize: 14,
     color: AppColors.grayDark,
-    marginTop: 6,
-  },
+    marginTop: 6 },
 
   // Stats
   statsRow: {
     flexDirection: 'row',
     marginBottom: 20,
-    gap: 10,
-  },
+    gap: 10 },
   statBox: {
     flex: 1,
     backgroundColor: AppColors.white,
     borderRadius: 14,
     paddingVertical: 16,
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.04,
-    shadowRadius: 4,
-    elevation: 1,
-  },
+    boxShadow: '0px 1px 4px rgba(0,0,0,0.04)',
+    elevation: 1 },
   statNumber: {
     fontSize: 24,
     fontWeight: '900',
-    color: PRIMARY,
-  },
+    color: PRIMARY },
   statLabel: {
     fontSize: 11,
     fontWeight: '600',
     color: AppColors.grayDark,
     marginTop: 4,
-    textAlign: 'center',
-  },
+    textAlign: 'center' },
 
   // Section
   section: {
-    marginBottom: 20,
-  },
+    marginBottom: 20 },
   sectionTitle: {
     fontSize: 18,
     fontWeight: '800',
     color: PRIMARY,
-    marginBottom: 12,
-  },
+    marginBottom: 12 },
 
   // Members
   memberCard: {
@@ -731,16 +691,11 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     padding: 14,
     marginBottom: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.04,
-    shadowRadius: 4,
-    elevation: 1,
-  },
+    boxShadow: '0px 1px 4px rgba(0,0,0,0.04)',
+    elevation: 1 },
   memberInfo: {
     flexDirection: 'row',
-    alignItems: 'center',
-  },
+    alignItems: 'center' },
   memberAvatar: {
     width: 42,
     height: 42,
@@ -748,99 +703,79 @@ const styles = StyleSheet.create({
     backgroundColor: PRIMARY_LIGHT,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 12,
-  },
+    marginRight: 12 },
   memberAvatarText: {
     fontSize: 18,
     fontWeight: '800',
-    color: AppColors.white,
-  },
+    color: AppColors.white },
   memberDetails: {
-    flex: 1,
-  },
+    flex: 1 },
   memberName: {
     fontSize: 15,
     fontWeight: '700',
-    color: AppColors.black,
-  },
+    color: AppColors.black },
   memberPhone: {
     fontSize: 13,
     color: AppColors.grayDark,
-    marginTop: 2,
-  },
+    marginTop: 2 },
   roleBadge: {
     paddingHorizontal: 10,
     paddingVertical: 5,
-    borderRadius: 10,
-  },
+    borderRadius: 10 },
   roleBadgeText: {
     fontSize: 11,
-    fontWeight: '700',
-  },
+    fontWeight: '700' },
 
   // Member controls
   memberControls: {
     marginTop: 10,
     paddingTop: 10,
     borderTopWidth: 1,
-    borderTopColor: '#F0F0F0',
-  },
+    borderTopColor: '#F0F0F0' },
   memberActions: {
     flexDirection: 'row',
-    gap: 8,
-  },
+    gap: 8 },
   actionBtn: {
     paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: 8,
-    backgroundColor: '#EEF5E6',
-  },
+    backgroundColor: '#EEF5E6' },
   actionBtnText: {
     fontSize: 13,
     fontWeight: '600',
-    color: PRIMARY,
-  },
+    color: PRIMARY },
   removeBtn: {
-    backgroundColor: '#FDEDED',
-  },
+    backgroundColor: '#FDEDED' },
   removeBtnText: {
     fontSize: 13,
     fontWeight: '600',
-    color: AppColors.danger,
-  },
+    color: AppColors.danger },
 
   // Role picker
   rolePickerContainer: {
-    marginTop: 4,
-  },
+    marginTop: 4 },
   rolePickerLabel: {
     fontSize: 12,
     fontWeight: '600',
     color: AppColors.grayDark,
-    marginBottom: 8,
-  },
+    marginBottom: 8 },
   rolePickerScroll: {
-    marginBottom: 8,
-  },
+    marginBottom: 8 },
   roleChip: {
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 16,
-    marginRight: 6,
-  },
+    marginRight: 6 },
   roleChipText: {
     fontSize: 12,
-    fontWeight: '600',
-  },
+    fontWeight: '600' },
   cancelPickerBtn: {
     alignSelf: 'flex-start',
-    paddingVertical: 4,
-  },
+    paddingVertical: 4 },
   cancelPickerText: {
     fontSize: 12,
     fontWeight: '600',
-    color: AppColors.gray,
-  },
+    color: AppColors.gray },
 
   // Invite code
   inviteCodeCard: {
@@ -848,50 +783,39 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     padding: 20,
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.04,
-    shadowRadius: 4,
-    elevation: 1,
-  },
+    boxShadow: '0px 1px 4px rgba(0,0,0,0.04)',
+    elevation: 1 },
   inviteCodeDesc: {
     fontSize: 13,
     color: AppColors.grayDark,
     textAlign: 'center',
-    marginBottom: 12,
-  },
+    marginBottom: 12 },
   inviteCode: {
     fontSize: 32,
     fontWeight: '900',
     letterSpacing: 6,
     color: PRIMARY,
-    marginBottom: 16,
-  },
+    marginBottom: 16 },
   inviteActions: {
     flexDirection: 'row',
-    gap: 10,
-  },
+    gap: 10 },
   inviteBtn: {
     backgroundColor: PRIMARY,
     paddingHorizontal: 24,
     paddingVertical: 12,
-    borderRadius: 10,
-  },
+    borderRadius: 10 },
   inviteBtnText: {
     color: AppColors.white,
     fontSize: 14,
-    fontWeight: '700',
-  },
+    fontWeight: '700' },
   inviteBtnSecondary: {
     backgroundColor: 'transparent',
     borderWidth: 1.5,
-    borderColor: PRIMARY,
-  },
+    borderColor: PRIMARY },
   inviteBtnSecondaryText: {
     color: PRIMARY,
     fontSize: 14,
-    fontWeight: '700',
-  },
+    fontWeight: '700' },
 
   // Leave button
   leaveBtn: {
@@ -900,11 +824,8 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     borderWidth: 1.5,
     borderColor: AppColors.danger,
-    alignItems: 'center',
-  },
+    alignItems: 'center' },
   leaveBtnText: {
     fontSize: 15,
     fontWeight: '600',
-    color: AppColors.danger,
-  },
-});
+    color: AppColors.danger } });

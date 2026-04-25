@@ -6,8 +6,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   Alert,
-  Switch,
-} from 'react-native';
+  Switch } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useFocusEffect } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -18,8 +17,7 @@ import {
   toUserFallback,
   toLivestockStats,
   type OnboardingSnapshot,
-  type UserFallback,
-} from '@/services/onboarding-fallback';
+  type UserFallback } from '@/services/onboarding-fallback';
 import { clearAuthTokens } from '@/services/api';
 import { useNetwork } from '@/hooks/use-network';
 import { useElderFlag } from '@/hooks/use-elder-flag';
@@ -34,8 +32,7 @@ const roleLabels: Record<string, string> = {
   bag_darga: 'Багийн дарга',
   sum_admin: 'Сумын удирдлага',
   khorshoo: 'Хоршоо',
-  service_provider: 'Үйлчилгээ үзүүлэгч',
-};
+  service_provider: 'Үйлчилгээ үзүүлэгч' };
 
 // Role-оос хамаарсан хяналтын самбарын маршрут
 const roleDashboard: Record<string, { route: string; emoji: string; title: string; desc: string }> = {
@@ -43,33 +40,27 @@ const roleDashboard: Record<string, { route: string; emoji: string; title: strin
     route: '/(tabs)/manage',
     emoji: '⚙️',
     title: 'Миний удирдлага',
-    desc: 'Сануулга, бүртгэл, санхүү',
-  },
+    desc: 'Сануулга, бүртгэл, санхүү' },
   bag_darga: {
     route: '/bag-dashboard',
     emoji: '👥',
     title: 'Багийн даргын самбар',
-    desc: 'Өрхийн жагсаалт, мэдэгдэл, эрсдэл',
-  },
+    desc: 'Өрхийн жагсаалт, мэдэгдэл, эрсдэл' },
   sum_admin: {
     route: '/sum-dashboard',
     emoji: '🏛️',
     title: 'Сумын удирдлагын самбар',
-    desc: 'Багуудын тайлан, тооллого, broadcast',
-  },
+    desc: 'Багуудын тайлан, тооллого, broadcast' },
   khorshoo: {
     route: '/coop-dashboard',
     emoji: '🤝',
     title: 'Хоршооны самбар',
-    desc: 'Гишүүд, бараа, худалдаа',
-  },
+    desc: 'Гишүүд, бараа, худалдаа' },
   service_provider: {
     route: '/service-dashboard',
     emoji: '🛠️',
     title: 'Үйлчилгээний самбар',
-    desc: 'Захиалга, хуваарь, орлого',
-  },
-};
+    desc: 'Захиалга, хуваарь, орлого' } };
 
 const animalMeta: Array<{ key: keyof NonNullable<OnboardingSnapshot['livestock']>; emoji: string; label: string }> = [
   { key: 'horse', emoji: '🐎', label: 'Адуу' },
@@ -314,8 +305,7 @@ export default function ProfileScreen() {
                   onPress: async () => {
                     await clearCache();
                     Alert.alert('Амжилттай', 'Cache цэвэрлэгдлээ');
-                  },
-                },
+                  } },
               ]);
             }}
           >
@@ -345,28 +335,24 @@ const styles = StyleSheet.create({
   emptyText: { fontSize: 14, color: AppColors.grayDark, marginTop: 8, textAlign: 'center', lineHeight: 20 },
   emptyBtn: {
     marginTop: 24, backgroundColor: AppColors.primary, paddingVertical: 14,
-    paddingHorizontal: 32, borderRadius: 12,
-  },
+    paddingHorizontal: 32, borderRadius: 12 },
   emptyBtnText: { color: AppColors.white, fontSize: 15, fontWeight: '700' },
   // Header
   profileHeader: { alignItems: 'center', paddingVertical: 24, paddingHorizontal: 16 },
   avatar: {
     width: 80, height: 80, borderRadius: 40, backgroundColor: AppColors.primary,
-    justifyContent: 'center', alignItems: 'center',
-  },
+    justifyContent: 'center', alignItems: 'center' },
   avatarText: { fontSize: 32, fontWeight: '800', color: AppColors.white },
   userName: { fontSize: 22, fontWeight: '800', color: AppColors.black, marginTop: 12 },
   userPhone: { fontSize: 15, color: AppColors.grayDark, marginTop: 4 },
   userLocation: { fontSize: 13, color: AppColors.gray, marginTop: 4, textAlign: 'center' },
   roleBadge: {
     marginTop: 10, backgroundColor: AppColors.primary + '18',
-    paddingHorizontal: 12, paddingVertical: 5, borderRadius: 10,
-  },
+    paddingHorizontal: 12, paddingVertical: 5, borderRadius: 10 },
   roleBadgeText: { fontSize: 12, fontWeight: '700', color: AppColors.primary },
   pkgBadge: {
     marginTop: 8, backgroundColor: AppColors.grayMedium + '40',
-    paddingHorizontal: 12, paddingVertical: 4, borderRadius: 10,
-  },
+    paddingHorizontal: 12, paddingVertical: 4, borderRadius: 10 },
   pkgBadgePremium: { backgroundColor: '#FFF3E0' },
   pkgBadgeText: { fontSize: 11, fontWeight: '600', color: AppColors.grayDark },
   pkgBadgeTextPremium: { color: '#E65100', fontWeight: '700' },
@@ -376,8 +362,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 16, marginTop: 12, marginBottom: 4,
     padding: 16, borderRadius: 14,
     backgroundColor: AppColors.primary,
-    shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.12, shadowRadius: 6, elevation: 3,
-  },
+    boxShadow: '0px 2px 6px rgba(0,0,0,0.12)',     elevation: 3 },
   dashboardEmoji: { fontSize: 32, marginRight: 14 },
   dashboardTitle: { fontSize: 15, fontWeight: '800', color: AppColors.white },
   dashboardDesc: { fontSize: 12, color: AppColors.white, opacity: 0.85, marginTop: 3 },
@@ -386,8 +371,7 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: AppColors.white, marginHorizontal: 16, marginTop: 12,
     borderRadius: 14, padding: 14,
-    shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.04, shadowRadius: 4, elevation: 2,
-  },
+    boxShadow: '0px 1px 4px rgba(0,0,0,0.04)',     elevation: 2 },
   cardHeaderRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 },
   cardTitle: { fontSize: 14, fontWeight: '700', color: AppColors.black },
   cardTotalText: { fontSize: 12, color: AppColors.gray, fontWeight: '600' },
@@ -395,16 +379,14 @@ const styles = StyleSheet.create({
   animalRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   animalChip: {
     alignItems: 'center', backgroundColor: '#F5F5F5', borderRadius: 10,
-    paddingVertical: 8, paddingHorizontal: 12, minWidth: 60,
-  },
+    paddingVertical: 8, paddingHorizontal: 12, minWidth: 60 },
   animalEmoji: { fontSize: 22 },
   animalCount: { fontSize: 15, fontWeight: '800', color: AppColors.black, marginTop: 2 },
   animalLabel: { fontSize: 10, color: AppColors.gray, marginTop: 1 },
   // Seasonal rows
   seasonRow: {
     flexDirection: 'row', alignItems: 'center', paddingVertical: 8,
-    borderTopWidth: 1, borderTopColor: '#F5F5F5',
-  },
+    borderTopWidth: 1, borderTopColor: '#F5F5F5' },
   seasonEmoji: { fontSize: 18, width: 28 },
   seasonLabel: { fontSize: 13, fontWeight: '600', color: AppColors.black, width: 80 },
   seasonValue: { flex: 1, fontSize: 12, color: AppColors.grayDark, textAlign: 'right' },
@@ -412,12 +394,10 @@ const styles = StyleSheet.create({
   // Menu
   menuSection: {
     marginHorizontal: 16, marginTop: 12, backgroundColor: AppColors.white,
-    borderRadius: 14, overflow: 'hidden',
-  },
+    borderRadius: 14, overflow: 'hidden' },
   menuItem: {
     flexDirection: 'row', alignItems: 'center', padding: 16,
-    borderBottomWidth: 1, borderBottomColor: '#F0F0F0',
-  },
+    borderBottomWidth: 1, borderBottomColor: '#F0F0F0' },
   menuIcon: { fontSize: 20, marginRight: 14 },
   menuText: { flex: 1, fontSize: 14, fontWeight: '500', color: AppColors.black },
   menuArrow: { fontSize: 20, color: AppColors.gray },
@@ -425,8 +405,6 @@ const styles = StyleSheet.create({
   // Logout
   logoutBtn: {
     marginHorizontal: 16, marginTop: 20, padding: 14, borderRadius: 12,
-    borderWidth: 1.5, borderColor: AppColors.danger, alignItems: 'center',
-  },
+    borderWidth: 1.5, borderColor: AppColors.danger, alignItems: 'center' },
   logoutText: { fontSize: 14, fontWeight: '700', color: AppColors.danger },
-  version: { textAlign: 'center', fontSize: 11, color: AppColors.gray, marginTop: 20 },
-});
+  version: { textAlign: 'center', fontSize: 11, color: AppColors.gray, marginTop: 20 } });

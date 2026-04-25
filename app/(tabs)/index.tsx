@@ -6,8 +6,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   RefreshControl,
-  ActivityIndicator,
-} from 'react-native';
+  ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -21,17 +20,14 @@ import {
   marketApi,
   pricesApi,
   healthApi,
-  newsApi,
-} from '@/services/api';
+  newsApi } from '@/services/api';
 import {
   parseOnboardingSnapshot,
-  toLivestockStats,
-} from '@/services/onboarding-fallback';
+  toLivestockStats } from '@/services/onboarding-fallback';
 import {
   normalizeBackendWeather,
   normalizeOpenWeather,
-  type NormalizedWeather,
-} from '@/services/weather-provider';
+  type NormalizedWeather } from '@/services/weather-provider';
 import { StaleBadge } from '@/components/stale-badge';
 import type { CacheMeta } from '@/services/cache-state';
 import { AdBanner, AdBannerLarge } from '@/components/ad-banner';
@@ -43,8 +39,7 @@ import { getMigrationAdvice, type MigrationAdvice } from '@/services/migration-a
 
 const animalNames: Record<string, string> = {
   sheep: 'Хонь', goat: 'Ямаа', cattle: 'Үхэр', cow: 'Үхэр',
-  horse: 'Адуу', camel: 'Тэмээ',
-};
+  horse: 'Адуу', camel: 'Тэмээ' };
 
 const ONBOARDING_DATA_KEY = '@malchin_onboarding_data';
 
@@ -64,8 +59,7 @@ async function loadLivestockFromOnboarding() {
 
 const animalEmojis: Record<string, string> = {
   sheep: '🐑', goat: '🐐', cattle: '🐂',
-  horse: '🐎', camel: '🐪',
-};
+  horse: '🐎', camel: '🐪' };
 
 const quickActionItems = [
   { emoji: '🐑', label: 'Мал бүртгэл', route: '/livestock' },
@@ -113,8 +107,7 @@ export default function HomeScreen() {
   const { visibleCards, context: homeCtx } = useHomeFeed({
     role,
     hasLivestock: totalAnimals > 0,
-    hasHighAlert: alerts.some((a: any) => a.severity === 'high'),
-  });
+    hasHighAlert: alerts.some((a: any) => a.severity === 'high') });
 
   const loadData = async () => {
     try {
@@ -144,8 +137,7 @@ export default function HomeScreen() {
       if (stats) {
         const items = stats.livestock.map((item: any) => ({
           ...item,
-          emoji: animalEmojis[item.animal_type] || '🐾',
-        }));
+          emoji: animalEmojis[item.animal_type] || '🐾' }));
         setLivestock(items);
         setTotalAnimals(stats.total_animals || 0);
       }
@@ -159,8 +151,7 @@ export default function HomeScreen() {
         setWeatherMeta({
           fromCache: wr.fromCache,
           offline: wr.offline,
-          expired: wr.expired,
-        });
+          expired: wr.expired });
       }
       if (alertsRes.status === 'fulfilled') {
         const ar = alertsRes.value;
@@ -219,16 +210,14 @@ export default function HomeScreen() {
       hasLivestock: totalAnimals > 0,
       weatherTemp: weather?.temp ?? undefined,
       dzudRisk: weather?.dzudRisk === 'unknown' ? undefined : weather?.dzudRisk,
-      hasHighAlert: alerts.some((a: any) => a.severity === 'high'),
-    });
+      hasHighAlert: alerts.some((a: any) => a.severity === 'high') });
     setDailyTasks(tasks);
 
     setMigrationAdvice(
       getMigrationAdvice({
         month: new Date().getMonth() + 1,
         weatherTemp: weather?.temp ?? undefined,
-        dzudRisk: weather?.dzudRisk === 'unknown' ? undefined : weather?.dzudRisk,
-      })
+        dzudRisk: weather?.dzudRisk === 'unknown' ? undefined : weather?.dzudRisk })
     );
   }, [role, totalAnimals, weather, alerts]);
 
@@ -718,36 +707,31 @@ const styles = StyleSheet.create({
   inboxBtn: {
     width: 44, height: 44, borderRadius: 22, backgroundColor: AppColors.white,
     alignItems: 'center', justifyContent: 'center',
-    shadowColor: '#000', shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1, shadowRadius: 4, elevation: 3,
-  },
+    boxShadow: '0px 2px 4px rgba(0,0,0,0.1)',  
+      elevation: 3 },
   inboxIcon: { fontSize: 22 },
   inboxDot: {
     position: 'absolute', top: 8, right: 10,
     width: 10, height: 10, borderRadius: 5, backgroundColor: AppColors.danger,
-    borderWidth: 2, borderColor: AppColors.white,
-  },
+    borderWidth: 2, borderColor: AppColors.white },
   roleBanner: {
     flexDirection: 'row', alignItems: 'center',
     marginHorizontal: 16, marginTop: 12, padding: 14,
     backgroundColor: AppColors.primary, borderRadius: 14,
-    shadowColor: '#000', shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1, shadowRadius: 6, elevation: 4,
-  },
+    boxShadow: '0px 2px 6px rgba(0,0,0,0.1)',  
+      elevation: 4 },
   roleEmoji: { fontSize: 30, marginRight: 12 },
   roleTitle: { fontSize: 16, fontWeight: '700', color: AppColors.white },
   roleDesc: { fontSize: 12, color: '#E8F5E9', marginTop: 2 },
   roleArrow: { fontSize: 28, color: AppColors.white, fontWeight: '700' },
   card: {
     backgroundColor: AppColors.white, marginHorizontal: 16, marginTop: 12,
-    borderRadius: 16, padding: 16, shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.06, shadowRadius: 8, elevation: 3,
-  },
+    borderRadius: 16, padding: 16, boxShadow: '0px 2px 8px rgba(0,0,0,0.06)', 
+       elevation: 3 },
   cardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   cardTitle: { fontSize: 17, fontWeight: '700', color: AppColors.black, marginBottom: 12 },
   totalBadge: {
-    backgroundColor: AppColors.primaryLight, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12,
-  },
+    backgroundColor: AppColors.primaryLight, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12 },
   totalBadgeText: { color: AppColors.white, fontSize: 13, fontWeight: '600' },
   livestockGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
   livestockItem: { alignItems: 'center', minWidth: 60 },
@@ -762,8 +746,7 @@ const styles = StyleSheet.create({
   dzudText: { color: AppColors.white, fontSize: 12, fontWeight: '600' },
   alertItem: {
     borderLeftWidth: 4, paddingLeft: 12, paddingVertical: 8, marginBottom: 8,
-    backgroundColor: '#FAFAFA', borderRadius: 6,
-  },
+    backgroundColor: '#FAFAFA', borderRadius: 6 },
   alertTitle: { fontSize: 14, fontWeight: '600', color: AppColors.black },
   alertRegion: { fontSize: 12, color: AppColors.grayDark, marginTop: 2 },
   tipCard: { backgroundColor: '#F0FFF4', borderWidth: 1, borderColor: '#C6F6D5' },
@@ -771,20 +754,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 4,
     backgroundColor: AppColors.primary,
-    borderRadius: 10,
-  },
+    borderRadius: 10 },
   advisoryCountText: {
     fontSize: 11,
     color: AppColors.white,
-    fontWeight: '700',
-  },
+    fontWeight: '700' },
   taskItem: {
-    flexDirection: 'row', alignItems: 'flex-start', paddingVertical: 8, gap: 10,
-  },
+    flexDirection: 'row', alignItems: 'flex-start', paddingVertical: 8, gap: 10 },
   taskNum: {
     width: 26, height: 26, borderRadius: 13, backgroundColor: AppColors.primary,
-    alignItems: 'center', justifyContent: 'center',
-  },
+    alignItems: 'center', justifyContent: 'center' },
   taskNumText: { color: AppColors.white, fontSize: 13, fontWeight: '700' },
   taskTitle: { fontSize: 14, fontWeight: '700', color: AppColors.black },
   taskDetail: { fontSize: 12, color: AppColors.grayDark, marginTop: 2 },
@@ -792,8 +771,7 @@ const styles = StyleSheet.create({
   moduleItem: {
     width: '47%', backgroundColor: '#F0FFF4', borderRadius: 12,
     padding: 12, alignItems: 'center',
-    borderWidth: 1, borderColor: '#C6F6D5',
-  },
+    borderWidth: 1, borderColor: '#C6F6D5' },
   moduleEmoji: { fontSize: 30 },
   moduleLabel: { fontSize: 13, fontWeight: '700', color: AppColors.primaryDark, marginTop: 6 },
   moduleDesc: { fontSize: 11, color: AppColors.grayDark, marginTop: 3, textAlign: 'center' },
@@ -802,8 +780,7 @@ const styles = StyleSheet.create({
   migrationTitle: { fontSize: 15, fontWeight: '700', color: AppColors.black, marginTop: 8 },
   migrationReason: { fontSize: 13, color: AppColors.grayDark, marginTop: 4 },
   migrationSteps: {
-    marginTop: 10, padding: 10, backgroundColor: '#F0FFF4', borderRadius: 8,
-  },
+    marginTop: 10, padding: 10, backgroundColor: '#F0FFF4', borderRadius: 8 },
   migrationStepsTitle: { fontSize: 12, fontWeight: '700', color: AppColors.primaryDark },
   migrationStep: { fontSize: 12, color: AppColors.grayDark, marginTop: 4, lineHeight: 18 },
   tipText: { fontSize: 14, color: AppColors.grayDark, lineHeight: 20 },
@@ -811,106 +788,86 @@ const styles = StyleSheet.create({
   financeContainer: { gap: 12 },
   financeRow: { flexDirection: 'row', gap: 12 },
   financeItem: {
-    flex: 1, borderRadius: 12, padding: 14, alignItems: 'center',
-  },
+    flex: 1, borderRadius: 12, padding: 14, alignItems: 'center' },
   financeLabel: { fontSize: 13, color: AppColors.grayDark, marginBottom: 4 },
   financeAmount: { fontSize: 18, fontWeight: '700' },
   profitRow: {
     flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
-    backgroundColor: '#F5F5F5', borderRadius: 12, padding: 14,
-  },
+    backgroundColor: '#F5F5F5', borderRadius: 12, padding: 14 },
   profitLabel: { fontSize: 14, fontWeight: '600', color: AppColors.black },
   profitAmount: { fontSize: 20, fontWeight: '800' },
   // Quick Actions Grid (2x3)
   quickActionsGrid: {
-    flexDirection: 'row', flexWrap: 'wrap', gap: 10,
-  },
+    flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
   gridActionBtn: {
     width: '31%', backgroundColor: '#F0FFF4', borderRadius: 14, paddingVertical: 16,
-    alignItems: 'center', borderWidth: 1, borderColor: '#C6F6D5',
-  },
+    alignItems: 'center', borderWidth: 1, borderColor: '#C6F6D5' },
   gridActionIcon: { fontSize: 28 },
   gridActionLabel: {
-    fontSize: 12, fontWeight: '600', color: AppColors.primaryDark, marginTop: 8, textAlign: 'center',
-  },
+    fontSize: 12, fontWeight: '600', color: AppColors.primaryDark, marginTop: 8, textAlign: 'center' },
   // Existing quick actions row
   quickActions: { flexDirection: 'row', marginHorizontal: 16, marginTop: 16, gap: 12 },
   actionBtn: {
     flex: 1, backgroundColor: AppColors.white, borderRadius: 16, padding: 16,
-    alignItems: 'center', shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.06, shadowRadius: 8, elevation: 3,
-  },
+    alignItems: 'center', boxShadow: '0px 2px 8px rgba(0,0,0,0.06)', 
+       elevation: 3 },
   actionIcon: { fontSize: 28 },
   actionLabel: { fontSize: 12, fontWeight: '600', color: AppColors.grayDark, marginTop: 8 },
   // Insurance grid (2x2)
   insuranceGrid: {
-    flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginTop: 4,
-  },
+    flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginTop: 4 },
   insuranceItem: {
     width: '47%', backgroundColor: '#F0FFF4', borderRadius: 12,
     paddingVertical: 14, alignItems: 'center',
-    borderWidth: 1, borderColor: '#C6F6D5',
-  },
+    borderWidth: 1, borderColor: '#C6F6D5' },
   insuranceEmoji: { fontSize: 26 },
   insuranceLabel: {
-    fontSize: 13, fontWeight: '600', color: AppColors.grayDark, marginTop: 6,
-  },
+    fontSize: 13, fontWeight: '600', color: AppColors.grayDark, marginTop: 6 },
   insuranceTip: {
     marginTop: 12, padding: 10, backgroundColor: '#FFFBEA',
-    borderRadius: 10, borderLeftWidth: 3, borderLeftColor: AppColors.secondary,
-  },
+    borderRadius: 10, borderLeftWidth: 3, borderLeftColor: AppColors.secondary },
   insuranceTipText: { fontSize: 13, color: AppColors.grayDark, lineHeight: 18 },
   // PRD cards: livestock_health / sum_announcement / market_prices / nearby_listings
   miniStatsRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     gap: 8,
-    marginTop: 4,
-  },
+    marginTop: 4 },
   miniStat: {
     flex: 1,
     backgroundColor: '#F7FAFC',
     borderRadius: 10,
     paddingVertical: 10,
     paddingHorizontal: 6,
-    alignItems: 'center',
-  },
+    alignItems: 'center' },
   miniStatValue: {
     fontSize: 17,
     fontWeight: '800',
-    color: AppColors.black,
-  },
+    color: AppColors.black },
   miniStatLabel: {
     fontSize: 11,
     color: AppColors.grayDark,
     marginTop: 4,
-    textAlign: 'center',
-  },
+    textAlign: 'center' },
   announceTitle: {
     fontSize: 15,
     fontWeight: '700',
     color: AppColors.black,
-    marginTop: 4,
-  },
+    marginTop: 4 },
   announceSummary: {
     fontSize: 13,
     color: AppColors.grayDark,
     marginTop: 4,
-    lineHeight: 18,
-  },
+    lineHeight: 18 },
   listingItem: {
     paddingVertical: 8,
     borderBottomWidth: 1,
-    borderBottomColor: AppColors.grayLight,
-  },
+    borderBottomColor: AppColors.grayLight },
   listingTitle: {
     fontSize: 14,
     fontWeight: '600',
-    color: AppColors.black,
-  },
+    color: AppColors.black },
   listingMeta: {
     fontSize: 12,
     color: AppColors.grayDark,
-    marginTop: 2,
-  },
-});
+    marginTop: 2 } });

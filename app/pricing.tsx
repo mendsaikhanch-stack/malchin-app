@@ -6,8 +6,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   Alert,
-  ActivityIndicator,
-} from 'react-native';
+  ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Stack, useRouter } from 'expo-router';
 import { AppColors } from '@/constants/theme';
@@ -16,8 +15,7 @@ import {
   PACKAGES,
   featuresOfPackage,
   type PackageId,
-  type FeatureKey,
-} from '@/services/pricing';
+  type FeatureKey } from '@/services/pricing';
 
 // Monggol tайлбар feature-ийн display нэр
 const FEATURE_LABEL: Record<FeatureKey, string> = {
@@ -39,24 +37,21 @@ const FEATURE_LABEL: Record<FeatureKey, string> = {
   provider_booking: 'Захиалга',
   provider_commission: 'Комисс + payout',
   offline_sync_basic: 'Оффлайн sync',
-  offline_sync_bulk: 'Оффлайн bulk (history, market)',
-};
+  offline_sync_bulk: 'Оффлайн bulk (history, market)' };
 
 const PACKAGE_EMOJI: Record<PackageId, string> = {
   free: '🌱',
   premium_malchin: '⭐',
   cooperative: '🤝',
   sum_license: '🏛️',
-  verified_provider: '🛠️',
-};
+  verified_provider: '🛠️' };
 
 const PACKAGE_PRICE: Record<PackageId, string> = {
   free: '0₮',
   premium_malchin: '9,900₮ / сар',
   cooperative: 'Үнийн санал',
   sum_license: 'Жилийн гэрээ',
-  verified_provider: '19,900₮ / сар + комисс',
-};
+  verified_provider: '19,900₮ / сар + комисс' };
 
 const PACKAGE_ORDER: PackageId[] = [
   'free',
@@ -87,8 +82,7 @@ export default function PricingScreen() {
         { text: 'Хаах', style: 'cancel' },
         {
           text: 'Багцыг сонгох (demo)',
-          onPress: () => updatePackage(id),
-        },
+          onPress: () => updatePackage(id) },
       ]
     );
   };
@@ -189,8 +183,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     backgroundColor: AppColors.white,
     borderBottomWidth: 1,
-    borderBottomColor: AppColors.grayLight,
-  },
+    borderBottomColor: AppColors.grayLight },
   backBtn: { width: 32, height: 32, alignItems: 'center', justifyContent: 'center' },
   backIcon: { fontSize: 30, color: AppColors.black, lineHeight: 30 },
   headerTitle: { fontSize: 17, fontWeight: '700', color: AppColors.black },
@@ -201,36 +194,28 @@ const styles = StyleSheet.create({
     backgroundColor: '#E8F5E9',
     borderRadius: 12,
     padding: 12,
-    marginBottom: 12,
-  },
+    marginBottom: 12 },
   noteTitle: { fontSize: 13, fontWeight: '600', color: AppColors.grayDark },
   noteText: {
     fontSize: 15,
     fontWeight: '700',
     color: AppColors.black,
-    marginTop: 4,
-  },
+    marginTop: 4 },
   card: {
     backgroundColor: AppColors.white,
     borderRadius: 14,
     padding: 14,
     marginBottom: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 3,
-    elevation: 1,
-  },
+    boxShadow: '0px 1px 3px rgba(0,0,0,0.05)',
+    elevation: 1 },
   cardActive: {
     borderWidth: 2,
-    borderColor: AppColors.primary,
-  },
+    borderColor: AppColors.primary },
   cardHead: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
-    marginBottom: 10,
-  },
+    marginBottom: 10 },
   cardEmoji: { fontSize: 32 },
   cardName: { fontSize: 16, fontWeight: '700', color: AppColors.black },
   cardPrice: { fontSize: 14, color: AppColors.primary, fontWeight: '600', marginTop: 2 },
@@ -239,36 +224,30 @@ const styles = StyleSheet.create({
     backgroundColor: AppColors.primary,
     borderRadius: 10,
     paddingVertical: 4,
-    paddingHorizontal: 10,
-  },
+    paddingHorizontal: 10 },
   badgeActiveText: { color: AppColors.white, fontSize: 11, fontWeight: '700' },
   featureList: { marginTop: 4 },
   featureRow: {
     flexDirection: 'row',
     alignItems: 'flex-start',
     gap: 8,
-    paddingVertical: 4,
-  },
+    paddingVertical: 4 },
   checkIcon: {
     fontSize: 13,
     color: AppColors.success,
     fontWeight: '700',
-    marginTop: 1,
-  },
+    marginTop: 1 },
   featureText: { fontSize: 13, color: AppColors.grayDark, flex: 1 },
   selectBtn: {
     marginTop: 12,
     backgroundColor: AppColors.primary,
     borderRadius: 10,
     paddingVertical: 10,
-    alignItems: 'center',
-  },
+    alignItems: 'center' },
   selectBtnText: { color: AppColors.white, fontSize: 14, fontWeight: '700' },
   footnote: {
     fontSize: 12,
     color: AppColors.gray,
     marginTop: 8,
     lineHeight: 18,
-    textAlign: 'center',
-  },
-});
+    textAlign: 'center' } });

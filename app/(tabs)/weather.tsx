@@ -6,8 +6,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   ActivityIndicator,
-  RefreshControl,
-} from 'react-native';
+  RefreshControl } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AppColors } from '@/constants/theme';
@@ -15,8 +14,7 @@ import { weatherApi } from '@/services/api';
 import { getAimagList, getSumsByAimag } from '@/services/mongolia-geo';
 import {
   parseOnboardingSnapshot,
-  toUserFallback,
-} from '@/services/onboarding-fallback';
+  toUserFallback } from '@/services/onboarding-fallback';
 
 const ONBOARDING_DATA_KEY = '@malchin_onboarding_data';
 const aimags = getAimagList();
@@ -304,53 +302,44 @@ const styles = StyleSheet.create({
   subtitle: { fontSize: 13, color: AppColors.grayDark, marginTop: 4 },
   pickerToggleRow: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-    paddingHorizontal: 16, paddingVertical: 8, marginTop: 4,
-  },
+    paddingHorizontal: 16, paddingVertical: 8, marginTop: 4 },
   pickerToggle: { paddingVertical: 6, paddingHorizontal: 8 },
   pickerToggleText: { fontSize: 13, fontWeight: '600', color: AppColors.primary },
   resetLocationBtn: {
     paddingHorizontal: 10, paddingVertical: 6, borderRadius: 8,
-    backgroundColor: AppColors.primary + '14',
-  },
+    backgroundColor: AppColors.primary + '14' },
   resetLocationText: { fontSize: 12, fontWeight: '700', color: AppColors.primary },
   sectionLabel: {
     fontSize: 12, fontWeight: '700', color: AppColors.gray,
     paddingHorizontal: 16, marginTop: 8, marginBottom: 6,
-    textTransform: 'uppercase', letterSpacing: 0.5,
-  },
+    textTransform: 'uppercase', letterSpacing: 0.5 },
   aimagWrap: {
     flexDirection: 'row', flexWrap: 'wrap',
-    paddingHorizontal: 16, gap: 8,
-  },
+    paddingHorizontal: 16, gap: 8 },
   aimagChip: {
     paddingHorizontal: 14, paddingVertical: 7, borderRadius: 18,
-    backgroundColor: AppColors.white, borderWidth: 1.5, borderColor: AppColors.grayMedium,
-  },
+    backgroundColor: AppColors.white, borderWidth: 1.5, borderColor: AppColors.grayMedium },
   aimagChipActive: { backgroundColor: AppColors.primary, borderColor: AppColors.primary },
   aimagChipText: { fontSize: 13, fontWeight: '600', color: AppColors.grayDark },
   aimagChipTextActive: { color: AppColors.white },
   sumWrap: {
     flexDirection: 'row', flexWrap: 'wrap',
-    paddingHorizontal: 16, gap: 6,
-  },
+    paddingHorizontal: 16, gap: 6 },
   sumChip: {
     paddingHorizontal: 12, paddingVertical: 6, borderRadius: 14,
-    backgroundColor: AppColors.white, borderWidth: 1, borderColor: AppColors.grayMedium,
-  },
+    backgroundColor: AppColors.white, borderWidth: 1, borderColor: AppColors.grayMedium },
   sumChipActive: { backgroundColor: AppColors.accent, borderColor: AppColors.accent },
   sumChipText: { fontSize: 12, fontWeight: '600', color: AppColors.grayDark },
   sumChipTextActive: { color: AppColors.white },
   sumBanner: {
     marginHorizontal: 16, marginTop: 8, padding: 10, borderRadius: 10,
-    backgroundColor: '#FFF8E1', borderWidth: 1, borderColor: '#FFE082',
-  },
+    backgroundColor: '#FFF8E1', borderWidth: 1, borderColor: '#FFE082' },
   sumBannerText: { fontSize: 12, color: '#6D4C00', fontWeight: '600' },
   sumBannerNote: { fontWeight: '400', fontStyle: 'italic', color: '#8D6E00' },
   currentCard: {
     backgroundColor: AppColors.white, marginHorizontal: 16, marginTop: 16,
     borderRadius: 20, padding: 24, alignItems: 'center',
-    shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.08, shadowRadius: 12, elevation: 4,
-  },
+    boxShadow: '0px 2px 12px rgba(0,0,0,0.08)',     elevation: 4 },
   currentIcon: { fontSize: 64 },
   currentTemp: { fontSize: 48, fontWeight: '800', color: AppColors.black, marginTop: 8 },
   currentCondition: { fontSize: 16, color: AppColors.grayDark, marginTop: 4 },
@@ -361,8 +350,7 @@ const styles = StyleSheet.create({
   detailValue: { fontSize: 16, fontWeight: '700', color: AppColors.black, marginTop: 2 },
   dzudCard: {
     marginHorizontal: 16, marginTop: 12, borderRadius: 16, padding: 16,
-    backgroundColor: AppColors.white, borderWidth: 2,
-  },
+    backgroundColor: AppColors.white, borderWidth: 2 },
   dzudHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   dzudTitle: { fontSize: 16, fontWeight: '700', color: AppColors.black },
   dzudBadge: { paddingHorizontal: 12, paddingVertical: 4, borderRadius: 8 },
@@ -374,8 +362,7 @@ const styles = StyleSheet.create({
   forecastItem: {
     flexDirection: 'row', alignItems: 'center', backgroundColor: AppColors.white,
     borderRadius: 12, padding: 12, marginBottom: 8, gap: 12,
-    shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.04, shadowRadius: 4, elevation: 2,
-  },
+    boxShadow: '0px 1px 4px rgba(0,0,0,0.04)',     elevation: 2 },
   forecastDate: { fontSize: 12, color: AppColors.grayDark, width: 72 },
   forecastIcon: { fontSize: 22 },
   forecastTempCol: { alignItems: 'center' as const, width: 50 },
@@ -387,8 +374,6 @@ const styles = StyleSheet.create({
   forecastDzudText: { color: AppColors.white, fontSize: 10, fontWeight: '700' },
   errorCard: {
     marginHorizontal: 16, marginTop: 16, padding: 32, borderRadius: 16,
-    backgroundColor: AppColors.white, alignItems: 'center',
-  },
+    backgroundColor: AppColors.white, alignItems: 'center' },
   errorText: { fontSize: 14, color: AppColors.grayDark },
-  retryText: { fontSize: 14, color: AppColors.primary, fontWeight: '600', marginTop: 12 },
-});
+  retryText: { fontSize: 14, color: AppColors.primary, fontWeight: '600', marginTop: 12 } });

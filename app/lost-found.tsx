@@ -8,8 +8,7 @@ import {
   TextInput,
   Modal,
   Alert,
-  ActivityIndicator,
-} from 'react-native';
+  ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Stack, useRouter } from 'expo-router';
 import { AppColors } from '@/constants/theme';
@@ -25,8 +24,7 @@ import {
   filterByType,
   sortByDateDesc,
   type Listing,
-  type ListingType,
-} from '@/services/lost-found-data';
+  type ListingType } from '@/services/lost-found-data';
 
 const SPECIES = [
   { id: 'horse', label: 'Адуу', emoji: '🐎' },
@@ -52,8 +50,7 @@ export default function LostFoundScreen() {
   const [form, setForm] = useState<Partial<Listing>>({
     type: 'lost',
     species: 'horse',
-    color: 'Хээр',
-  });
+    color: 'Хээр' });
   const [detailModal, setDetailModal] = useState<Listing | null>(null);
 
   useEffect(() => {
@@ -94,8 +91,7 @@ export default function LostFoundScreen() {
       earTag: form.earTag || '',
       lastSeen: form.lastSeen!,
       phone: form.phone!,
-      reward: form.reward,
-    });
+      reward: form.reward });
     // Optimistic UI — сүлжээгүй үед queue-д орно, reconnect үед autoSync flush.
     setListings([next, ...listings]);
     setModalVisible(false);
@@ -129,8 +125,7 @@ export default function LostFoundScreen() {
             () => lostFoundApi.resolve(id),
             { table_name: 'lost_found', action: 'UPDATE', record_id: 0, data: { id, status: 'resolved' } }
           );
-        },
-      },
+        } },
     ]);
   };
 
@@ -437,28 +432,24 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
     paddingHorizontal: 16, paddingVertical: 12,
-    backgroundColor: AppColors.white, borderBottomWidth: 1, borderBottomColor: AppColors.grayLight,
-  },
+    backgroundColor: AppColors.white, borderBottomWidth: 1, borderBottomColor: AppColors.grayLight },
   backBtn: { width: 32, height: 32, alignItems: 'center', justifyContent: 'center' },
   backIcon: { fontSize: 30, color: AppColors.black, lineHeight: 30 },
   headerTitle: { fontSize: 17, fontWeight: '700', color: AppColors.black },
   tabs: {
     flexDirection: 'row', backgroundColor: AppColors.white,
-    paddingHorizontal: 16, paddingBottom: 10,
-  },
+    paddingHorizontal: 16, paddingBottom: 10 },
   tab: {
     flex: 1, paddingVertical: 10, alignItems: 'center',
-    borderBottomWidth: 2, borderBottomColor: 'transparent',
-  },
+    borderBottomWidth: 2, borderBottomColor: 'transparent' },
   tabActive: { borderBottomColor: AppColors.primary },
   tabText: { fontSize: 14, color: AppColors.grayDark, fontWeight: '600' },
   tabTextActive: { color: AppColors.primary },
   list: { padding: 16 },
   card: {
     backgroundColor: AppColors.white, borderRadius: 14, padding: 14, marginBottom: 10,
-    shadowColor: '#000', shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05, shadowRadius: 4, elevation: 2,
-  },
+    boxShadow: '0px 1px 4px rgba(0,0,0,0.05)',  
+      elevation: 2 },
   cardResolved: { opacity: 0.6 },
   cardRow: { flexDirection: 'row', alignItems: 'center' },
   cardEmoji: { fontSize: 36, marginRight: 12 },
@@ -467,41 +458,32 @@ const styles = StyleSheet.create({
   cardDate: { fontSize: 12, color: AppColors.gray, marginTop: 2 },
   rewardBadge: {
     width: 32, height: 32, borderRadius: 16, backgroundColor: '#FFF3E0',
-    alignItems: 'center', justifyContent: 'center',
-  },
+    alignItems: 'center', justifyContent: 'center' },
   rewardText: { fontSize: 18 },
   resolvedBadge: {
-    marginTop: 8, fontSize: 12, fontWeight: '700', color: AppColors.success,
-  },
+    marginTop: 8, fontSize: 12, fontWeight: '700', color: AppColors.success },
   empty: { textAlign: 'center', color: AppColors.gray, marginTop: 40 },
   fab: {
     position: 'absolute', bottom: 24, left: 16, right: 16,
     backgroundColor: AppColors.primary, borderRadius: 14, paddingVertical: 14,
-    alignItems: 'center', shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.2,
-    shadowRadius: 8, elevation: 6,
-  },
+    alignItems: 'center', boxShadow: '0px 4px 8px rgba(0,0,0,0.2)', 
+     elevation: 6 },
   fabText: { color: AppColors.white, fontSize: 15, fontWeight: '700' },
   modalOverlay: {
-    flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end',
-  },
+    flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
   modalContent: {
     backgroundColor: AppColors.white, borderTopLeftRadius: 20, borderTopRightRadius: 20,
-    padding: 20, maxHeight: '90%',
-  },
+    padding: 20, maxHeight: '90%' },
   modalTitle: {
-    fontSize: 18, fontWeight: '700', color: AppColors.black, marginBottom: 16,
-  },
+    fontSize: 18, fontWeight: '700', color: AppColors.black, marginBottom: 16 },
   label: { fontSize: 13, fontWeight: '600', color: AppColors.grayDark, marginTop: 12, marginBottom: 6 },
   input: {
     borderWidth: 1, borderColor: AppColors.grayMedium, borderRadius: 10,
-    paddingHorizontal: 12, paddingVertical: 10, fontSize: 15,
-  },
+    paddingHorizontal: 12, paddingVertical: 10, fontSize: 15 },
   chipRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   chip: {
     paddingHorizontal: 12, paddingVertical: 8, borderRadius: 20,
-    borderWidth: 1, borderColor: AppColors.grayMedium, backgroundColor: AppColors.white,
-  },
+    borderWidth: 1, borderColor: AppColors.grayMedium, backgroundColor: AppColors.white },
   chipActive: { backgroundColor: AppColors.primary, borderColor: AppColors.primary },
   chipText: { fontSize: 13, color: AppColors.black },
   modalActions: { flexDirection: 'row', gap: 10, marginTop: 20, marginBottom: 10 },
@@ -512,8 +494,7 @@ const styles = StyleSheet.create({
   btnSecondaryText: { color: AppColors.black, fontSize: 15, fontWeight: '600' },
   detailRow: {
     flexDirection: 'row', paddingVertical: 10,
-    borderBottomWidth: 1, borderBottomColor: AppColors.grayLight,
-  },
+    borderBottomWidth: 1, borderBottomColor: AppColors.grayLight },
   detailKey: { flex: 1, fontSize: 14, color: AppColors.grayDark },
   detailValue: { flex: 2, fontSize: 14, color: AppColors.black, fontWeight: '600' },
   matchBox: {
@@ -522,22 +503,19 @@ const styles = StyleSheet.create({
     backgroundColor: '#F0FFF4',
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#C6F6D5',
-  },
+    borderColor: '#C6F6D5' },
   matchTitle: {
     fontSize: 14,
     fontWeight: '800',
     color: AppColors.primaryDark,
-    marginBottom: 10,
-  },
+    marginBottom: 10 },
   matchRow: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 8,
     gap: 10,
     borderTopWidth: 1,
-    borderTopColor: '#D4E8D4',
-  },
+    borderTopColor: '#D4E8D4' },
   matchEmoji: { fontSize: 24 },
   matchHeader: { fontSize: 13, fontWeight: '700', color: AppColors.black },
   matchLoc: { fontSize: 11, color: AppColors.grayDark, marginTop: 2 },
@@ -545,7 +523,5 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 10,
-    backgroundColor: AppColors.gray,
-  },
-  matchPct: { color: AppColors.white, fontSize: 12, fontWeight: '800' },
-});
+    backgroundColor: AppColors.gray },
+  matchPct: { color: AppColors.white, fontSize: 12, fontWeight: '800' } });

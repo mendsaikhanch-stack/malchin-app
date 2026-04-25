@@ -5,8 +5,7 @@ import {
   ScrollView,
   StyleSheet,
   TouchableOpacity,
-  Modal,
-} from 'react-native';
+  Modal } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Stack, useRouter } from 'expo-router';
 import { AppColors } from '@/constants/theme';
@@ -46,16 +45,14 @@ const MOCK: Item[] = [
 3. Хөлдсөн шээс, баас харагдаж болох — ариутгалтай холбоотой`,
     author: 'Ахмад Лувсан', location: 'Төв аймаг, Алтанбулаг',
     season: 'spring', species: ['all'],
-    date: '2026-03-20', views: 458, saved: false,
-  },
+    date: '2026-03-20', views: 458, saved: false },
   {
     id: '2', type: 'audio', source: 'elder',
     title: 'Ямаа угаах цаг, арга',
     body: '3 минутын аудио — Ямаа хэзээ угаах вэ? Ямар жор ашиглах вэ? Уламжлалт ургамлын тос, шинэ заст хоёрын ялгаа.',
     author: 'Ахмад Сараа', location: 'Архангай',
     season: 'spring', species: ['goat'],
-    date: '2026-04-02', views: 312,
-  },
+    date: '2026-04-02', views: 312 },
   {
     id: '3', type: 'text', source: 'expert',
     title: 'Сул малыг тордох мэргэжлийн зөвлөгөө',
@@ -73,8 +70,7 @@ const MOCK: Item[] = [
 4. 2 долоо хоног тусгаарлах`,
     author: 'Др. Баатар (мал эмч)', location: 'УБ',
     season: 'spring', species: ['sheep', 'goat'],
-    date: '2026-03-15', views: 892,
-  },
+    date: '2026-03-15', views: 892 },
   {
     id: '4', type: 'text', source: 'official',
     title: 'Вакцинжуулалтын 2026 оны 5-р сарын хуваарь',
@@ -89,8 +85,7 @@ const MOCK: Item[] = [
 1, 2, 4 баг — 16-21`,
     author: 'Сумын ЗДТГ', location: 'Алтанбулаг сум',
     season: 'any', species: ['all'],
-    date: '2026-04-20', views: 1240,
-  },
+    date: '2026-04-20', views: 1240 },
   {
     id: '5', type: 'text', source: 'elder',
     title: 'Төл бойжилт — үүрэн хайр',
@@ -104,27 +99,23 @@ const MOCK: Item[] = [
 Амьд төлөөс нь зөв эх баталгаатай.`,
     author: 'Ахмад Жаргал', location: 'Завхан аймаг',
     season: 'spring', species: ['sheep', 'goat'],
-    date: '2026-04-15', views: 673,
-  },
+    date: '2026-04-15', views: 673 },
 ];
 
 const SOURCE_BADGE: Record<Source, { label: string; color: string; emoji: string }> = {
   elder: { label: 'Ахмадын ухаан', color: AppColors.secondary, emoji: '👴' },
   expert: { label: 'Мэргэжилтэн', color: AppColors.accent, emoji: '🎓' },
-  official: { label: 'Албан ёсны', color: AppColors.primary, emoji: '🏛️' },
-};
+  official: { label: 'Албан ёсны', color: AppColors.primary, emoji: '🏛️' } };
 
 const TYPE_EMOJI: Record<ContentType, string> = {
-  text: '📝', audio: '🎙️', video: '🎥', card: '🖼️',
-};
+  text: '📝', audio: '🎙️', video: '🎥', card: '🖼️' };
 
 const SEASON_LABEL: Record<Season, string> = {
   any: 'Бүх улирал',
   winter: 'Өвөл',
   spring: 'Хавар',
   summer: 'Зун',
-  autumn: 'Намар',
-};
+  autumn: 'Намар' };
 
 export default function WisdomFeed() {
   const router = useRouter();
@@ -284,8 +275,7 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F8F9FA' },
   header: {
     flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 12,
-    backgroundColor: AppColors.white, borderBottomWidth: 1, borderBottomColor: AppColors.grayLight,
-  },
+    backgroundColor: AppColors.white, borderBottomWidth: 1, borderBottomColor: AppColors.grayLight },
   backBtn: { width: 32, height: 32, alignItems: 'center', justifyContent: 'center' },
   backIcon: { fontSize: 30, color: AppColors.black, lineHeight: 30 },
   headerTitle: { fontSize: 17, fontWeight: '700', color: AppColors.black },
@@ -293,16 +283,14 @@ const styles = StyleSheet.create({
   filter: { padding: 12, gap: 8, backgroundColor: AppColors.white },
   chip: {
     paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20,
-    borderWidth: 1, borderColor: AppColors.grayMedium, backgroundColor: AppColors.white,
-  },
+    borderWidth: 1, borderColor: AppColors.grayMedium, backgroundColor: AppColors.white },
   chipActive: { backgroundColor: AppColors.primary, borderColor: AppColors.primary },
   chipText: { fontSize: 13, color: AppColors.black, fontWeight: '600' },
   chipTextActive: { color: AppColors.white },
   body: { padding: 16 },
   card: {
     backgroundColor: AppColors.white, borderRadius: 14, padding: 14, marginBottom: 10,
-    shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 3, elevation: 1,
-  },
+    boxShadow: '0px 1px 3px rgba(0,0,0,0.05)',     elevation: 1 },
   cardHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   srcBadge: { paddingHorizontal: 8, paddingVertical: 4, borderRadius: 8 },
   srcText: { color: AppColors.white, fontSize: 11, fontWeight: '700' },
@@ -311,35 +299,29 @@ const styles = StyleSheet.create({
   cardBody: { fontSize: 13, color: AppColors.grayDark, marginTop: 6, lineHeight: 18 },
   cardFoot: {
     flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 10,
-    paddingTop: 10, borderTopWidth: 1, borderTopColor: AppColors.grayLight,
-  },
+    paddingTop: 10, borderTopWidth: 1, borderTopColor: AppColors.grayLight },
   metaText: { fontSize: 11, color: AppColors.grayDark, flex: 0 },
   saveIcon: { fontSize: 18, marginLeft: 'auto' },
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
   modalContent: {
     backgroundColor: AppColors.white, borderTopLeftRadius: 20, borderTopRightRadius: 20,
-    padding: 20, maxHeight: '92%',
-  },
+    padding: 20, maxHeight: '92%' },
   closeBtn: { fontSize: 22, color: AppColors.grayDark, fontWeight: '700' },
   detailTitle: { fontSize: 20, fontWeight: '800', color: AppColors.black, marginTop: 16 },
   detailMeta: { flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginTop: 8, marginBottom: 14 },
   detailMetaText: { fontSize: 12, color: AppColors.grayDark },
   audioPlayer: {
     backgroundColor: '#F0FFF4', borderRadius: 10, padding: 20, alignItems: 'center',
-    marginBottom: 14, borderWidth: 1, borderColor: '#C6F6D5',
-  },
+    marginBottom: 14, borderWidth: 1, borderColor: '#C6F6D5' },
   audioPlayerText: { fontSize: 14, color: AppColors.primaryDark, fontWeight: '600' },
   detailBody: { fontSize: 15, color: AppColors.black, lineHeight: 24, marginBottom: 14 },
   note: {
     padding: 12, backgroundColor: '#FFFBEA', borderRadius: 10,
-    borderLeftWidth: 3, borderLeftColor: AppColors.secondary, marginBottom: 14,
-  },
+    borderLeftWidth: 3, borderLeftColor: AppColors.secondary, marginBottom: 14 },
   noteText: { fontSize: 12, color: AppColors.grayDark, lineHeight: 18 },
   detailActions: { flexDirection: 'row', gap: 10, marginTop: 10 },
   actionBtn: {
     flex: 1, paddingVertical: 12, borderRadius: 10, alignItems: 'center',
-    backgroundColor: AppColors.grayLight,
-  },
+    backgroundColor: AppColors.grayLight },
   actionBtnActive: { backgroundColor: '#FFF3E0' },
-  actionBtnText: { fontSize: 13, fontWeight: '700', color: AppColors.black },
-});
+  actionBtnText: { fontSize: 13, fontWeight: '700', color: AppColors.black } });

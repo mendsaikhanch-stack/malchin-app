@@ -7,8 +7,7 @@ import {
   TouchableOpacity,
   TextInput,
   RefreshControl,
-  ActivityIndicator,
-} from 'react-native';
+  ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { AppColors } from '@/constants/theme';
 import { knowledgeApi } from '@/services/api';
@@ -31,11 +30,9 @@ const animalFilters = [
 ];
 
 const seasonEmoji: Record<string, string> = {
-  spring: '\uD83C\uDF38', summer: '\u2600\uFE0F', autumn: '\uD83C\uDF42', winter: '\u2744\uFE0F',
-};
+  spring: '\uD83C\uDF38', summer: '\u2600\uFE0F', autumn: '\uD83C\uDF42', winter: '\u2744\uFE0F' };
 const seasonLabel: Record<string, string> = {
-  spring: 'Хавар', summer: 'Зун', autumn: 'Намар', winter: 'Өвөл',
-};
+  spring: 'Хавар', summer: 'Зун', autumn: 'Намар', winter: 'Өвөл' };
 
 export default function KnowledgeScreen() {
   const [loading, setLoading] = useState(true);
@@ -177,7 +174,7 @@ const styles = StyleSheet.create({
   tipHeading: { fontSize: 15, fontWeight: '700', color: AppColors.black, marginTop: 6 },
   tipContent: { fontSize: 13, color: AppColors.grayDark, lineHeight: 20, marginTop: 6 },
   resultCount: { paddingHorizontal: 20, marginTop: 12, fontSize: 12, color: AppColors.gray },
-  itemCard: { backgroundColor: AppColors.white, marginHorizontal: 16, marginTop: 8, borderRadius: 14, padding: 14, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 6, elevation: 2 },
+  itemCard: { backgroundColor: AppColors.white, marginHorizontal: 16, marginTop: 8, borderRadius: 14, padding: 14, boxShadow: '0px 1px 6px rgba(0,0,0,0.05)',     elevation: 2 },
   itemHeader: { flexDirection: 'row', alignItems: 'flex-start' },
   itemEmoji: { fontSize: 24, marginRight: 10, marginTop: 2 },
   itemTitle: { fontSize: 14, fontWeight: '700', color: AppColors.black, lineHeight: 20 },
@@ -187,5 +184,4 @@ const styles = StyleSheet.create({
   expandIcon: { fontSize: 12, color: AppColors.gray, marginTop: 4 },
   itemBody: { marginTop: 10, paddingTop: 10, borderTopWidth: 1, borderTopColor: '#F0F0F0' },
   itemContent: { fontSize: 13, color: AppColors.grayDark, lineHeight: 21 },
-  emptyText: { textAlign: 'center', color: AppColors.gray, marginTop: 30, fontSize: 14 },
-});
+  emptyText: { textAlign: 'center', color: AppColors.gray, marginTop: 30, fontSize: 14 } });

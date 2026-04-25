@@ -8,8 +8,7 @@ import {
   TextInput,
   RefreshControl,
   ActivityIndicator,
-  Linking,
-} from 'react-native';
+  Linking } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { AppColors } from '@/constants/theme';
@@ -18,8 +17,7 @@ import { insuranceApi } from '@/services/api';
 const BRAND = {
   primary: '#2d5016',
   primaryLight: '#4a7c28',
-  bg: '#f5f7f0',
-};
+  bg: '#f5f7f0' };
 
 type TabKey = 'insurance' | 'livestock' | 'welfare' | 'docs' | 'calc';
 
@@ -76,8 +74,7 @@ export default function InsuranceScreen() {
         health: Math.round(income * 0.02),
         total,
         percent: '11.5%',
-        yearly: total * 12,
-      });
+        yearly: total * 12 });
     }
   };
 
@@ -481,17 +478,12 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     backgroundColor: '#e8ede2',
     borderRadius: 14,
-    padding: 3,
-  },
+    padding: 3 },
   tabItem: { flex: 1, paddingVertical: 10, borderRadius: 12, alignItems: 'center' },
   tabItemActive: {
     backgroundColor: AppColors.white,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.08,
-    shadowRadius: 4,
-    elevation: 3,
-  },
+    boxShadow: '0px 1px 4px rgba(0,0,0,0.08)',
+    elevation: 3 },
   tabText: { fontSize: 11, fontWeight: '600', color: AppColors.grayDark },
   tabTextActive: { color: BRAND.primary, fontWeight: '700' },
 
@@ -504,8 +496,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 12,
     alignItems: 'flex-start',
-    gap: 8,
-  },
+    gap: 8 },
   infoEmoji: { fontSize: 20 },
   infoText: { flex: 1, fontSize: 13, color: BRAND.primary, lineHeight: 20 },
 
@@ -516,12 +507,8 @@ const styles = StyleSheet.create({
     backgroundColor: AppColors.white,
     borderRadius: 16,
     padding: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 6,
-    elevation: 2,
-  },
+    boxShadow: '0px 1px 6px rgba(0,0,0,0.05)',
+    elevation: 2 },
   cardHeader: { flexDirection: 'row', alignItems: 'flex-start', gap: 10 },
   cardEmoji: { fontSize: 28, marginTop: 2 },
   cardHeaderInfo: { flex: 1 },
@@ -546,8 +533,7 @@ const styles = StyleSheet.create({
     marginBottom: 14,
     paddingBottom: 14,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
-  },
+    borderBottomColor: '#f0f0f0' },
   welfareTitle: { fontSize: 14, fontWeight: '700', color: AppColors.black, marginBottom: 4 },
   welfareDesc: { fontSize: 12, color: AppColors.grayDark, lineHeight: 18, marginBottom: 6 },
   welfareMetaRow: { flexDirection: 'row', gap: 6, marginTop: 2 },
@@ -569,8 +555,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderBottomWidth: 1,
     borderBottomColor: '#f5f5f5',
-    gap: 10,
-  },
+    gap: 10 },
   contactEmoji: { fontSize: 22 },
   contactInfo: { flex: 1 },
   contactTitle: { fontSize: 13, fontWeight: '600', color: AppColors.black },
@@ -589,14 +574,12 @@ const styles = StyleSheet.create({
     padding: 12,
     fontSize: 16,
     color: AppColors.black,
-    backgroundColor: '#fafafa',
-  },
+    backgroundColor: '#fafafa' },
   calcBtn: {
     backgroundColor: BRAND.primary,
     borderRadius: 12,
     paddingHorizontal: 16,
-    justifyContent: 'center',
-  },
+    justifyContent: 'center' },
   calcBtnText: { color: AppColors.white, fontSize: 13, fontWeight: '700' },
 
   calcSubtitle: { fontSize: 13, color: AppColors.grayDark, marginBottom: 10 },
@@ -606,16 +589,14 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingVertical: 8,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
-  },
+    borderBottomColor: '#f0f0f0' },
   calcLabel: { fontSize: 13, color: AppColors.grayDark },
   calcValue: { fontSize: 13, fontWeight: '600', color: AppColors.black },
   calcDivider: { height: 2, backgroundColor: BRAND.primary, marginVertical: 8, borderRadius: 1 },
   calcTotalRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingVertical: 6,
-  },
+    paddingVertical: 6 },
   calcTotalLabel: { fontSize: 14, fontWeight: '700', color: BRAND.primary },
   calcTotalValue: { fontSize: 16, fontWeight: '800', color: BRAND.primary },
 
@@ -623,8 +604,7 @@ const styles = StyleSheet.create({
     marginTop: 12,
     backgroundColor: '#fff8e1',
     borderRadius: 10,
-    padding: 12,
-  },
+    padding: 12 },
   calcTipText: { fontSize: 12, color: '#f57f17', lineHeight: 18 },
 
   // Quick calc
@@ -633,8 +613,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 10,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
-  },
+    borderBottomColor: '#f0f0f0' },
   quickCalcIncome: { flex: 1, fontSize: 14, fontWeight: '600', color: AppColors.black },
   quickCalcArrow: { fontSize: 14, color: AppColors.gray, marginHorizontal: 8 },
   quickCalcTotal: { fontSize: 14, fontWeight: '700', color: BRAND.primary },
@@ -644,18 +623,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'flex-start',
     marginBottom: 14,
-    gap: 12,
-  },
+    gap: 12 },
   stepCircle: {
     width: 32,
     height: 32,
     borderRadius: 16,
     backgroundColor: BRAND.primary,
     justifyContent: 'center',
-    alignItems: 'center',
-  },
+    alignItems: 'center' },
   stepNumber: { fontSize: 14, fontWeight: '800', color: AppColors.white },
   stepContent: { flex: 1 },
   stepTitle: { fontSize: 14, fontWeight: '700', color: AppColors.black, marginBottom: 2 },
-  stepDesc: { fontSize: 12, color: AppColors.grayDark, lineHeight: 18 },
-});
+  stepDesc: { fontSize: 12, color: AppColors.grayDark, lineHeight: 18 } });

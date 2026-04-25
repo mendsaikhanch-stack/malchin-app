@@ -11,8 +11,7 @@ import {
   RefreshControl,
   ActivityIndicator,
   Linking,
-  Image,
-} from 'react-native';
+  Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { AppColors } from '@/constants/theme';
 import { marketApi, pricesApi } from '@/services/api';
@@ -28,15 +27,13 @@ const tabs = ['Ханш', 'Түүхий эд', 'Зарууд', 'Миний за�
 const itemTypeLabels: Record<string, string> = {
   livestock: 'Мах',
   live: 'Амьд мал',
-  dairy: 'Сүү, цагаан идээ',
-};
+  dairy: 'Сүү, цагаан идээ' };
 
 const materialLabels: Record<string, string> = {
   cashmere: 'Ноолуур',
   wool: 'Ноос',
   hide: 'Арьс шир',
-  feed: 'Тэжээл',
-};
+  feed: 'Тэжээл' };
 
 const supplyLabel = (s: string) => {
   if (s === 'high') return { text: 'Их', color: AppColors.success };
@@ -183,8 +180,7 @@ export default function MarketScreen() {
         table_name: 'listings',
         action: editingId ? 'UPDATE' : 'INSERT',
         record_id: editingId ?? 0,
-        data: payload,
-      }
+        data: payload }
     );
 
     setShowModal(false); resetForm();
@@ -604,7 +600,7 @@ const styles = StyleSheet.create({
   // Tabs
   tabBar: { flexDirection: 'row', marginHorizontal: 16, marginTop: 8, backgroundColor: '#EEEEEE', borderRadius: 12, padding: 3 },
   tab: { flex: 1, paddingVertical: 10, alignItems: 'center', borderRadius: 10 },
-  tabActive: { backgroundColor: AppColors.white, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.1, shadowRadius: 4, elevation: 2 },
+  tabActive: { backgroundColor: AppColors.white, boxShadow: '0px 1px 4px rgba(0,0,0,0.1)',     elevation: 2 },
   tabText: { fontSize: 13, fontWeight: '600', color: AppColors.grayDark },
   tabTextActive: { color: AppColors.primary, fontWeight: '700' },
   // Filters
@@ -620,7 +616,7 @@ const styles = StyleSheet.create({
   chipSmallText: { fontSize: 11, fontWeight: '600', color: AppColors.grayDark },
   chipSmallTextActive: { color: AppColors.white },
   // Market price card
-  marketCard: { backgroundColor: AppColors.white, marginHorizontal: 16, marginTop: 12, borderRadius: 16, padding: 14, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.06, shadowRadius: 8, elevation: 3 },
+  marketCard: { backgroundColor: AppColors.white, marginHorizontal: 16, marginTop: 12, borderRadius: 16, padding: 14, boxShadow: '0px 2px 8px rgba(0,0,0,0.06)',     elevation: 3 },
   marketName: { fontSize: 15, fontWeight: '800', color: AppColors.black, marginBottom: 8 },
   tableHeader: { flexDirection: 'row', borderBottomWidth: 1.5, borderBottomColor: AppColors.grayMedium, paddingBottom: 6, marginBottom: 4 },
   th: { fontSize: 10, fontWeight: '700', color: AppColors.gray, textTransform: 'uppercase' },
@@ -647,12 +643,11 @@ const styles = StyleSheet.create({
     marginTop: 10,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#DCEDC8',
-  },
+    borderColor: '#DCEDC8' },
   quotaText: { fontSize: 12, color: AppColors.grayDark, fontWeight: '600' },
   emptyCard: { alignItems: 'center', paddingVertical: 50, marginHorizontal: 16, backgroundColor: AppColors.white, borderRadius: 16, marginTop: 16 },
   emptyTitle: { fontSize: 16, fontWeight: '700', color: AppColors.grayDark, marginTop: 8 },
-  listingCard: { backgroundColor: AppColors.white, marginHorizontal: 16, marginTop: 10, borderRadius: 16, padding: 14, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.06, shadowRadius: 8, elevation: 3 },
+  listingCard: { backgroundColor: AppColors.white, marginHorizontal: 16, marginTop: 10, borderRadius: 16, padding: 14, boxShadow: '0px 2px 8px rgba(0,0,0,0.06)',     elevation: 3 },
   listingHeader: { flexDirection: 'row', alignItems: 'center' },
   listingTitle: { fontSize: 15, fontWeight: '700', color: AppColors.black },
   listingMeta: { fontSize: 12, color: AppColors.grayDark, marginTop: 2 },
@@ -696,5 +691,4 @@ const styles = StyleSheet.create({
   soldBadge: { position: 'absolute', top: 10, right: 10, zIndex: 1, backgroundColor: '#E65100', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 4 },
   soldBadgeText: { fontSize: 10, fontWeight: '800', color: AppColors.white },
   // Empty subtext
-  emptySubtext: { fontSize: 13, color: AppColors.gray, marginTop: 4, textAlign: 'center' },
-});
+  emptySubtext: { fontSize: 13, color: AppColors.gray, marginTop: 4, textAlign: 'center' } });

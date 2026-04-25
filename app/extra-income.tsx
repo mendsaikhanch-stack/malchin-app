@@ -7,8 +7,7 @@ import {
   TouchableOpacity,
   Modal,
   TextInput,
-  Alert,
-} from 'react-native';
+  Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Stack, useRouter } from 'expo-router';
 import { AppColors } from '@/constants/theme';
@@ -58,8 +57,7 @@ export default function ExtraIncome() {
         title: form.title,
         price: form.price,
         description: form.description || '',
-        status: 'active',
-      },
+        status: 'active' },
       ...listings,
     ]);
     setModalVisible(false);
@@ -203,8 +201,7 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F8F9FA' },
   header: {
     flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 12,
-    backgroundColor: AppColors.white, borderBottomWidth: 1, borderBottomColor: AppColors.grayLight,
-  },
+    backgroundColor: AppColors.white, borderBottomWidth: 1, borderBottomColor: AppColors.grayLight },
   backBtn: { width: 32, height: 32, alignItems: 'center', justifyContent: 'center' },
   backIcon: { fontSize: 30, color: AppColors.black, lineHeight: 30 },
   headerTitle: { fontSize: 17, fontWeight: '700', color: AppColors.black },
@@ -215,23 +212,20 @@ const styles = StyleSheet.create({
   gridItem: {
     width: '48%', backgroundColor: AppColors.white, borderRadius: 14, padding: 14,
     alignItems: 'center',
-    shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 3, elevation: 1,
-  },
+    boxShadow: '0px 1px 3px rgba(0,0,0,0.05)',     elevation: 1 },
   gridEmoji: { fontSize: 36 },
   gridLabel: { fontSize: 14, fontWeight: '700', color: AppColors.black, marginTop: 6 },
   gridDesc: { fontSize: 11, color: AppColors.grayDark, marginTop: 3, textAlign: 'center' },
   emptyCard: {
     backgroundColor: AppColors.white, borderRadius: 14, padding: 30, alignItems: 'center',
-    borderWidth: 1, borderColor: AppColors.grayLight, borderStyle: 'dashed',
-  },
+    borderWidth: 1, borderColor: AppColors.grayLight, borderStyle: 'dashed' },
   emptyEmoji: { fontSize: 48 },
   emptyText: { fontSize: 14, color: AppColors.grayDark, marginTop: 10, fontWeight: '600' },
   emptyHint: { fontSize: 12, color: AppColors.gray, marginTop: 4 },
   listingCard: {
     flexDirection: 'row', alignItems: 'center', gap: 12,
     backgroundColor: AppColors.white, borderRadius: 14, padding: 14, marginBottom: 10,
-    shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 3, elevation: 1,
-  },
+    boxShadow: '0px 1px 3px rgba(0,0,0,0.05)',     elevation: 1 },
   listingEmoji: { fontSize: 32 },
   listingTitle: { fontSize: 14, fontWeight: '700', color: AppColors.black },
   listingDesc: { fontSize: 12, color: AppColors.grayDark, marginTop: 2 },
@@ -239,25 +233,21 @@ const styles = StyleSheet.create({
   storyCard: {
     flexDirection: 'row', gap: 12,
     backgroundColor: '#FFFBEA', borderRadius: 14, padding: 14, marginBottom: 10,
-    borderLeftWidth: 3, borderLeftColor: AppColors.secondary,
-  },
+    borderLeftWidth: 3, borderLeftColor: AppColors.secondary },
   storyEmoji: { fontSize: 28 },
   storyTitle: { fontSize: 14, fontWeight: '700', color: AppColors.black },
   storyBody: { fontSize: 12, color: AppColors.grayDark, marginTop: 4, lineHeight: 18 },
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
   modalContent: {
-    backgroundColor: AppColors.white, borderTopLeftRadius: 20, borderTopRightRadius: 20, padding: 20,
-  },
+    backgroundColor: AppColors.white, borderTopLeftRadius: 20, borderTopRightRadius: 20, padding: 20 },
   modalTitle: { fontSize: 17, fontWeight: '700', color: AppColors.black, marginBottom: 10 },
   label: { fontSize: 13, fontWeight: '600', color: AppColors.grayDark, marginTop: 12, marginBottom: 6 },
   input: {
     borderWidth: 1, borderColor: AppColors.grayMedium, borderRadius: 10,
-    paddingHorizontal: 12, paddingVertical: 10, fontSize: 15,
-  },
+    paddingHorizontal: 12, paddingVertical: 10, fontSize: 15 },
   modalActions: { flexDirection: 'row', gap: 10, marginTop: 20 },
   btn: { flex: 1, paddingVertical: 12, borderRadius: 10, alignItems: 'center' },
   btnPrimary: { backgroundColor: AppColors.primary },
   btnSecondary: { backgroundColor: AppColors.grayLight },
   btnPrimaryText: { color: AppColors.white, fontSize: 15, fontWeight: '700' },
-  btnSecondaryText: { color: AppColors.black, fontSize: 15, fontWeight: '600' },
-});
+  btnSecondaryText: { color: AppColors.black, fontSize: 15, fontWeight: '600' } });

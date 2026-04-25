@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import {
   View, Text, ScrollView, StyleSheet, TouchableOpacity, TextInput,
-  Modal, Alert, RefreshControl, ActivityIndicator,
-} from 'react-native';
+  Modal, Alert, RefreshControl, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { AppColors } from '@/constants/theme';
 import { reminderApi, registryApi, financeApi } from '@/services/api';
@@ -340,7 +339,7 @@ const styles = StyleSheet.create({
   title: { fontSize: 22, fontWeight: '800', color: AppColors.black },
   tabBar: { flexDirection: 'row', marginHorizontal: 16, marginTop: 8, backgroundColor: '#EEE', borderRadius: 12, padding: 3 },
   tab: { flex: 1, paddingVertical: 9, alignItems: 'center', borderRadius: 10 },
-  tabActive: { backgroundColor: '#FFF', elevation: 2, shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 4, shadowOffset: { width: 0, height: 1 } },
+  tabActive: { backgroundColor: '#FFF', elevation: 2, boxShadow: '0px 1px 4px rgba(0,0,0,0.1)' },
   tabText: { fontSize: 11, fontWeight: '600', color: AppColors.grayDark },
   tabTextActive: { color: AppColors.primary, fontWeight: '700' },
   sectionTitle: { fontSize: 16, fontWeight: '700', color: AppColors.black, marginTop: 20, marginBottom: 10 },
@@ -348,7 +347,7 @@ const styles = StyleSheet.create({
   // Reminder
   addBtn: { backgroundColor: AppColors.primary, padding: 14, borderRadius: 12, alignItems: 'center', marginTop: 8 },
   addBtnText: { color: '#FFF', fontSize: 14, fontWeight: '700' },
-  reminderCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#FFF', borderRadius: 12, padding: 12, marginTop: 8, elevation: 2, shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 4, shadowOffset: { width: 0, height: 1 } },
+  reminderCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#FFF', borderRadius: 12, padding: 12, marginTop: 8, elevation: 2, boxShadow: '0px 1px 4px rgba(0,0,0,0.05)' },
   overdueCard: { borderWidth: 1.5, borderColor: AppColors.danger },
   reminderEmoji: { fontSize: 24, marginRight: 10 },
   reminderTitle: { fontSize: 14, fontWeight: '600', color: AppColors.black },
@@ -364,11 +363,11 @@ const styles = StyleSheet.create({
   vaccineMonth: { fontSize: 12, fontWeight: '700', color: AppColors.primary },
   // Registry
   regGrid: { flexDirection: 'row', gap: 10, marginTop: 8 },
-  regCard: { flex: 1, backgroundColor: '#FFF', borderRadius: 14, padding: 16, alignItems: 'center', elevation: 2, shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 4, shadowOffset: { width: 0, height: 1 } },
+  regCard: { flex: 1, backgroundColor: '#FFF', borderRadius: 14, padding: 16, alignItems: 'center', elevation: 2, boxShadow: '0px 1px 4px rgba(0,0,0,0.05)' },
   regEmoji: { fontSize: 28 },
   regCount: { fontSize: 22, fontWeight: '800', color: AppColors.black, marginTop: 4 },
   regLabel: { fontSize: 10, color: AppColors.grayDark, marginTop: 2, textAlign: 'center' },
-  regBtn: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#FFF', borderRadius: 12, padding: 14, marginTop: 8, elevation: 2, shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 4, shadowOffset: { width: 0, height: 1 } },
+  regBtn: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#FFF', borderRadius: 12, padding: 14, marginTop: 8, elevation: 2, boxShadow: '0px 1px 4px rgba(0,0,0,0.05)' },
   regBtnEmoji: { fontSize: 24, marginRight: 12 },
   regBtnTitle: { fontSize: 14, fontWeight: '600', color: AppColors.black },
   regBtnDesc: { fontSize: 11, color: AppColors.grayDark },
@@ -413,5 +412,4 @@ const styles = StyleSheet.create({
   cancelBtn: { flex: 1, padding: 14, borderRadius: 12, borderWidth: 1.5, borderColor: AppColors.grayMedium, alignItems: 'center' },
   cancelText: { fontSize: 15, fontWeight: '600', color: AppColors.grayDark },
   saveBtn: { flex: 1, padding: 14, borderRadius: 12, backgroundColor: AppColors.primary, alignItems: 'center' },
-  saveText: { fontSize: 15, fontWeight: '700', color: '#FFF' },
-});
+  saveText: { fontSize: 15, fontWeight: '700', color: '#FFF' } });

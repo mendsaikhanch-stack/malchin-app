@@ -7,8 +7,7 @@ import {
   TouchableOpacity,
   TextInput,
   RefreshControl,
-  ActivityIndicator,
-} from 'react-native';
+  ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { AppColors } from '@/constants/theme';
 import { insuranceApi } from '@/services/api';
@@ -16,8 +15,7 @@ import { insuranceApi } from '@/services/api';
 const BRAND = {
   primary: '#2d5016',
   primaryLight: '#4a7c28',
-  bg: '#f5f7f0',
-};
+  bg: '#f5f7f0' };
 
 type TabKey = 'types' | 'calc' | 'guide';
 
@@ -65,8 +63,7 @@ export default function LivestockInsuranceScreen() {
       setCalcResult({
         bod_count: bod, bog_count: bog, total_head: bod + bog,
         bod_premium: bodPremium, bog_premium: bogPremium, total_premium: bodPremium + bogPremium,
-        estimated_compensation: { bod: bod * 150000, bog: bog * 50000, total: bod * 150000 + bog * 50000 },
-      });
+        estimated_compensation: { bod: bod * 150000, bog: bog * 50000, total: bod * 150000 + bog * 50000 } });
     }
   };
 
@@ -454,21 +451,18 @@ const styles = StyleSheet.create({
   // Tab bar
   tabBar: {
     flexDirection: 'row', marginHorizontal: 16, marginTop: 12, marginBottom: 16,
-    backgroundColor: '#e8ede2', borderRadius: 14, padding: 3,
-  },
+    backgroundColor: '#e8ede2', borderRadius: 14, padding: 3 },
   tabItem: { flex: 1, paddingVertical: 10, borderRadius: 12, alignItems: 'center' },
   tabItemActive: {
     backgroundColor: AppColors.white,
-    shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.08, shadowRadius: 4, elevation: 3,
-  },
+    boxShadow: '0px 1px 4px rgba(0,0,0,0.08)',     elevation: 3 },
   tabText: { fontSize: 12, fontWeight: '600', color: AppColors.grayDark },
   tabTextActive: { color: BRAND.primary, fontWeight: '700' },
 
   // Info box
   infoBox: {
     flexDirection: 'row', marginHorizontal: 16, marginBottom: 12,
-    backgroundColor: '#e8f5e9', borderRadius: 12, padding: 12, alignItems: 'flex-start', gap: 8,
-  },
+    backgroundColor: '#e8f5e9', borderRadius: 12, padding: 12, alignItems: 'flex-start', gap: 8 },
   infoEmoji: { fontSize: 20 },
   infoText: { flex: 1, fontSize: 13, color: BRAND.primary, lineHeight: 20 },
 
@@ -476,8 +470,7 @@ const styles = StyleSheet.create({
   card: {
     marginHorizontal: 16, marginBottom: 12, backgroundColor: AppColors.white,
     borderRadius: 16, padding: 16,
-    shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 6, elevation: 2,
-  },
+    boxShadow: '0px 1px 6px rgba(0,0,0,0.05)',     elevation: 2 },
   cardHeader: { flexDirection: 'row', alignItems: 'flex-start', gap: 10 },
   cardEmoji: { fontSize: 28, marginTop: 2 },
   cardHeaderInfo: { flex: 1 },
@@ -506,8 +499,7 @@ const styles = StyleSheet.create({
   // Calendar
   calendarRow: {
     flexDirection: 'row', alignItems: 'center', paddingVertical: 10,
-    borderBottomWidth: 1, borderBottomColor: '#f0f0f0', gap: 10,
-  },
+    borderBottomWidth: 1, borderBottomColor: '#f0f0f0', gap: 10 },
   calendarEmoji: { fontSize: 20 },
   calendarMonth: { fontSize: 13, fontWeight: '700', color: AppColors.black },
   calendarEvent: { fontSize: 12, color: AppColors.grayDark, marginTop: 1 },
@@ -519,12 +511,10 @@ const styles = StyleSheet.create({
   calcRow: { flexDirection: 'row', gap: 12 },
   calcInput: {
     borderWidth: 1.5, borderColor: AppColors.grayMedium, borderRadius: 12,
-    padding: 12, fontSize: 16, color: AppColors.black, backgroundColor: '#fafafa',
-  },
+    padding: 12, fontSize: 16, color: AppColors.black, backgroundColor: '#fafafa' },
   calcBtn: {
     backgroundColor: BRAND.primary, borderRadius: 12, paddingVertical: 14,
-    alignItems: 'center', marginTop: 14,
-  },
+    alignItems: 'center', marginTop: 14 },
   calcBtnText: { color: AppColors.white, fontSize: 15, fontWeight: '700' },
   calcSubtitle: { fontSize: 13, color: AppColors.grayDark, marginBottom: 10 },
 
@@ -532,8 +522,7 @@ const styles = StyleSheet.create({
   resultBox: { backgroundColor: '#fafafa', borderRadius: 12, padding: 14 },
   resultRow: {
     flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 8,
-    borderBottomWidth: 1, borderBottomColor: '#f0f0f0',
-  },
+    borderBottomWidth: 1, borderBottomColor: '#f0f0f0' },
   resultLabel: { fontSize: 13, color: AppColors.grayDark },
   resultValue: { fontSize: 13, fontWeight: '600', color: AppColors.black },
   resultNote: { fontSize: 11, color: AppColors.gray, marginBottom: 4, marginLeft: 4 },
@@ -544,8 +533,7 @@ const styles = StyleSheet.create({
 
   // ROI
   roiBox: {
-    marginTop: 12, backgroundColor: '#fff8e1', borderRadius: 12, padding: 14, alignItems: 'center',
-  },
+    marginTop: 12, backgroundColor: '#fff8e1', borderRadius: 12, padding: 14, alignItems: 'center' },
   roiTitle: { fontSize: 13, fontWeight: '700', color: '#f57f17', marginBottom: 4 },
   roiText: { fontSize: 12, color: '#f57f17', textAlign: 'center' },
   roiHighlight: { fontSize: 24, fontWeight: '800', color: '#E65100', marginTop: 6 },
@@ -553,8 +541,7 @@ const styles = StyleSheet.create({
   // Examples
   exampleRow: {
     flexDirection: 'row', alignItems: 'center', paddingVertical: 12,
-    borderBottomWidth: 1, borderBottomColor: '#f0f0f0',
-  },
+    borderBottomWidth: 1, borderBottomColor: '#f0f0f0' },
   exampleLabel: { fontSize: 14, fontWeight: '700', color: AppColors.black },
   exampleMeta: { fontSize: 12, color: AppColors.grayDark, marginTop: 2 },
   examplePremium: { fontSize: 13, fontWeight: '600', color: BRAND.primary },
@@ -564,8 +551,7 @@ const styles = StyleSheet.create({
   stepRow: { flexDirection: 'row', alignItems: 'flex-start', marginBottom: 16, gap: 12 },
   stepCircle: {
     width: 32, height: 32, borderRadius: 16, backgroundColor: BRAND.primary,
-    justifyContent: 'center', alignItems: 'center',
-  },
+    justifyContent: 'center', alignItems: 'center' },
   stepNumber: { fontSize: 14, fontWeight: '800', color: AppColors.white },
   stepContent: { flex: 1 },
   stepTitle: { fontSize: 14, fontWeight: '700', color: AppColors.black, marginBottom: 2 },
@@ -573,8 +559,6 @@ const styles = StyleSheet.create({
 
   // FAQ
   faqItem: {
-    marginBottom: 14, paddingBottom: 14, borderBottomWidth: 1, borderBottomColor: '#f0f0f0',
-  },
+    marginBottom: 14, paddingBottom: 14, borderBottomWidth: 1, borderBottomColor: '#f0f0f0' },
   faqQuestion: { fontSize: 14, fontWeight: '700', color: AppColors.black, marginBottom: 4 },
-  faqAnswer: { fontSize: 13, color: AppColors.grayDark, lineHeight: 19 },
-});
+  faqAnswer: { fontSize: 13, color: AppColors.grayDark, lineHeight: 19 } });

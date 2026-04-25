@@ -1,8 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import {
   View, Text, ScrollView, StyleSheet, TouchableOpacity, TextInput,
-  Modal, Alert, RefreshControl, ActivityIndicator,
-} from 'react-native';
+  Modal, Alert, RefreshControl, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { AppColors } from '@/constants/theme';
 import { pastureApi } from '@/services/api';
@@ -22,22 +21,19 @@ const pastureTypes = [
 const grassQualityMap: Record<string, { label: string; color: string }> = {
   good: { label: 'Сайн', color: '#43A047' },
   fair: { label: 'Дунд', color: '#FF8F00' },
-  poor: { label: 'Муу', color: '#E53935' },
-};
+  poor: { label: 'Муу', color: '#E53935' } };
 
 const reasonLabels: Record<string, string> = {
   seasonal: 'Улирлын',
   feed_search: 'Тэжээл хайх',
   water: 'Ус',
   emergency: 'Яаралтай',
-  other: 'Бусад',
-};
+  other: 'Бусад' };
 
 const transportLabels: Record<string, string> = {
   on_foot: 'Явган',
   vehicle: 'Машинаар',
-  mixed: 'Холимог',
-};
+  mixed: 'Холимог' };
 
 function fmt(n: number) { return (n || 0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
 
@@ -175,8 +171,7 @@ export default function PastureScreen() {
       water_source: pWater.trim() || undefined,
       aimag: pAimag.trim() || undefined,
       sum: pSum.trim() || undefined,
-      notes: pNotes.trim() || undefined,
-    };
+      notes: pNotes.trim() || undefined };
     if (pLat.trim()) data.lat = parseFloat(pLat);
     if (pLng.trim()) data.lng = parseFloat(pLng);
     try {
@@ -208,8 +203,7 @@ export default function PastureScreen() {
         start_date: gStartDate,
         animal_count: parseInt(gAnimalCount) || undefined,
         grass_condition_start: gGrassStart,
-        notes: gNotes.trim() || undefined,
-      });
+        notes: gNotes.trim() || undefined });
       setShowAddGrazing(false);
       setGPastureId(null); setGStartDate(todayStr()); setGAnimalCount(''); setGGrassStart('good'); setGNotes('');
       loadData();
@@ -259,8 +253,7 @@ export default function PastureScreen() {
         reason: mReason,
         transport_method: mTransport,
         cost: parseFloat(mCost) || undefined,
-        notes: mNotes.trim() || undefined,
-      });
+        notes: mNotes.trim() || undefined });
       setShowAddMigration(false);
       setMFromPasture(null); setMToPasture(null); setMFromLocation(''); setMToLocation('');
       setMDate(todayStr()); setMAnimalCount(''); setMDistance(''); setMDuration('');
@@ -888,7 +881,7 @@ const styles = StyleSheet.create({
   // Sub-tabs
   tabBar: { flexDirection: 'row', marginHorizontal: 16, marginTop: 8, backgroundColor: '#e8ece2', borderRadius: 12, padding: 3 },
   tab: { flex: 1, paddingVertical: 9, alignItems: 'center', borderRadius: 10 },
-  tabActive: { backgroundColor: '#FFF', elevation: 2, shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 4, shadowOffset: { width: 0, height: 1 } },
+  tabActive: { backgroundColor: '#FFF', elevation: 2, boxShadow: '0px 1px 4px rgba(0,0,0,0.1)' },
   tabText: { fontSize: 12, fontWeight: '600', color: '#616161' },
   tabTextActive: { color: '#2d5016', fontWeight: '700' },
 
@@ -905,7 +898,7 @@ const styles = StyleSheet.create({
   filterChipTextActive: { color: '#2d5016' },
 
   // Cards
-  card: { backgroundColor: '#FFF', borderRadius: 14, padding: 14, marginTop: 10, elevation: 2, shadowColor: '#000', shadowOpacity: 0.06, shadowRadius: 6, shadowOffset: { width: 0, height: 2 } },
+  card: { backgroundColor: '#FFF', borderRadius: 14, padding: 14, marginTop: 10, elevation: 2, boxShadow: '0px 2px 6px rgba(0,0,0,0.06)' },
   activeCard: { borderWidth: 2, borderColor: '#4a7c28', backgroundColor: '#f9fcf5' },
   cardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   cardTitle: { fontSize: 15, fontWeight: '700', color: '#1A1A1A', flex: 1 },
@@ -977,5 +970,4 @@ const styles = StyleSheet.create({
   cancelBtn: { flex: 1, padding: 14, borderRadius: 12, borderWidth: 1.5, borderColor: '#E0E0E0', alignItems: 'center' },
   cancelText: { fontSize: 15, fontWeight: '600', color: '#616161' },
   saveBtn: { flex: 1, padding: 14, borderRadius: 12, backgroundColor: '#2d5016', alignItems: 'center' },
-  saveText: { fontSize: 15, fontWeight: '700', color: '#FFF' },
-});
+  saveText: { fontSize: 15, fontWeight: '700', color: '#FFF' } });

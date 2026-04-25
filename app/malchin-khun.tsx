@@ -6,8 +6,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   Alert,
-  Linking,
-} from 'react-native';
+  Linking } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Stack, useRouter } from 'expo-router';
 import { AppColors } from '@/constants/theme';
@@ -296,8 +295,7 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F8F9FA' },
   header: {
     flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 12,
-    backgroundColor: AppColors.white, borderBottomWidth: 1, borderBottomColor: AppColors.grayLight,
-  },
+    backgroundColor: AppColors.white, borderBottomWidth: 1, borderBottomColor: AppColors.grayLight },
   backBtn: { width: 32, height: 32, alignItems: 'center', justifyContent: 'center' },
   backIcon: { fontSize: 30, color: AppColors.black, lineHeight: 30 },
   headerTitle: { fontSize: 17, fontWeight: '700', color: AppColors.black },
@@ -306,8 +304,7 @@ const styles = StyleSheet.create({
   tab: {
     paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20,
     borderWidth: 1, borderColor: AppColors.grayMedium, backgroundColor: AppColors.white,
-    flexDirection: 'row', alignItems: 'center', gap: 6,
-  },
+    flexDirection: 'row', alignItems: 'center', gap: 6 },
   tabActive: { backgroundColor: AppColors.primary, borderColor: AppColors.primary },
   tabEmoji: { fontSize: 16 },
   tabText: { fontSize: 13, color: AppColors.black, fontWeight: '600' },
@@ -315,13 +312,11 @@ const styles = StyleSheet.create({
   body: { padding: 16 },
   card: {
     backgroundColor: AppColors.white, borderRadius: 14, padding: 14, marginBottom: 12,
-    shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 3, elevation: 1,
-  },
+    boxShadow: '0px 1px 3px rgba(0,0,0,0.05)',     elevation: 1 },
   cardTitle: { fontSize: 15, fontWeight: '700', color: AppColors.black, marginBottom: 10 },
   reminder: {
     flexDirection: 'row', alignItems: 'center', paddingVertical: 10,
-    borderBottomWidth: 1, borderBottomColor: AppColors.grayLight,
-  },
+    borderBottomWidth: 1, borderBottomColor: AppColors.grayLight },
   reminderTitle: { fontSize: 14, fontWeight: '600', color: AppColors.black },
   reminderDate: { fontSize: 12, color: AppColors.grayDark, marginTop: 2 },
   reminderBadge: { paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6 },
@@ -333,20 +328,16 @@ const styles = StyleSheet.create({
   empty: { fontSize: 13, color: AppColors.gray, fontStyle: 'italic', marginBottom: 10 },
   addBtn: {
     paddingVertical: 10, alignItems: 'center', borderRadius: 10,
-    backgroundColor: AppColors.grayLight,
-  },
+    backgroundColor: AppColors.grayLight },
   addBtnText: { color: AppColors.primary, fontSize: 13, fontWeight: '700' },
   infoRow: {
     flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 8,
-    borderBottomWidth: 1, borderBottomColor: AppColors.grayLight,
-  },
+    borderBottomWidth: 1, borderBottomColor: AppColors.grayLight },
   infoKey: { fontSize: 13, color: AppColors.grayDark },
   infoValue: { fontSize: 14, fontWeight: '700', color: AppColors.black },
   linkBtn: { paddingVertical: 10, alignItems: 'center' },
   linkBtnText: { color: AppColors.primary, fontSize: 13, fontWeight: '700' },
   emergencyBtn: {
     backgroundColor: AppColors.danger, paddingVertical: 12, borderRadius: 10,
-    alignItems: 'center', marginBottom: 8,
-  },
-  emergencyText: { color: AppColors.white, fontSize: 14, fontWeight: '700' },
-});
+    alignItems: 'center', marginBottom: 8 },
+  emergencyText: { color: AppColors.white, fontSize: 14, fontWeight: '700' } });

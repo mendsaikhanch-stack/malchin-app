@@ -7,8 +7,7 @@ import {
   TouchableOpacity,
   Dimensions,
   NativeSyntheticEvent,
-  NativeScrollEvent,
-} from 'react-native';
+  NativeScrollEvent } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 
@@ -19,26 +18,22 @@ const pages = [
     emoji: '🐑🐎🐪',
     title: 'МАЛЧИН',
     description:
-      'Хөдөөгийн ухаалаг туслах\n\nМалаа бүртгэх, эрүүл мэндийг хянах, цаг агаар, зах зээлийн мэдээлэл авах бүгдийг нэг аппаар.',
-  },
+      'Хөдөөгийн ухаалаг туслах\n\nМалаа бүртгэх, эрүүл мэндийг хянах, цаг агаар, зах зээлийн мэдээлэл авах бүгдийг нэг аппаар.' },
   {
     emoji: '📋',
     title: 'Малаа бүртгэ',
     description:
-      'Нэг бүрчлэн бүртгэж, эрүүл мэнд, үржил, бэлчээрийн мэдээлэл хөтөл. Ээмэг сканнердаж хурдан бүртгэл хийгээрэй.',
-  },
+      'Нэг бүрчлэн бүртгэж, эрүүл мэнд, үржил, бэлчээрийн мэдээлэл хөтөл. Ээмэг сканнердаж хурдан бүртгэл хийгээрэй.' },
   {
     emoji: '📊',
     title: 'Зах зээлийн мэдээлэл',
     description:
-      'Бодит цагийн ханш, түүхий эдийн үнэ, зар нийтлэх. Малын бүтээгдэхүүний үнийг хянаж, ашигтай худалдаа хийгээрэй.',
-  },
+      'Бодит цагийн ханш, түүхий эдийн үнэ, зар нийтлэх. Малын бүтээгдэхүүний үнийг хянаж, ашигтай худалдаа хийгээрэй.' },
   {
     emoji: '🤖',
     title: 'Ухаалаг Туслах',
     description:
-      'Малын өвчин оношлох, зөвлөгөө авах, дуут команд өгөх. Хиймэл оюун ухааны тусламжтай малаа илүү сайн арчлаарай.',
-  },
+      'Малын өвчин оношлох, зөвлөгөө авах, дуут команд өгөх. Хиймэл оюун ухааны тусламжтай малаа илүү сайн арчлаарай.' },
 ];
 
 export default function WelcomeScreen() {
@@ -55,8 +50,7 @@ export default function WelcomeScreen() {
     if (currentPage < pages.length - 1) {
       scrollRef.current?.scrollTo({
         x: (currentPage + 1) * width,
-        animated: true,
-      });
+        animated: true });
       setCurrentPage(currentPage + 1);
     }
   };
@@ -126,28 +120,24 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 40,
-  },
+    paddingHorizontal: 40 },
   pageEmoji: { fontSize: 72, marginBottom: 32 },
   pageTitle: {
     fontSize: 32,
     fontWeight: '800',
     color: '#2d5016',
     marginBottom: 20,
-    textAlign: 'center',
-  },
+    textAlign: 'center' },
   pageDescription: {
     fontSize: 16,
     color: '#4A4A4A',
     textAlign: 'center',
-    lineHeight: 26,
-  },
+    lineHeight: 26 },
   dotsContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    paddingVertical: 20,
-  },
+    paddingVertical: 20 },
   dot: { width: 10, height: 10, borderRadius: 5, marginHorizontal: 6 },
   dotActive: { backgroundColor: '#2d5016', width: 28, borderRadius: 5 },
   dotInactive: { backgroundColor: '#C8D6C0' },
@@ -156,20 +146,15 @@ const styles = StyleSheet.create({
     backgroundColor: '#2d5016',
     borderRadius: 16,
     paddingVertical: 18,
-    alignItems: 'center',
-  },
+    alignItems: 'center' },
   nextButtonText: { color: '#FFFFFF', fontSize: 18, fontWeight: '700' },
   startButton: {
     backgroundColor: '#2d5016',
     borderRadius: 16,
     paddingVertical: 18,
     alignItems: 'center',
-    shadowColor: '#2d5016',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 6,
-  },
+    boxShadow: '0px 4px 8px rgba(45,80,22,0.3)',
+    elevation: 6 },
   startButtonText: { color: '#FFFFFF', fontSize: 20, fontWeight: '800' },
   loginButton: {
     marginTop: 10,
@@ -178,13 +163,10 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     alignItems: 'center',
     borderWidth: 1.5,
-    borderColor: '#2d5016',
-  },
+    borderColor: '#2d5016' },
   loginButtonText: { color: '#2d5016', fontSize: 17, fontWeight: '700' },
   loginNote: {
     fontSize: 11,
     color: '#7A7A7A',
     textAlign: 'center',
-    marginTop: 8,
-  },
-});
+    marginTop: 8 } });

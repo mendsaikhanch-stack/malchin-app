@@ -8,8 +8,7 @@ import {
   TextInput,
   Alert,
   ActivityIndicator,
-  Share,
-} from 'react-native';
+  Share } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import * as Clipboard from 'expo-clipboard';
@@ -23,8 +22,7 @@ const animalTypes: Record<string, { label: string; emoji: string }> = {
   goat: { label: 'Ямаа', emoji: '🐐' },
   cattle: { label: 'Үхэр', emoji: '🐄' },
   horse: { label: 'Морь', emoji: '🐎' },
-  camel: { label: 'Тэмээ', emoji: '🐫' },
-};
+  camel: { label: 'Тэмээ', emoji: '🐫' } };
 
 const genderLabels: Record<string, string> = { male: 'Эр', female: 'Эм' };
 
@@ -32,22 +30,19 @@ const statusLabels: Record<string, { label: string; bg: string; color: string }>
   active: { label: 'Идэвхтэй', bg: '#E8F5E9', color: '#2E7D32' },
   sold: { label: 'Зарагдсан', bg: '#FFF3E0', color: '#E65100' },
   dead: { label: 'Үхсэн', bg: '#FFEBEE', color: '#C62828' },
-  slaughtered: { label: 'Нядалсан', bg: '#FBE9E7', color: '#BF360C' },
-};
+  slaughtered: { label: 'Нядалсан', bg: '#FBE9E7', color: '#BF360C' } };
 
 const originLabels: Record<string, string> = {
   own_birth: 'Өөрийн төл',
   purchased: 'Худалдаж авсан',
   gift: 'Бэлэг',
-  exchange: 'Солилцсон',
-};
+  exchange: 'Солилцсон' };
 
 const severityLabels: Record<string, { label: string; bg: string; color: string }> = {
   low: { label: 'Хөнгөн', bg: '#E8F5E9', color: '#2E7D32' },
   medium: { label: 'Дунд', bg: '#FFF3E0', color: '#E65100' },
   high: { label: 'Хүнд', bg: '#FFEBEE', color: '#C62828' },
-  critical: { label: 'Маш хүнд', bg: '#F3E5F5', color: '#6A1B9A' },
-};
+  critical: { label: 'Маш хүнд', bg: '#F3E5F5', color: '#6A1B9A' } };
 
 function getAnimalInfo(type: string) {
   return animalTypes[type] || { label: type, emoji: '🐾' };
@@ -491,43 +486,35 @@ function InfoGridItem({ label, value }: { label: string; value: string }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f7f0',
-  },
+    backgroundColor: '#f5f7f0' },
   scrollView: {
-    flex: 1,
-  },
+    flex: 1 },
   scrollContent: {
-    paddingBottom: 40,
-  },
+    paddingBottom: 40 },
 
   // Header
   header: {
     paddingHorizontal: 20,
     paddingTop: 16,
-    paddingBottom: 8,
-  },
+    paddingBottom: 8 },
   title: {
     fontSize: 26,
     fontWeight: '800',
-    color: '#1A1A1A',
-  },
+    color: '#1A1A1A' },
   subtitle: {
     fontSize: 13,
     color: AppColors.grayDark,
     marginTop: 4,
-    lineHeight: 18,
-  },
+    lineHeight: 18 },
 
   // Search Section
   searchSection: {
     paddingHorizontal: 20,
     paddingTop: 16,
-    paddingBottom: 8,
-  },
+    paddingBottom: 8 },
   searchInputRow: {
     flexDirection: 'row',
-    gap: 10,
-  },
+    gap: 10 },
   searchInputContainer: {
     flex: 1,
     flexDirection: 'row',
@@ -538,22 +525,16 @@ const styles = StyleSheet.create({
     borderColor: '#e0e8d8',
     paddingHorizontal: 14,
     height: 52,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 3,
-  },
+    boxShadow: '0px 2px 8px rgba(0,0,0,0.06)',
+    elevation: 3 },
   searchIcon: {
     fontSize: 20,
-    marginRight: 10,
-  },
+    marginRight: 10 },
   searchInput: {
     flex: 1,
     fontSize: 16,
     color: '#1A1A1A',
-    fontWeight: '600',
-  },
+    fontWeight: '600' },
   searchButton: {
     backgroundColor: '#2d5016',
     borderRadius: 14,
@@ -561,17 +542,12 @@ const styles = StyleSheet.create({
     height: 52,
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#2d5016',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 4,
-  },
+    boxShadow: '0px 4px 8px rgba(45,80,22,0.3)',
+    elevation: 4 },
   searchButtonText: {
     color: '#fff',
     fontSize: 16,
-    fontWeight: '700',
-  },
+    fontWeight: '700' },
 
   // Scanner Button
   scannerButton: {
@@ -585,42 +561,35 @@ const styles = StyleSheet.create({
     borderWidth: 1.5,
     borderColor: '#d0d9c6',
     borderStyle: 'dashed',
-    opacity: 0.6,
-  },
+    opacity: 0.6 },
   scannerButtonText: {
     fontSize: 15,
     fontWeight: '600',
     color: AppColors.grayDark,
-    marginRight: 8,
-  },
+    marginRight: 8 },
   comingSoonBadge: {
     backgroundColor: '#4a7c28',
     borderRadius: 8,
     paddingHorizontal: 8,
-    paddingVertical: 2,
-  },
+    paddingVertical: 2 },
   comingSoonText: {
     fontSize: 10,
     fontWeight: '700',
-    color: '#fff',
-  },
+    color: '#fff' },
 
   // Recent Lookups
   recentSection: {
     paddingHorizontal: 20,
-    paddingTop: 12,
-  },
+    paddingTop: 12 },
   recentTitle: {
     fontSize: 13,
     fontWeight: '600',
     color: AppColors.grayDark,
-    marginBottom: 8,
-  },
+    marginBottom: 8 },
   recentChips: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 8,
-  },
+    gap: 8 },
   recentChip: {
     backgroundColor: '#fff',
     borderRadius: 20,
@@ -628,29 +597,22 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     borderWidth: 1,
     borderColor: '#d0d9c6',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.04,
-    shadowRadius: 4,
-    elevation: 2,
-  },
+    boxShadow: '0px 1px 4px rgba(0,0,0,0.04)',
+    elevation: 2 },
   recentChipText: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#2d5016',
-  },
+    color: '#2d5016' },
 
   // Center Message
   centerMessage: {
     alignItems: 'center',
     paddingTop: 40,
-    paddingBottom: 20,
-  },
+    paddingBottom: 20 },
   loadingText: {
     fontSize: 14,
     color: AppColors.grayDark,
-    marginTop: 12,
-  },
+    marginTop: 12 },
 
   // Not Found
   notFoundCard: {
@@ -660,28 +622,21 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 32,
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 3,
-  },
+    boxShadow: '0px 2px 8px rgba(0,0,0,0.06)',
+    elevation: 3 },
   notFoundEmoji: {
     fontSize: 48,
-    marginBottom: 12,
-  },
+    marginBottom: 12 },
   notFoundTitle: {
     fontSize: 20,
     fontWeight: '800',
     color: '#1A1A1A',
-    marginBottom: 8,
-  },
+    marginBottom: 8 },
   notFoundText: {
     fontSize: 14,
     color: AppColors.grayDark,
     textAlign: 'center',
-    lineHeight: 20,
-  },
+    lineHeight: 20 },
 
   // Result Card
   resultCard: {
@@ -690,160 +645,131 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 16,
     padding: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    elevation: 4,
-  },
+    boxShadow: '0px 2px 12px rgba(0,0,0,0.08)',
+    elevation: 4 },
 
   // Card Header
   cardHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 16,
-  },
+    marginBottom: 16 },
   cardEmoji: {
     fontSize: 40,
-    marginRight: 12,
-  },
+    marginRight: 12 },
   cardHeaderInfo: {
-    flex: 1,
-  },
+    flex: 1 },
   cardName: {
     fontSize: 22,
     fontWeight: '800',
-    color: '#1A1A1A',
-  },
+    color: '#1A1A1A' },
   cardType: {
     fontSize: 13,
     color: AppColors.grayDark,
-    marginTop: 2,
-  },
+    marginTop: 2 },
   statusBadge: {
     paddingHorizontal: 10,
     paddingVertical: 4,
-    borderRadius: 10,
-  },
+    borderRadius: 10 },
   statusBadgeText: {
     fontSize: 11,
-    fontWeight: '700',
-  },
+    fontWeight: '700' },
 
   // Info Grid
   infoGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 8,
-    marginBottom: 16,
-  },
+    marginBottom: 16 },
   infoGridItem: {
     backgroundColor: '#f5f7f0',
     borderRadius: 10,
     paddingHorizontal: 12,
     paddingVertical: 8,
     minWidth: '45%',
-    flexGrow: 1,
-  },
+    flexGrow: 1 },
   infoGridLabel: {
     fontSize: 10,
     color: AppColors.gray,
     fontWeight: '600',
-    textTransform: 'uppercase',
-  },
+    textTransform: 'uppercase' },
   infoGridValue: {
     fontSize: 14,
     fontWeight: '700',
     color: '#2d5016',
-    marginTop: 2,
-  },
+    marginTop: 2 },
 
   // Section
   section: {
     marginBottom: 16,
     paddingTop: 12,
     borderTopWidth: 1,
-    borderTopColor: '#f0f0f0',
-  },
+    borderTopColor: '#f0f0f0' },
   sectionTitle: {
     fontSize: 16,
     fontWeight: '700',
     color: '#1A1A1A',
-    marginBottom: 10,
-  },
+    marginBottom: 10 },
 
   // Genealogy
   genealogyRow: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 6,
-    marginLeft: 8,
-  },
+    marginLeft: 8 },
   genealogyRole: {
     fontSize: 13,
     fontWeight: '600',
     color: AppColors.grayDark,
     marginRight: 6,
-    width: 50,
-  },
+    width: 50 },
   genealogyName: {
     fontSize: 13,
     color: '#2d5016',
     fontWeight: '600',
-    flex: 1,
-  },
+    flex: 1 },
 
   // Health Records
   healthItem: {
     backgroundColor: '#f5f7f0',
     borderRadius: 10,
     padding: 10,
-    marginBottom: 6,
-  },
+    marginBottom: 6 },
   healthItemHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
-  },
+    alignItems: 'center' },
   healthItemTitle: {
     fontSize: 13,
     fontWeight: '600',
     color: '#1A1A1A',
     flex: 1,
-    marginRight: 8,
-  },
+    marginRight: 8 },
   healthItemDate: {
     fontSize: 11,
     color: AppColors.grayDark,
-    marginTop: 4,
-  },
+    marginTop: 4 },
   severityBadge: {
     paddingHorizontal: 8,
     paddingVertical: 2,
-    borderRadius: 8,
-  },
+    borderRadius: 8 },
   severityBadgeText: {
     fontSize: 10,
-    fontWeight: '700',
-  },
+    fontWeight: '700' },
 
   // Vaccinations
   vaccinationItem: {
     backgroundColor: '#f5f7f0',
     borderRadius: 10,
     padding: 10,
-    marginBottom: 6,
-  },
+    marginBottom: 6 },
   vaccinationName: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#1A1A1A',
-  },
+    color: '#1A1A1A' },
   vaccinationDate: {
     fontSize: 11,
     color: AppColors.grayDark,
-    marginTop: 4,
-  },
+    marginTop: 4 },
 
   // Action Buttons
   actionButtons: {
@@ -852,63 +778,53 @@ const styles = StyleSheet.create({
     marginTop: 16,
     paddingTop: 16,
     borderTopWidth: 1,
-    borderTopColor: '#f0f0f0',
-  },
+    borderTopColor: '#f0f0f0' },
   editButton: {
     flex: 1,
     paddingVertical: 14,
     borderRadius: 12,
     backgroundColor: '#E8F5E9',
-    alignItems: 'center',
-  },
+    alignItems: 'center' },
   editButtonText: {
     fontSize: 14,
     fontWeight: '700',
-    color: '#2d5016',
-  },
+    color: '#2d5016' },
   healthButton: {
     flex: 1,
     paddingVertical: 14,
     borderRadius: 12,
     backgroundColor: '#E3F2FD',
-    alignItems: 'center',
-  },
+    alignItems: 'center' },
   healthButtonText: {
     fontSize: 14,
     fontWeight: '700',
-    color: '#1565C0',
-  },
+    color: '#1565C0' },
   shareButton: {
     flex: 1,
     paddingVertical: 14,
     borderRadius: 12,
     backgroundColor: '#FFF3E0',
-    alignItems: 'center',
-  },
+    alignItems: 'center' },
   shareButtonText: {
     fontSize: 14,
     fontWeight: '700',
-    color: '#E65100',
-  },
+    color: '#E65100' },
   copyButton: {
     flex: 1,
     paddingVertical: 14,
     borderRadius: 12,
     backgroundColor: '#F3E5F5',
-    alignItems: 'center',
-  },
+    alignItems: 'center' },
   copyButtonText: {
     fontSize: 14,
     fontWeight: '700',
-    color: '#6A1B9A',
-  },
+    color: '#6A1B9A' },
 
   // Mode toggle
   modeRow: {
     flexDirection: 'row',
     gap: 8,
-    marginTop: 12,
-  },
+    marginTop: 12 },
   modeBtn: {
     flex: 1,
     paddingVertical: 12,
@@ -916,32 +832,26 @@ const styles = StyleSheet.create({
     backgroundColor: '#e8ede2',
     alignItems: 'center',
     borderWidth: 1.5,
-    borderColor: '#d0d9c6',
-  },
+    borderColor: '#d0d9c6' },
   modeBtnActive: {
     backgroundColor: '#2d5016',
-    borderColor: '#2d5016',
-  },
+    borderColor: '#2d5016' },
   modeBtnText: {
     fontSize: 13,
     fontWeight: '600',
-    color: AppColors.grayDark,
-  },
+    color: AppColors.grayDark },
   modeBtnTextActive: {
-    color: '#fff',
-  },
+    color: '#fff' },
 
   // Batch results
   batchSection: {
     marginHorizontal: 20,
-    marginTop: 20,
-  },
+    marginTop: 20 },
   batchTitle: {
     fontSize: 16,
     fontWeight: '700',
     color: '#1A1A1A',
-    marginBottom: 12,
-  },
+    marginBottom: 12 },
   batchItem: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -950,17 +860,12 @@ const styles = StyleSheet.create({
     padding: 14,
     marginBottom: 8,
     gap: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.04,
-    shadowRadius: 4,
-    elevation: 2,
-  },
+    boxShadow: '0px 1px 4px rgba(0,0,0,0.04)',
+    elevation: 2 },
   batchItemNotFound: {
     backgroundColor: '#FFF8F8',
     borderWidth: 1,
-    borderColor: '#FFCDD2',
-  },
+    borderColor: '#FFCDD2' },
   batchEmoji: { fontSize: 28 },
   batchTag: { fontSize: 14, fontWeight: '700', color: '#1A1A1A' },
   batchInfo: { fontSize: 12, color: AppColors.grayDark, marginTop: 2 },
@@ -975,26 +880,19 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 16,
     padding: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 3,
-  },
+    boxShadow: '0px 2px 8px rgba(0,0,0,0.06)',
+    elevation: 3 },
   quickActionsTitle: {
     fontSize: 16,
     fontWeight: '700',
     color: '#1A1A1A',
-    marginBottom: 14,
-  },
+    marginBottom: 14 },
   quickActionBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 12,
     borderBottomWidth: 1,
     borderBottomColor: '#f0f0f0',
-    gap: 12,
-  },
+    gap: 12 },
   quickActionEmoji: { fontSize: 24 },
-  quickActionLabel: { fontSize: 15, fontWeight: '600', color: '#2d5016' },
-});
+  quickActionLabel: { fontSize: 15, fontWeight: '600', color: '#2d5016' } });

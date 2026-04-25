@@ -1,8 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import {
   View, Text, ScrollView, StyleSheet, TouchableOpacity, TextInput,
-  Modal, Alert, RefreshControl, ActivityIndicator, FlatList,
-} from 'react-native';
+  Modal, Alert, RefreshControl, ActivityIndicator, FlatList } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { AppColors } from '@/constants/theme';
 import { breedingApi, animalsApi } from '@/services/api';
@@ -12,28 +11,24 @@ const tabs = ['Хээлтүүлэг', 'Төллөлт', 'Календарь'];
 const COLORS = {
   primary: '#2d5016',
   primaryLight: '#4a7c28',
-  bg: '#f5f7f0',
-};
+  bg: '#f5f7f0' };
 
 const breedingStatusMap: Record<string, { label: string; bg: string; color: string }> = {
   bred:      { label: 'Хээлтүүлсэн', bg: '#FFF8E1', color: '#F9A825' },
   confirmed: { label: 'Баталгаажсан', bg: '#E3F2FD', color: '#1565C0' },
   due:       { label: 'Хүлээгдэж буй', bg: '#FFF3E0', color: '#EF6C00' },
   delivered: { label: 'Төрсөн', bg: '#E8F5E9', color: '#2E7D32' },
-  failed:    { label: 'Амжилтгүй', bg: '#FFEBEE', color: '#C62828' },
-};
+  failed:    { label: 'Амжилтгүй', bg: '#FFEBEE', color: '#C62828' } };
 
 const difficultyMap: Record<string, { label: string; bg: string; color: string }> = {
   easy:      { label: 'Хөнгөн', bg: '#E8F5E9', color: '#2E7D32' },
   normal:    { label: 'Хэвийн', bg: '#E3F2FD', color: '#1565C0' },
   difficult: { label: 'Хүнд', bg: '#FFF3E0', color: '#EF6C00' },
-  emergency: { label: 'Яаралтай', bg: '#FFEBEE', color: '#C62828' },
-};
+  emergency: { label: 'Яаралтай', bg: '#FFEBEE', color: '#C62828' } };
 
 const methodLabels: Record<string, string> = {
   natural: 'Байгалийн',
-  artificial: 'Зохиомлоор',
-};
+  artificial: 'Зохиомлоор' };
 
 function StatusBadge({ map, value }: { map: Record<string, { label: string; bg: string; color: string }>; value: string }) {
   const info = map[value] || { label: value, bg: '#F5F5F5', color: '#616161' };
@@ -152,18 +147,15 @@ export default function BreedingScreen() {
 
   const femalePickerItems = femaleAnimals.map((a: any) => ({
     label: `${a.name || a.animal_type || 'Эм мал'}${a.ear_tag ? ' (' + a.ear_tag + ')' : ''}`,
-    value: a.id,
-  }));
+    value: a.id }));
 
   const malePickerItems = maleAnimals.map((a: any) => ({
     label: `${a.name || a.animal_type || 'Эр мал'}${a.ear_tag ? ' (' + a.ear_tag + ')' : ''}`,
-    value: a.id,
-  }));
+    value: a.id }));
 
   const breedingPickerItems = breedingRecords.map((b: any) => ({
     label: `${animalName(b.female_id)} - ${b.breeding_date}`,
-    value: b.id,
-  }));
+    value: b.id }));
 
   const loadAnimals = async () => {
     try {
@@ -228,8 +220,7 @@ export default function BreedingScreen() {
       female_id: bFemaleId,
       breeding_date: bDate,
       breeding_method: bMethod,
-      notes: bNotes,
-    };
+      notes: bNotes };
     if (bMaleId) payload.male_id = bMaleId;
     try {
       if (editingBreeding) {
@@ -286,8 +277,7 @@ export default function BreedingScreen() {
       offspring_count: parseInt(birthOffspring) || 1,
       alive_count: parseInt(birthAlive) || 1,
       difficulty: birthDifficulty,
-      notes: birthNotes,
-    };
+      notes: birthNotes };
     if (birthFatherId) payload.father_id = birthFatherId;
     if (birthBreedingId) payload.breeding_id = birthBreedingId;
     try {
@@ -680,13 +670,13 @@ const s = StyleSheet.create({
   // Tab bar
   tabBar: { flexDirection: 'row', marginHorizontal: 16, marginTop: 8, backgroundColor: '#e0e8d5', borderRadius: 12, padding: 3 },
   tab: { flex: 1, paddingVertical: 9, alignItems: 'center', borderRadius: 10 },
-  tabActive: { backgroundColor: '#FFF', elevation: 2, shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 4, shadowOffset: { width: 0, height: 1 } },
+  tabActive: { backgroundColor: '#FFF', elevation: 2, boxShadow: '0px 1px 4px rgba(0,0,0,0.1)' },
   tabText: { fontSize: 12, fontWeight: '600', color: AppColors.grayDark },
   tabTextActive: { color: COLORS.primary, fontWeight: '700' },
 
   // Stats
   statsRow: { flexDirection: 'row', gap: 10, marginTop: 8 },
-  statCard: { flex: 1, backgroundColor: '#FFF', borderRadius: 14, padding: 14, alignItems: 'center', elevation: 2, shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 4, shadowOffset: { width: 0, height: 1 } },
+  statCard: { flex: 1, backgroundColor: '#FFF', borderRadius: 14, padding: 14, alignItems: 'center', elevation: 2, boxShadow: '0px 1px 4px rgba(0,0,0,0.05)' },
   statValue: { fontSize: 22, fontWeight: '800', color: COLORS.primary },
   statLabel: { fontSize: 10, color: AppColors.grayDark, marginTop: 2, textAlign: 'center' },
 
@@ -695,7 +685,7 @@ const s = StyleSheet.create({
   addBtnText: { color: '#FFF', fontSize: 14, fontWeight: '700' },
 
   // Card
-  card: { backgroundColor: '#FFF', borderRadius: 14, padding: 14, marginTop: 10, elevation: 2, shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 4, shadowOffset: { width: 0, height: 1 } },
+  card: { backgroundColor: '#FFF', borderRadius: 14, padding: 14, marginTop: 10, elevation: 2, boxShadow: '0px 1px 4px rgba(0,0,0,0.05)' },
   cardTitle: { fontSize: 15, fontWeight: '700', color: AppColors.black },
   cardSub: { fontSize: 13, color: AppColors.grayDark, marginTop: 2 },
   cardInfo: { flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginTop: 8 },
@@ -713,7 +703,7 @@ const s = StyleSheet.create({
 
   // Calendar
   sectionTitle: { fontSize: 16, fontWeight: '700', color: AppColors.black, marginTop: 12, marginBottom: 10 },
-  calendarCard: { backgroundColor: '#FFF', borderRadius: 12, padding: 14, marginBottom: 8, borderLeftWidth: 4, elevation: 2, shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 4, shadowOffset: { width: 0, height: 1 } },
+  calendarCard: { backgroundColor: '#FFF', borderRadius: 12, padding: 14, marginBottom: 8, borderLeftWidth: 4, elevation: 2, boxShadow: '0px 1px 4px rgba(0,0,0,0.05)' },
   calendarAnimal: { fontSize: 15, fontWeight: '700', color: AppColors.black },
   calendarDate: { fontSize: 12, color: AppColors.grayDark, marginTop: 4 },
   urgencyBadge: { paddingHorizontal: 10, paddingVertical: 5, borderRadius: 8 },
@@ -753,5 +743,4 @@ const s = StyleSheet.create({
   pickerModalTitle: { fontSize: 18, fontWeight: '700', color: AppColors.black },
   pickerItem: { paddingVertical: 12, paddingHorizontal: 8, borderBottomWidth: 1, borderBottomColor: '#F0F0F0' },
   pickerItemActive: { backgroundColor: COLORS.bg },
-  pickerItemText: { fontSize: 15, color: AppColors.black },
-});
+  pickerItemText: { fontSize: 15, color: AppColors.black } });

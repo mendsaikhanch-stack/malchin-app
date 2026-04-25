@@ -9,8 +9,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   ActivityIndicator,
-  Alert,
-} from 'react-native';
+  Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { AppColors } from '@/constants/theme';
 import { aiApi, livestockApi } from '@/services/api';
@@ -49,16 +48,14 @@ const ACTION_LABELS: Record<string, string> = {
   vaccination: 'Вакцинжуулалт',
   migration: 'Нүүдэл',
   grazing: 'Бэлчээрлэлт',
-  unknown: 'Тодорхойгүй',
-};
+  unknown: 'Тодорхойгүй' };
 
 const ANIMAL_LABELS: Record<string, string> = {
   sheep: 'Хонь',
   goat: 'Ямаа',
   cattle: 'Үхэр',
   horse: 'Морь/Адуу',
-  camel: 'Тэмээ',
-};
+  camel: 'Тэмээ' };
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -67,8 +64,7 @@ const ANIMAL_LABELS: Record<string, string> = {
 const COLORS = {
   primaryGreen: '#2d5016',
   lightGreen: '#4a7c28',
-  background: '#f5f7f0',
-};
+  background: '#f5f7f0' };
 
 const quickQuestions = [
   'Хонины тураалд юу хийх вэ?',
@@ -95,8 +91,7 @@ export default function AIAdvisorScreen() {
       id: 0,
       text: 'Сайн байна уу! Би таны малчны зөвлөгч. Мал аж ахуйн талаар ямар ч асуулт асуугаарай.',
       sender: 'ai',
-      timestamp: now(),
-    },
+      timestamp: now() },
   ]);
   const [chatInput, setChatInput] = useState('');
   const [chatLoading, setChatLoading] = useState(false);
@@ -122,8 +117,7 @@ export default function AIAdvisorScreen() {
         id: Date.now(),
         text: text.trim(),
         sender: 'user',
-        timestamp: now(),
-      };
+        timestamp: now() };
 
       setMessages((prev) => [...prev, userMsg]);
       setChatInput('');
@@ -137,8 +131,7 @@ export default function AIAdvisorScreen() {
           id: Date.now() + 1,
           text: res.answer || 'Уучлаарай, хариулт олдсонгүй.',
           sender: 'ai',
-          timestamp: now(),
-        };
+          timestamp: now() };
         setMessages((prev) => [...prev, aiMsg]);
       } catch {
         setMessages((prev) => [
@@ -147,8 +140,7 @@ export default function AIAdvisorScreen() {
             id: Date.now() + 1,
             text: 'Алдаа гарлаа. Интернет холболтоо шалгана уу.',
             sender: 'ai',
-            timestamp: now(),
-          },
+            timestamp: now() },
         ]);
       } finally {
         setChatLoading(false);
@@ -187,8 +179,7 @@ export default function AIAdvisorScreen() {
             animal_type: parsedCommand.animal_type || 'sheep',
             event_type: parsedCommand.event_type || 'other',
             quantity: parsedCommand.count || 1,
-            note: parsedCommand.raw_text,
-          });
+            note: parsedCommand.raw_text });
           resultMessage = 'Малын үйл явдал амжилттай бүртгэгдлээ!';
           break;
         case 'health':
@@ -220,8 +211,7 @@ export default function AIAdvisorScreen() {
       action: parsedCommand.action,
       result: resultStatus,
       message: resultMessage,
-      timestamp: now(),
-    };
+      timestamp: now() };
     setCommandHistory((prev) => [entry, ...prev].slice(0, 5));
 
     // Show toast
@@ -570,8 +560,7 @@ const styles = StyleSheet.create({
     paddingTop: 16,
     paddingBottom: 12,
     borderBottomWidth: 1,
-    borderBottomColor: AppColors.grayMedium,
-  },
+    borderBottomColor: AppColors.grayMedium },
   title: { fontSize: 24, fontWeight: '800', color: AppColors.black },
   subtitle: { fontSize: 13, color: AppColors.grayDark, marginTop: 2 },
 
@@ -583,25 +572,20 @@ const styles = StyleSheet.create({
     marginBottom: 4,
     backgroundColor: AppColors.grayLight,
     borderRadius: 12,
-    padding: 4,
-  },
+    padding: 4 },
   toggleBtn: {
     flex: 1,
     paddingVertical: 10,
     borderRadius: 10,
-    alignItems: 'center',
-  },
+    alignItems: 'center' },
   toggleBtnActive: {
-    backgroundColor: COLORS.primaryGreen,
-  },
+    backgroundColor: COLORS.primaryGreen },
   toggleBtnText: {
     fontSize: 15,
     fontWeight: '600',
-    color: AppColors.grayDark,
-  },
+    color: AppColors.grayDark },
   toggleBtnTextActive: {
-    color: AppColors.white,
-  },
+    color: AppColors.white },
 
   // Chat mode
   chatContainer: { flex: 1 },
@@ -614,8 +598,7 @@ const styles = StyleSheet.create({
     padding: 12,
     marginBottom: 6,
     borderWidth: 1,
-    borderColor: AppColors.grayMedium,
-  },
+    borderColor: AppColors.grayMedium },
   quickBtnText: { fontSize: 14, color: COLORS.primaryGreen, fontWeight: '500' },
   messageBubble: { flexDirection: 'row', marginTop: 12, alignItems: 'flex-end' },
   userBubble: { justifyContent: 'flex-end' },
@@ -626,12 +609,8 @@ const styles = StyleSheet.create({
   aiContent: {
     backgroundColor: AppColors.white,
     borderBottomLeftRadius: 4,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.06,
-    shadowRadius: 4,
-    elevation: 2,
-  },
+    boxShadow: '0px 1px 4px rgba(0,0,0,0.06)',
+    elevation: 2 },
   messageText: { fontSize: 15, color: AppColors.black, lineHeight: 22 },
   userMessageText: { color: AppColors.white },
   timestamp: { fontSize: 10, color: AppColors.gray, marginTop: 4 },
@@ -644,8 +623,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderTopWidth: 1,
     borderTopColor: AppColors.grayMedium,
-    backgroundColor: AppColors.white,
-  },
+    backgroundColor: AppColors.white },
   input: {
     flex: 1,
     backgroundColor: '#F5F5F5',
@@ -654,8 +632,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     fontSize: 15,
     maxHeight: 100,
-    color: AppColors.black,
-  },
+    color: AppColors.black },
   sendBtn: {
     width: 42,
     height: 42,
@@ -663,8 +640,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.primaryGreen,
     justifyContent: 'center',
     alignItems: 'center',
-    marginLeft: 8,
-  },
+    marginLeft: 8 },
   sendBtnDisabled: { backgroundColor: AppColors.grayMedium },
   sendBtnText: { fontSize: 18, color: AppColors.white },
 
@@ -675,8 +651,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '700',
     color: COLORS.primaryGreen,
-    marginBottom: 8,
-  },
+    marginBottom: 8 },
   commandInput: {
     backgroundColor: AppColors.white,
     borderRadius: 14,
@@ -687,23 +662,19 @@ const styles = StyleSheet.create({
     fontSize: 16,
     minHeight: 80,
     textAlignVertical: 'top',
-    color: AppColors.black,
-  },
+    color: AppColors.black },
   executeBtn: {
     backgroundColor: COLORS.lightGreen,
     borderRadius: 12,
     paddingVertical: 14,
     alignItems: 'center',
-    marginTop: 10,
-  },
+    marginTop: 10 },
   executeBtnDisabled: {
-    backgroundColor: AppColors.grayMedium,
-  },
+    backgroundColor: AppColors.grayMedium },
   executeBtnText: {
     fontSize: 16,
     fontWeight: '700',
-    color: AppColors.white,
-  },
+    color: AppColors.white },
 
   // Suggestion chips
   suggestionsSection: { marginTop: 20 },
@@ -711,26 +682,22 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '600',
     color: AppColors.grayDark,
-    marginBottom: 8,
-  },
+    marginBottom: 8 },
   chipsContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 8,
-  },
+    gap: 8 },
   chip: {
     backgroundColor: AppColors.white,
     borderRadius: 20,
     paddingHorizontal: 14,
     paddingVertical: 8,
     borderWidth: 1,
-    borderColor: COLORS.lightGreen,
-  },
+    borderColor: COLORS.lightGreen },
   chipText: {
     fontSize: 13,
     color: COLORS.primaryGreen,
-    fontWeight: '500',
-  },
+    fontWeight: '500' },
 
   // Parsed result card
   parsedCard: {
@@ -740,53 +707,42 @@ const styles = StyleSheet.create({
     marginTop: 20,
     borderWidth: 1,
     borderColor: COLORS.lightGreen,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 6,
-    elevation: 3,
-  },
+    boxShadow: '0px 2px 6px rgba(0,0,0,0.08)',
+    elevation: 3 },
   parsedTitle: {
     fontSize: 16,
     fontWeight: '700',
     color: COLORS.primaryGreen,
-    marginBottom: 12,
-  },
+    marginBottom: 12 },
   parsedRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingVertical: 6,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
-  },
+    borderBottomColor: '#f0f0f0' },
   parsedLabel: {
     fontSize: 14,
     color: AppColors.grayDark,
-    fontWeight: '500',
-  },
+    fontWeight: '500' },
   parsedValue: {
     fontSize: 14,
     color: AppColors.black,
-    fontWeight: '600',
-  },
+    fontWeight: '600' },
   confirmRow: {
     flexDirection: 'row',
     marginTop: 16,
-    gap: 10,
-  },
+    gap: 10 },
   confirmBtn: {
     flex: 1,
     backgroundColor: COLORS.lightGreen,
     borderRadius: 10,
     paddingVertical: 12,
-    alignItems: 'center',
-  },
+    alignItems: 'center' },
   confirmBtnText: {
     fontSize: 15,
     fontWeight: '700',
-    color: AppColors.white,
-  },
+    color: AppColors.white },
   cancelBtn: {
     flex: 1,
     backgroundColor: AppColors.grayLight,
@@ -794,20 +750,17 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: AppColors.grayMedium,
-  },
+    borderColor: AppColors.grayMedium },
   cancelBtnText: {
     fontSize: 15,
     fontWeight: '600',
-    color: AppColors.grayDark,
-  },
+    color: AppColors.grayDark },
   lowConfidenceText: {
     fontSize: 13,
     color: AppColors.danger,
     marginTop: 12,
     textAlign: 'center',
-    fontWeight: '500',
-  },
+    fontWeight: '500' },
 
   // Command history
   historySection: { marginTop: 24 },
@@ -815,47 +768,38 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '700',
     color: COLORS.primaryGreen,
-    marginBottom: 10,
-  },
+    marginBottom: 10 },
   historyItem: {
     backgroundColor: AppColors.white,
     borderRadius: 10,
     padding: 12,
     marginBottom: 8,
     borderWidth: 1,
-    borderColor: AppColors.grayMedium,
-  },
+    borderColor: AppColors.grayMedium },
   historyHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 4,
-  },
+    marginBottom: 4 },
   historyCommand: {
     fontSize: 14,
     fontWeight: '600',
     color: AppColors.black,
     flex: 1,
-    marginRight: 8,
-  },
+    marginRight: 8 },
   historyTime: {
     fontSize: 11,
-    color: AppColors.gray,
-  },
+    color: AppColors.gray },
   historyResult: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 4,
-  },
+    marginTop: 4 },
   historyDot: {
     width: 8,
     height: 8,
     borderRadius: 4,
-    marginRight: 6,
-  },
+    marginRight: 6 },
   historyMessage: {
     fontSize: 13,
     color: AppColors.grayDark,
-    flex: 1,
-  },
-});
+    flex: 1 } });

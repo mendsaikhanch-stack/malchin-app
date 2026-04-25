@@ -6,8 +6,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   Alert,
-  Linking,
-} from 'react-native';
+  Linking } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Stack, useRouter } from 'expo-router';
 import { AppColors } from '@/constants/theme';
@@ -36,14 +35,12 @@ const STATUS_COLOR: Record<Booking['status'], string> = {
   pending: AppColors.warning,
   accepted: AppColors.accent,
   done: AppColors.success,
-  cancelled: AppColors.gray,
-};
+  cancelled: AppColors.gray };
 const STATUS_LABEL: Record<Booking['status'], string> = {
   pending: 'Хүлээгдэж',
   accepted: 'Хүлээн авсан',
   done: 'Дууссан',
-  cancelled: 'Цуцалсан',
-};
+  cancelled: 'Цуцалсан' };
 
 export default function ServiceDashboard() {
   const router = useRouter();
@@ -188,8 +185,7 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F8F9FA' },
   header: {
     flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 12,
-    backgroundColor: AppColors.white, borderBottomWidth: 1, borderBottomColor: AppColors.grayLight,
-  },
+    backgroundColor: AppColors.white, borderBottomWidth: 1, borderBottomColor: AppColors.grayLight },
   backBtn: { width: 32, height: 32, alignItems: 'center', justifyContent: 'center' },
   backIcon: { fontSize: 30, color: AppColors.black, lineHeight: 30 },
   headerTitle: { fontSize: 17, fontWeight: '700', color: AppColors.black },
@@ -198,24 +194,21 @@ const styles = StyleSheet.create({
   statsRow: { flexDirection: 'row', gap: 8, marginBottom: 12 },
   stat: {
     flex: 1, backgroundColor: AppColors.white, borderRadius: 12, padding: 12, alignItems: 'center',
-    shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 3, elevation: 1,
-  },
+    boxShadow: '0px 1px 3px rgba(0,0,0,0.05)',     elevation: 1 },
   statEmoji: { fontSize: 24 },
   statValue: { fontSize: 18, fontWeight: '800', color: AppColors.black, marginTop: 4 },
   statLabel: { fontSize: 11, color: AppColors.grayDark, marginTop: 2 },
   filterRow: { gap: 8, paddingVertical: 4 },
   filterChip: {
     paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20,
-    borderWidth: 1, borderColor: AppColors.grayMedium, backgroundColor: AppColors.white,
-  },
+    borderWidth: 1, borderColor: AppColors.grayMedium, backgroundColor: AppColors.white },
   filterChipActive: { backgroundColor: AppColors.primary, borderColor: AppColors.primary },
   filterText: { fontSize: 13, color: AppColors.black, fontWeight: '600' },
   filterTextActive: { color: AppColors.white },
   empty: { textAlign: 'center', color: AppColors.gray, marginTop: 30 },
   booking: {
     backgroundColor: AppColors.white, borderRadius: 14, padding: 14, marginTop: 10,
-    shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 3, elevation: 1,
-  },
+    boxShadow: '0px 1px 3px rgba(0,0,0,0.05)',     elevation: 1 },
   bookingHead: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   bookingClient: { fontSize: 14, fontWeight: '700', color: AppColors.black },
   bookingService: { fontSize: 13, color: AppColors.grayDark, marginTop: 2 },
@@ -226,13 +219,10 @@ const styles = StyleSheet.create({
   bookingActions: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 10 },
   miniBtn: {
     paddingHorizontal: 12, paddingVertical: 8, borderRadius: 8,
-    backgroundColor: AppColors.grayLight,
-  },
+    backgroundColor: AppColors.grayLight },
   miniBtnText: { fontSize: 12, fontWeight: '700', color: AppColors.black },
   fab: {
     position: 'absolute', bottom: 20, left: 16, right: 16,
     backgroundColor: AppColors.primary, borderRadius: 14, paddingVertical: 14, alignItems: 'center',
-    shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.2, shadowRadius: 8, elevation: 6,
-  },
-  fabText: { color: AppColors.white, fontSize: 14, fontWeight: '700' },
-});
+    boxShadow: '0px 4px 8px rgba(0,0,0,0.2)',     elevation: 6 },
+  fabText: { color: AppColors.white, fontSize: 14, fontWeight: '700' } });

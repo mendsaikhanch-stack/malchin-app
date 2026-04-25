@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import {
   View, Text, ScrollView, StyleSheet, TouchableOpacity, TextInput,
-  Modal, Alert, RefreshControl, ActivityIndicator,
-} from 'react-native';
+  Modal, Alert, RefreshControl, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { AppColors } from '@/constants/theme';
 import { healthApi, animalsApi } from '@/services/api';
@@ -35,8 +34,7 @@ const severityLevels = [
 const statusLabels: Record<string, string> = {
   treated: 'Эмчилсэн',
   pending: 'Хүлээгдэж буй',
-  monitoring: 'Хянаж буй',
-};
+  monitoring: 'Хянаж буй' };
 
 function fmt(n: number) { return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
 
@@ -174,8 +172,7 @@ export default function HealthScreen() {
       record_type: hRecordType,
       title: hTitle.trim(),
       record_date: hDate.trim(),
-      severity: hSeverity,
-    };
+      severity: hSeverity };
     if (hDescription.trim()) data.description = hDescription.trim();
     if (hDiagnosis.trim()) data.diagnosis = hDiagnosis.trim();
     if (hTreatment.trim()) data.treatment = hTreatment.trim();
@@ -246,8 +243,7 @@ export default function HealthScreen() {
     }
     const data: any = {
       vaccine_name: vName.trim(),
-      vaccination_date: vDate.trim(),
-    };
+      vaccination_date: vDate.trim() };
     if (vMode === 'individual') {
       data.animal_id = parseInt(vAnimalId);
     } else {
@@ -366,11 +362,9 @@ export default function HealthScreen() {
                 <Text style={styles.recordDate}>{r.record_date?.split(' ')[0]}</Text>
                 {r.status && (
                   <View style={[styles.statusBadge, {
-                    backgroundColor: r.status === 'treated' ? '#E8F5E9' : r.status === 'pending' ? '#FFF8E1' : '#E3F2FD',
-                  }]}>
+                    backgroundColor: r.status === 'treated' ? '#E8F5E9' : r.status === 'pending' ? '#FFF8E1' : '#E3F2FD' }]}>
                     <Text style={[styles.statusText, {
-                      color: r.status === 'treated' ? AppColors.success : r.status === 'pending' ? AppColors.warning : AppColors.accent,
-                    }]}>{statusLabels[r.status] || r.status}</Text>
+                      color: r.status === 'treated' ? AppColors.success : r.status === 'pending' ? AppColors.warning : AppColors.accent }]}>{statusLabels[r.status] || r.status}</Text>
                   </View>
                 )}
                 {r.cost > 0 && <Text style={styles.recordCost}>{'\₮'}{fmt(r.cost)}</Text>}
@@ -716,7 +710,7 @@ const styles = StyleSheet.create({
   title: { fontSize: 22, fontWeight: '800', color: AppColors.black },
   tabBar: { flexDirection: 'row', marginHorizontal: 16, marginTop: 8, backgroundColor: '#e8ebe3', borderRadius: 12, padding: 3 },
   tab: { flex: 1, paddingVertical: 9, alignItems: 'center', borderRadius: 10 },
-  tabActive: { backgroundColor: '#FFF', elevation: 2, shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 4, shadowOffset: { width: 0, height: 1 } },
+  tabActive: { backgroundColor: '#FFF', elevation: 2, boxShadow: '0px 1px 4px rgba(0,0,0,0.1)' },
   tabText: { fontSize: 12, fontWeight: '600', color: AppColors.grayDark },
   tabTextActive: { color: '#2d5016', fontWeight: '700' },
   sectionTitle: { fontSize: 16, fontWeight: '700', color: AppColors.black, marginTop: 20, marginBottom: 10 },
@@ -724,7 +718,7 @@ const styles = StyleSheet.create({
 
   // Stats
   statsRow: { flexDirection: 'row', gap: 8, marginTop: 8 },
-  statCard: { flex: 1, borderRadius: 14, padding: 12, alignItems: 'center', elevation: 2, shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 4, shadowOffset: { width: 0, height: 1 } },
+  statCard: { flex: 1, borderRadius: 14, padding: 12, alignItems: 'center', elevation: 2, boxShadow: '0px 1px 4px rgba(0,0,0,0.05)' },
   statEmoji: { fontSize: 20 },
   statValue: { fontSize: 18, fontWeight: '800', color: AppColors.black, marginTop: 4 },
   statLabel: { fontSize: 9, color: AppColors.grayDark, marginTop: 2, textAlign: 'center' },
@@ -740,7 +734,7 @@ const styles = StyleSheet.create({
   addBtnText: { color: '#FFF', fontSize: 14, fontWeight: '700' },
 
   // Record cards
-  recordCard: { backgroundColor: '#FFF', borderRadius: 12, padding: 14, marginTop: 8, elevation: 2, shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 4, shadowOffset: { width: 0, height: 1 } },
+  recordCard: { backgroundColor: '#FFF', borderRadius: 12, padding: 14, marginTop: 8, elevation: 2, boxShadow: '0px 1px 4px rgba(0,0,0,0.05)' },
   recordHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   recordAnimal: { fontSize: 13, fontWeight: '600', color: AppColors.grayDark },
   recordTitle: { fontSize: 15, fontWeight: '700', color: AppColors.black, marginTop: 4 },
@@ -754,7 +748,7 @@ const styles = StyleSheet.create({
   statusText: { fontSize: 10, fontWeight: '600' },
 
   // Vaccine cards
-  vaccineCard: { backgroundColor: '#FFF', borderRadius: 12, padding: 14, marginTop: 8, elevation: 2, shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 4, shadowOffset: { width: 0, height: 1 } },
+  vaccineCard: { backgroundColor: '#FFF', borderRadius: 12, padding: 14, marginTop: 8, elevation: 2, boxShadow: '0px 1px 4px rgba(0,0,0,0.05)' },
   vaccineCardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   vaccineCardName: { fontSize: 15, fontWeight: '700', color: AppColors.black },
   vaccineCardCost: { fontSize: 13, fontWeight: '700', color: '#2d5016' },
@@ -766,7 +760,7 @@ const styles = StyleSheet.create({
   vaccineCardVet: { fontSize: 11, color: AppColors.grayDark, marginTop: 4 },
 
   // Due/Schedule cards
-  dueCard: { backgroundColor: '#FFF', borderRadius: 12, padding: 14, marginTop: 8, borderLeftWidth: 4, elevation: 2, shadowColor: '#000', shadowOpacity: 0.05, shadowRadius: 4, shadowOffset: { width: 0, height: 1 } },
+  dueCard: { backgroundColor: '#FFF', borderRadius: 12, padding: 14, marginTop: 8, borderLeftWidth: 4, elevation: 2, boxShadow: '0px 1px 4px rgba(0,0,0,0.05)' },
   dueCardMain: { flexDirection: 'row', alignItems: 'center' },
   dueVaccineName: { fontSize: 14, fontWeight: '700', color: AppColors.black },
   dueAnimal: { fontSize: 12, color: '#4a7c28', marginTop: 2 },
@@ -798,7 +792,7 @@ const styles = StyleSheet.create({
   // Mode toggle
   modeToggle: { flexDirection: 'row', backgroundColor: '#e8ebe3', borderRadius: 10, padding: 3 },
   modeBtn: { flex: 1, paddingVertical: 8, alignItems: 'center', borderRadius: 8 },
-  modeBtnActive: { backgroundColor: '#FFF', elevation: 2, shadowColor: '#000', shadowOpacity: 0.1, shadowRadius: 3, shadowOffset: { width: 0, height: 1 } },
+  modeBtnActive: { backgroundColor: '#FFF', elevation: 2, boxShadow: '0px 1px 3px rgba(0,0,0,0.1)' },
   modeBtnText: { fontSize: 13, fontWeight: '600', color: AppColors.grayDark },
   modeBtnTextActive: { color: '#2d5016', fontWeight: '700' },
 
@@ -819,5 +813,4 @@ const styles = StyleSheet.create({
   saveBtn: { flex: 1, padding: 14, borderRadius: 12, backgroundColor: '#2d5016', alignItems: 'center' },
   saveText: { fontSize: 15, fontWeight: '700', color: '#FFF' },
   deleteBtn: { padding: 14, borderRadius: 12, alignItems: 'center', marginTop: 10, backgroundColor: '#FFEBEE' },
-  deleteText: { fontSize: 14, fontWeight: '700', color: AppColors.danger },
-});
+  deleteText: { fontSize: 14, fontWeight: '700', color: AppColors.danger } });

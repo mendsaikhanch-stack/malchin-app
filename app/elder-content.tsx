@@ -8,8 +8,7 @@ import {
   TextInput,
   Modal,
   Alert,
-  ActivityIndicator,
-} from 'react-native';
+  ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Stack, useRouter } from 'expo-router';
 import { AppColors } from '@/constants/theme';
@@ -43,8 +42,7 @@ const MOCK_CONTENT: ContentItem[] = [
     species: ['all'],
     topic: 'traditional',
     status: 'published',
-    submittedAt: '2026-03-15',
-  },
+    submittedAt: '2026-03-15' },
   {
     id: '2',
     type: 'audio',
@@ -54,8 +52,7 @@ const MOCK_CONTENT: ContentItem[] = [
     species: ['goat'],
     topic: 'care',
     status: 'review',
-    submittedAt: '2026-04-20',
-  },
+    submittedAt: '2026-04-20' },
   {
     id: '3',
     type: 'text',
@@ -65,29 +62,24 @@ const MOCK_CONTENT: ContentItem[] = [
     species: ['sheep', 'goat'],
     topic: 'health',
     status: 'draft',
-    submittedAt: '2026-04-22',
-  },
+    submittedAt: '2026-04-22' },
 ];
 
 const TYPE_EMOJI: Record<ContentType, string> = {
-  text: '📝', audio: '🎙️', video: '🎥', card: '🖼️',
-};
+  text: '📝', audio: '🎙️', video: '🎥', card: '🖼️' };
 const TYPE_LABEL: Record<ContentType, string> = {
-  text: 'Бичвэр', audio: 'Аудио', video: 'Видео', card: 'Зурагтай карт',
-};
+  text: 'Бичвэр', audio: 'Аудио', video: 'Видео', card: 'Зурагтай карт' };
 
 const STATUS_COLOR: Record<Status, string> = {
   draft: AppColors.gray,
   review: AppColors.warning,
   published: AppColors.success,
-  archived: AppColors.grayDark,
-};
+  archived: AppColors.grayDark };
 const STATUS_LABEL: Record<Status, string> = {
   draft: 'Ноорог',
   review: 'Хянагдаж байна',
   published: 'Нийтэлсэн',
-  archived: 'Архивд',
-};
+  archived: 'Архивд' };
 
 const SEASONS = [
   { id: 'any', label: 'Бүх улирал' },
@@ -115,8 +107,7 @@ export default function ElderContent() {
     type: 'text',
     season: 'any',
     species: ['all'],
-    topic: 'traditional',
-  });
+    topic: 'traditional' });
   const [detailItem, setDetailItem] = useState<ContentItem | null>(null);
 
   // Flag loading
@@ -178,8 +169,7 @@ export default function ElderContent() {
       body: form.body,
       season: form.season || 'any',
       species: form.species || ['all'],
-      topic: form.topic || 'traditional',
-    };
+      topic: form.topic || 'traditional' };
     // Backend endpoint (POST /elder/content) хараахан байхгүй — fail үед
     // queue-д push. Локал мөрөө UI-д шууд харуулна (optimistic).
     const result = await queueOnFailure(
@@ -191,8 +181,7 @@ export default function ElderContent() {
       id: result.synced ? result.data.id : Date.now().toString(),
       ...payload,
       status: 'review',
-      submittedAt: new Date().toISOString().slice(0, 10),
-    };
+      submittedAt: new Date().toISOString().slice(0, 10) };
     setContent([local, ...content]);
     setModalVisible(false);
     setForm({ type: 'text', season: 'any', species: ['all'], topic: 'traditional' });
@@ -271,8 +260,7 @@ export default function ElderContent() {
                 {
                   text: 'Унтраах',
                   style: 'destructive',
-                  onPress: () => toggle(false),
-                },
+                  onPress: () => toggle(false) },
               ]
             )
           }
@@ -364,8 +352,7 @@ export default function ElderContent() {
                         const cur = form.species || [];
                         setForm({
                           ...form,
-                          species: selected ? cur.filter((x) => x !== sp.id) : [...cur, sp.id],
-                        });
+                          species: selected ? cur.filter((x) => x !== sp.id) : [...cur, sp.id] });
                       }}
                     >
                       <Text style={[styles.chipText, selected && styles.chipTextActive]}>
@@ -457,8 +444,7 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F8F9FA' },
   header: {
     flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 12, gap: 8,
-    backgroundColor: AppColors.white, borderBottomWidth: 1, borderBottomColor: AppColors.grayLight,
-  },
+    backgroundColor: AppColors.white, borderBottomWidth: 1, borderBottomColor: AppColors.grayLight },
   backBtn: { width: 32, height: 32, alignItems: 'center', justifyContent: 'center' },
   backIcon: { fontSize: 30, color: AppColors.black, lineHeight: 30 },
   headerTitle: { fontSize: 17, fontWeight: '700', color: AppColors.black },
@@ -468,34 +454,29 @@ const styles = StyleSheet.create({
     padding: 24,
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 12,
-  },
+    gap: 12 },
   optInEmoji: { fontSize: 64 },
   optInTitle: {
     fontSize: 20,
     fontWeight: '800',
     color: AppColors.black,
-    textAlign: 'center',
-  },
+    textAlign: 'center' },
   optInText: {
     fontSize: 14,
     color: AppColors.grayDark,
     textAlign: 'center',
-    lineHeight: 22,
-  },
+    lineHeight: 22 },
   optInPipeline: {
     fontSize: 12,
     color: AppColors.gray,
     textAlign: 'center',
-    marginTop: 4,
-  },
+    marginTop: 4 },
   optInBtn: {
     marginTop: 12,
     backgroundColor: AppColors.primary,
     paddingVertical: 12,
     paddingHorizontal: 28,
-    borderRadius: 12,
-  },
+    borderRadius: 12 },
   optInBtnText: { color: AppColors.white, fontSize: 15, fontWeight: '700' },
   disableBtn: {
     marginTop: 24,
@@ -505,13 +486,11 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: AppColors.grayMedium,
     alignItems: 'center',
-    backgroundColor: AppColors.white,
-  },
+    backgroundColor: AppColors.white },
   disableBtnText: {
     fontSize: 13,
     color: AppColors.grayDark,
-    fontWeight: '600',
-  },
+    fontWeight: '600' },
   verifiedBadge: { paddingHorizontal: 8, paddingVertical: 4, borderRadius: 8, backgroundColor: AppColors.success },
   verifiedText: { color: AppColors.white, fontSize: 10, fontWeight: '700' },
   stats: { flexDirection: 'row', gap: 8, padding: 12, backgroundColor: AppColors.white },
@@ -520,8 +499,7 @@ const styles = StyleSheet.create({
   statLabel: { fontSize: 11, color: AppColors.grayDark, marginTop: 2 },
   list: { padding: 16 },
   item: {
-    backgroundColor: AppColors.white, borderRadius: 14, padding: 14, marginBottom: 10,
-  },
+    backgroundColor: AppColors.white, borderRadius: 14, padding: 14, marginBottom: 10 },
   itemHead: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   itemEmoji: { fontSize: 28 },
   itemTitle: { fontSize: 14, fontWeight: '700', color: AppColors.black },
@@ -531,44 +509,37 @@ const styles = StyleSheet.create({
   itemBody: { fontSize: 13, color: AppColors.grayDark, marginTop: 10, lineHeight: 18 },
   reviewNote: {
     marginTop: 10, padding: 10, backgroundColor: '#FFFBEA', borderRadius: 8,
-    borderLeftWidth: 3, borderLeftColor: AppColors.secondary,
-  },
+    borderLeftWidth: 3, borderLeftColor: AppColors.secondary },
   reviewLabel: { fontSize: 12, fontWeight: '700', color: AppColors.grayDark },
   reviewText: { fontSize: 12, color: AppColors.grayDark, marginTop: 4 },
   fab: {
     position: 'absolute', bottom: 20, left: 16, right: 16,
     backgroundColor: AppColors.primary, borderRadius: 14, paddingVertical: 14, alignItems: 'center',
-    shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.2, shadowRadius: 8, elevation: 6,
-  },
+    boxShadow: '0px 4px 8px rgba(0,0,0,0.2)',     elevation: 6 },
   fabText: { color: AppColors.white, fontSize: 15, fontWeight: '700' },
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
   modalContent: {
     backgroundColor: AppColors.white, borderTopLeftRadius: 20, borderTopRightRadius: 20,
-    padding: 20, maxHeight: '90%',
-  },
+    padding: 20, maxHeight: '90%' },
   modalTitle: { fontSize: 18, fontWeight: '700', color: AppColors.black, marginBottom: 10 },
   label: { fontSize: 13, fontWeight: '600', color: AppColors.grayDark, marginTop: 12, marginBottom: 6 },
   input: {
     borderWidth: 1, borderColor: AppColors.grayMedium, borderRadius: 10,
-    paddingHorizontal: 12, paddingVertical: 10, fontSize: 15,
-  },
+    paddingHorizontal: 12, paddingVertical: 10, fontSize: 15 },
   chipRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
   chip: {
     paddingHorizontal: 10, paddingVertical: 6, borderRadius: 16,
-    borderWidth: 1, borderColor: AppColors.grayMedium, backgroundColor: AppColors.white,
-  },
+    borderWidth: 1, borderColor: AppColors.grayMedium, backgroundColor: AppColors.white },
   chipActive: { backgroundColor: AppColors.primary, borderColor: AppColors.primary },
   chipText: { fontSize: 12, color: AppColors.black },
   chipTextActive: { color: AppColors.white, fontWeight: '600' },
   note: {
     marginTop: 8, padding: 10, backgroundColor: '#FFFBEA', borderRadius: 8,
     fontSize: 12, color: AppColors.grayDark,
-    borderLeftWidth: 3, borderLeftColor: AppColors.secondary,
-  },
+    borderLeftWidth: 3, borderLeftColor: AppColors.secondary },
   info: {
     marginTop: 16, padding: 12, backgroundColor: '#F0FFF4', borderRadius: 10,
-    borderLeftWidth: 3, borderLeftColor: AppColors.primary,
-  },
+    borderLeftWidth: 3, borderLeftColor: AppColors.primary },
   infoTitle: { fontSize: 13, fontWeight: '700', color: AppColors.black },
   infoText: { fontSize: 12, color: AppColors.grayDark, marginTop: 4, lineHeight: 18 },
   detailSection: { fontSize: 12, color: AppColors.grayDark, marginTop: 6 },
@@ -578,5 +549,4 @@ const styles = StyleSheet.create({
   cancelBtn: { backgroundColor: AppColors.grayLight },
   cancelText: { fontSize: 14, fontWeight: '700', color: AppColors.black },
   submitBtn: { backgroundColor: AppColors.primary },
-  submitText: { fontSize: 14, fontWeight: '700', color: AppColors.white },
-});
+  submitText: { fontSize: 14, fontWeight: '700', color: AppColors.white } });

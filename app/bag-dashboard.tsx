@@ -8,8 +8,7 @@ import {
   Modal,
   TextInput,
   Alert,
-  ActivityIndicator,
-} from 'react-native';
+  ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Stack, useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -20,14 +19,12 @@ import {
   filterRisky,
   RISK_LABEL,
   type Household,
-  type BagStats,
-} from '@/services/bag-dashboard-data';
+  type BagStats } from '@/services/bag-dashboard-data';
 import { bagDashboardApi } from '@/services/api';
 import { queueOnFailure } from '@/services/sync-queue';
 import {
   parseOnboardingSnapshot,
-  toUserFallback,
-} from '@/services/onboarding-fallback';
+  toUserFallback } from '@/services/onboarding-fallback';
 import { parseBagId, bagDisplayLabel, slugifySum } from '@/services/bag-id';
 
 const ONBOARDING_DATA_KEY = '@malchin_onboarding_data';
@@ -35,8 +32,7 @@ const ONBOARDING_DATA_KEY = '@malchin_onboarding_data';
 const RISK_COLOR = {
   low: AppColors.success,
   medium: AppColors.warning,
-  high: AppColors.danger,
-};
+  high: AppColors.danger };
 
 export default function BagDashboard() {
   const router = useRouter();
@@ -88,8 +84,7 @@ export default function BagDashboard() {
         table_name: 'bag_broadcasts',
         action: 'INSERT',
         record_id: 0,
-        data: { bag_id: bagId, sum: slugifySum(sumLabel), ...payload },
-      }
+        data: { bag_id: bagId, sum: slugifySum(sumLabel), ...payload } }
     );
     setBroadcastModal(false);
     setBroadcastTitle('');
@@ -286,8 +281,7 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F8F9FA' },
   header: {
     flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 12,
-    backgroundColor: AppColors.white, borderBottomWidth: 1, borderBottomColor: AppColors.grayLight,
-  },
+    backgroundColor: AppColors.white, borderBottomWidth: 1, borderBottomColor: AppColors.grayLight },
   backBtn: { width: 32, height: 32, alignItems: 'center', justifyContent: 'center' },
   backIcon: { fontSize: 30, color: AppColors.black, lineHeight: 30 },
   headerTitle: { fontSize: 17, fontWeight: '700', color: AppColors.black },
@@ -298,26 +292,22 @@ const styles = StyleSheet.create({
   statsRow: { flexDirection: 'row', gap: 8, marginBottom: 12 },
   stat: {
     flex: 1, backgroundColor: AppColors.white, borderRadius: 12, padding: 10, alignItems: 'center',
-    shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 3, elevation: 1,
-  },
+    boxShadow: '0px 1px 3px rgba(0,0,0,0.05)',     elevation: 1 },
   statEmoji: { fontSize: 24 },
   statValue: { fontSize: 18, fontWeight: '800', color: AppColors.black, marginTop: 4 },
   statLabel: { fontSize: 11, color: AppColors.grayDark, marginTop: 2 },
   actions: { flexDirection: 'row', gap: 10, marginBottom: 12 },
   actionBtn: {
-    flex: 1, paddingVertical: 14, borderRadius: 14, alignItems: 'center', gap: 4,
-  },
+    flex: 1, paddingVertical: 14, borderRadius: 14, alignItems: 'center', gap: 4 },
   actionIcon: { fontSize: 24 },
   actionText: { color: AppColors.white, fontSize: 13, fontWeight: '700' },
   card: {
     backgroundColor: AppColors.white, borderRadius: 14, padding: 14, marginBottom: 12,
-    shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 3, elevation: 1,
-  },
+    boxShadow: '0px 1px 3px rgba(0,0,0,0.05)',     elevation: 1 },
   cardTitle: { fontSize: 15, fontWeight: '700', color: AppColors.black, marginBottom: 10 },
   notifItem: {
     flexDirection: 'row', alignItems: 'center', paddingVertical: 10,
-    borderBottomWidth: 1, borderBottomColor: AppColors.grayLight,
-  },
+    borderBottomWidth: 1, borderBottomColor: AppColors.grayLight },
   notifTitle: { fontSize: 14, fontWeight: '700', color: AppColors.black },
   notifBody: { fontSize: 13, color: AppColors.grayDark, marginTop: 2 },
   notifDate: { fontSize: 11, color: AppColors.gray, marginTop: 2 },
@@ -326,8 +316,7 @@ const styles = StyleSheet.create({
   readLabel: { fontSize: 10, color: AppColors.grayDark },
   hhRow: {
     flexDirection: 'row', alignItems: 'center', paddingVertical: 10,
-    borderBottomWidth: 1, borderBottomColor: AppColors.grayLight,
-  },
+    borderBottomWidth: 1, borderBottomColor: AppColors.grayLight },
   hhName: { fontSize: 14, fontWeight: '700', color: AppColors.black },
   otorBadge: { fontSize: 11, color: AppColors.accent },
   hhInfo: { fontSize: 12, color: AppColors.grayDark, marginTop: 3 },
@@ -336,19 +325,16 @@ const styles = StyleSheet.create({
   riskText: { fontSize: 10, color: AppColors.white, fontWeight: '700' },
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
   modalContent: {
-    backgroundColor: AppColors.white, borderTopLeftRadius: 20, borderTopRightRadius: 20, padding: 20,
-  },
+    backgroundColor: AppColors.white, borderTopLeftRadius: 20, borderTopRightRadius: 20, padding: 20 },
   modalTitle: { fontSize: 18, fontWeight: '700', color: AppColors.black },
   modalHint: { fontSize: 12, color: AppColors.grayDark, marginTop: 4, marginBottom: 8 },
   label: { fontSize: 13, fontWeight: '600', color: AppColors.grayDark, marginTop: 12, marginBottom: 6 },
   input: {
     borderWidth: 1, borderColor: AppColors.grayMedium, borderRadius: 10,
-    paddingHorizontal: 12, paddingVertical: 10, fontSize: 15,
-  },
+    paddingHorizontal: 12, paddingVertical: 10, fontSize: 15 },
   modalActions: { flexDirection: 'row', gap: 10, marginTop: 20 },
   btn: { flex: 1, paddingVertical: 12, borderRadius: 10, alignItems: 'center' },
   btnPrimary: { backgroundColor: AppColors.primary },
   btnSecondary: { backgroundColor: AppColors.grayLight },
   btnPrimaryText: { color: AppColors.white, fontSize: 15, fontWeight: '700' },
-  btnSecondaryText: { color: AppColors.black, fontSize: 15, fontWeight: '600' },
-});
+  btnSecondaryText: { color: AppColors.black, fontSize: 15, fontWeight: '600' } });

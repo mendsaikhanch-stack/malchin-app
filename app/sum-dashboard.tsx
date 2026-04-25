@@ -8,8 +8,7 @@ import {
   Modal,
   TextInput,
   Alert,
-  ActivityIndicator,
-} from 'react-native';
+  ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Stack, useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -22,15 +21,13 @@ import {
   sortEventsByDate,
   type BagStat,
   type SumEvent,
-  type SumStats,
-} from '@/services/sum-dashboard-data';
+  type SumStats } from '@/services/sum-dashboard-data';
 import { FeatureGate } from '@/components/feature-gate';
 import { sumDashboardApi } from '@/services/api';
 import { queueOnFailure } from '@/services/sync-queue';
 import {
   parseOnboardingSnapshot,
-  toUserFallback,
-} from '@/services/onboarding-fallback';
+  toUserFallback } from '@/services/onboarding-fallback';
 import { slugifySum } from '@/services/bag-id';
 
 const ONBOARDING_DATA_KEY = '@malchin_onboarding_data';
@@ -93,8 +90,7 @@ export default function SumDashboard() {
         table_name: 'sum_broadcasts',
         action: 'INSERT',
         record_id: 0,
-        data: { sum_id: sumId, ...payload },
-      }
+        data: { sum_id: sumId, ...payload } }
     );
     setBroadcastModal(false);
     setBTitle('');
@@ -198,8 +194,7 @@ export default function SumDashboard() {
               </View>
               <View style={styles.eventPct}>
                 <Text style={[styles.eventPctValue, {
-                  color: e.participation >= 80 ? AppColors.success : e.participation >= 60 ? AppColors.warning : AppColors.danger,
-                }]}>
+                  color: e.participation >= 80 ? AppColors.success : e.participation >= 60 ? AppColors.warning : AppColors.danger }]}>
                   {e.participation}%
                 </Text>
                 <Text style={styles.eventPctLabel}>оролцоо</Text>
@@ -326,8 +321,7 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F8F9FA' },
   header: {
     flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 12,
-    backgroundColor: AppColors.white, borderBottomWidth: 1, borderBottomColor: AppColors.grayLight,
-  },
+    backgroundColor: AppColors.white, borderBottomWidth: 1, borderBottomColor: AppColors.grayLight },
   backBtn: { width: 32, height: 32, alignItems: 'center', justifyContent: 'center' },
   backIcon: { fontSize: 30, color: AppColors.black, lineHeight: 30 },
   headerTitle: { fontSize: 17, fontWeight: '700', color: AppColors.black },
@@ -338,51 +332,43 @@ const styles = StyleSheet.create({
   heroRow: { flexDirection: 'row', gap: 10, marginBottom: 10 },
   hero: {
     flex: 1, backgroundColor: AppColors.white, borderRadius: 14, padding: 14,
-    shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.06, shadowRadius: 4, elevation: 2,
-  },
+    boxShadow: '0px 1px 4px rgba(0,0,0,0.06)',     elevation: 2 },
   heroLabel: { fontSize: 12, color: AppColors.grayDark },
   heroValue: { fontSize: 22, fontWeight: '800', color: AppColors.black, marginTop: 6 },
   heroSub: { fontSize: 11, color: AppColors.gray, marginTop: 2 },
   card: {
     backgroundColor: AppColors.white, borderRadius: 14, padding: 14, marginTop: 10,
-    shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 3, elevation: 1,
-  },
+    boxShadow: '0px 1px 3px rgba(0,0,0,0.05)',     elevation: 1 },
   cardTitle: { fontSize: 15, fontWeight: '700', color: AppColors.black, marginBottom: 10 },
   linkText: { fontSize: 12, color: AppColors.primary, fontWeight: '600' },
   mapPlaceholder: {
     backgroundColor: '#F0FFF4', borderRadius: 12, padding: 24, alignItems: 'center',
-    borderWidth: 1, borderColor: '#C6F6D5', borderStyle: 'dashed',
-  },
+    borderWidth: 1, borderColor: '#C6F6D5', borderStyle: 'dashed' },
   mapPlaceholderIcon: { fontSize: 48 },
   mapPlaceholderText: { fontSize: 13, color: AppColors.grayDark, marginTop: 8, textAlign: 'center' },
   mapPlaceholderHint: { fontSize: 11, color: AppColors.gray, marginTop: 4 },
   kpiRow: {
     flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
-    paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: AppColors.grayLight,
-  },
+    paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: AppColors.grayLight },
   kpiLabel: { fontSize: 13, color: AppColors.grayDark, flex: 1 },
   kpiValue: { fontSize: 16, fontWeight: '700', color: AppColors.black },
   kpiSub: { fontSize: 11, color: AppColors.gray, marginTop: 1 },
   bagRow: {
     flexDirection: 'row', alignItems: 'center', paddingVertical: 10,
-    borderBottomWidth: 1, borderBottomColor: AppColors.grayLight, gap: 10,
-  },
+    borderBottomWidth: 1, borderBottomColor: AppColors.grayLight, gap: 10 },
   rankCircle: {
     width: 28, height: 28, borderRadius: 14, backgroundColor: AppColors.primary,
-    alignItems: 'center', justifyContent: 'center',
-  },
+    alignItems: 'center', justifyContent: 'center' },
   rankText: { color: AppColors.white, fontSize: 13, fontWeight: '700' },
   bagName: { fontSize: 13, fontWeight: '700', color: AppColors.black },
   bagInfo: { fontSize: 11, color: AppColors.grayDark, marginTop: 2 },
   barOuter: {
-    marginTop: 6, height: 6, backgroundColor: AppColors.grayLight, borderRadius: 3, overflow: 'hidden',
-  },
+    marginTop: 6, height: 6, backgroundColor: AppColors.grayLight, borderRadius: 3, overflow: 'hidden' },
   barInner: { height: '100%', borderRadius: 3 },
   bagPct: { fontSize: 14, fontWeight: '700', color: AppColors.black, minWidth: 40, textAlign: 'right' },
   eventRow: {
     flexDirection: 'row', alignItems: 'center', paddingVertical: 10,
-    borderBottomWidth: 1, borderBottomColor: AppColors.grayLight,
-  },
+    borderBottomWidth: 1, borderBottomColor: AppColors.grayLight },
   eventTitle: { fontSize: 14, fontWeight: '700', color: AppColors.black },
   eventDate: { fontSize: 12, color: AppColors.grayDark, marginTop: 2 },
   eventPct: { alignItems: 'center' },
@@ -395,19 +381,16 @@ const styles = StyleSheet.create({
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
   modalContent: {
     backgroundColor: AppColors.white, borderTopLeftRadius: 20, borderTopRightRadius: 20,
-    padding: 20, maxHeight: '85%',
-  },
+    padding: 20, maxHeight: '85%' },
   modalTitle: { fontSize: 18, fontWeight: '700', color: AppColors.black, marginBottom: 8 },
   label: { fontSize: 13, fontWeight: '600', color: AppColors.grayDark, marginTop: 12, marginBottom: 6 },
   input: {
     borderWidth: 1, borderColor: AppColors.grayMedium, borderRadius: 10,
-    paddingHorizontal: 12, paddingVertical: 10, fontSize: 15,
-  },
+    paddingHorizontal: 12, paddingVertical: 10, fontSize: 15 },
   chipRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
   chip: {
     paddingHorizontal: 10, paddingVertical: 6, borderRadius: 16,
-    borderWidth: 1, borderColor: AppColors.grayMedium, backgroundColor: AppColors.white,
-  },
+    borderWidth: 1, borderColor: AppColors.grayMedium, backgroundColor: AppColors.white },
   chipActive: { backgroundColor: AppColors.primary, borderColor: AppColors.primary },
   chipText: { fontSize: 12, color: AppColors.black },
   chipTextActive: { color: AppColors.white, fontWeight: '600' },
@@ -416,5 +399,4 @@ const styles = StyleSheet.create({
   btnPrimary: { backgroundColor: AppColors.primary },
   btnSecondary: { backgroundColor: AppColors.grayLight },
   btnPrimaryText: { color: AppColors.white, fontSize: 15, fontWeight: '700' },
-  btnSecondaryText: { color: AppColors.black, fontSize: 15, fontWeight: '600' },
-});
+  btnSecondaryText: { color: AppColors.black, fontSize: 15, fontWeight: '600' } });

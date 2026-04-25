@@ -11,8 +11,7 @@ import {
   Alert,
   ActivityIndicator,
   RefreshControl,
-  Platform,
-} from 'react-native';
+  Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { AppColors } from '@/constants/theme';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -50,12 +49,10 @@ const animalTypes = [
 ];
 
 const animalTypeMap: Record<string, string> = {
-  sheep: 'Хонь', goat: 'Ямаа', cattle: 'Үхэр', horse: 'Морь', camel: 'Тэмээ',
-};
+  sheep: 'Хонь', goat: 'Ямаа', cattle: 'Үхэр', horse: 'Морь', camel: 'Тэмээ' };
 
 const animalEmojiMap: Record<string, string> = {
-  sheep: '🐑', goat: '🐐', cattle: '🐄', horse: '🐎', camel: '🐫',
-};
+  sheep: '🐑', goat: '🐐', cattle: '🐄', horse: '🐎', camel: '🐫' };
 
 const genderLabels: Record<string, string> = { male: 'Эр', female: 'Эм' };
 
@@ -63,15 +60,13 @@ const statusLabels: Record<string, { label: string; bg: string; color: string }>
   active: { label: 'Идэвхтэй', bg: '#E8F5E9', color: '#2E7D32' },
   sold: { label: 'Зарагдсан', bg: '#FFF3E0', color: '#E65100' },
   dead: { label: 'Үхсэн', bg: '#FFEBEE', color: '#C62828' },
-  slaughtered: { label: 'Нядалсан', bg: '#FBE9E7', color: '#BF360C' },
-};
+  slaughtered: { label: 'Нядалсан', bg: '#FBE9E7', color: '#BF360C' } };
 
 const originLabels: Record<string, string> = {
   own_birth: 'Өөрийн төл',
   purchased: 'Худалдаж авсан',
   gift: 'Бэлэг',
-  exchange: 'Солилцсон',
-};
+  exchange: 'Солилцсон' };
 
 const eventTypes = [
   { key: 'birth', label: 'Төрсөн', emoji: '🎉' },
@@ -202,8 +197,7 @@ function IndividualAnimalsTab() {
           } catch {
             Alert.alert('Алдаа', 'Устгахад алдаа гарлаа');
           }
-        },
-      },
+        } },
     ]);
   };
 
@@ -404,8 +398,7 @@ function AddEditAnimalModal({
   animal,
   allAnimals,
   onClose,
-  onSaved,
-}: {
+  onSaved }: {
   visible: boolean;
   animal: any;
   allAnimals: any[];
@@ -484,16 +477,14 @@ function AddEditAnimalModal({
       origin,
       mother_id: motherId ? parseInt(motherId) : undefined,
       father_id: fatherId ? parseInt(fatherId) : undefined,
-      notes: notes.trim() || undefined,
-    };
+      notes: notes.trim() || undefined };
     const result = await queueOnFailure(
       () => isEdit ? animalsApi.update(animal.id, data) : animalsApi.create(data),
       {
         table_name: 'animals',
         action: isEdit ? 'UPDATE' : 'INSERT',
         record_id: isEdit ? animal.id : 0,
-        data,
-      }
+        data }
     );
     setSaving(false);
     if (result.synced) {
@@ -752,8 +743,7 @@ function AnimalDetailModal({
   loading,
   onClose,
   onEdit,
-  onDeleted,
-}: {
+  onDeleted }: {
   animal: any;
   loading: boolean;
   onClose: () => void;
@@ -776,8 +766,7 @@ function AnimalDetailModal({
           } catch {
             Alert.alert('Алдаа', 'Устгахад алдаа гарлаа');
           }
-        },
-      },
+        } },
     ]);
   };
 
@@ -1058,8 +1047,7 @@ function AggregateTab() {
       animal_type: selectedAnimal,
       event_type: selectedEvent,
       quantity: num,
-      note: eventNote,
-    };
+      note: eventNote };
     const result = await queueOnFailure(
       () => livestockApi.addEvent(payload),
       { table_name: 'livestock_events', action: 'INSERT', record_id: 0, data: payload }
@@ -1290,17 +1278,12 @@ const styles = StyleSheet.create({
     marginBottom: 4,
     backgroundColor: '#e8ede0',
     borderRadius: 12,
-    padding: 3,
-  },
+    padding: 3 },
   tab: { flex: 1, paddingVertical: 10, alignItems: 'center', borderRadius: 10 },
   tabActive: {
     backgroundColor: '#fff',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-  },
+    boxShadow: '0px 1px 4px rgba(0,0,0,0.1)',
+    elevation: 2 },
   tabText: { fontSize: 14, fontWeight: '600', color: AppColors.grayDark },
   tabTextActive: { color: '#2d5016', fontWeight: '700' },
 
@@ -1314,12 +1297,8 @@ const styles = StyleSheet.create({
     marginTop: 10,
     borderRadius: 14,
     justifyContent: 'space-around',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
-  },
+    boxShadow: '0px 1px 4px rgba(0,0,0,0.05)',
+    elevation: 2 },
   statItem: { alignItems: 'center' },
   statNumber: { fontSize: 14, fontWeight: '800', color: '#2d5016' },
   statLabel: { fontSize: 10, color: AppColors.grayDark, marginTop: 1 },
@@ -1333,8 +1312,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     backgroundColor: '#fff',
     borderWidth: 1.5,
-    borderColor: AppColors.grayMedium,
-  },
+    borderColor: AppColors.grayMedium },
   filterChipActive: { backgroundColor: '#2d5016', borderColor: '#2d5016' },
   filterChipText: { fontSize: 13, fontWeight: '600', color: AppColors.grayDark },
   filterChipTextActive: { color: '#fff' },
@@ -1348,8 +1326,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#1A1A1A',
     borderWidth: 1.5,
-    borderColor: AppColors.grayMedium,
-  },
+    borderColor: AppColors.grayMedium },
 
   // ── Animal list cards ──
   listContent: { paddingHorizontal: 16, paddingTop: 8, paddingBottom: 100 },
@@ -1358,12 +1335,8 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     padding: 14,
     marginBottom: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 6,
-    elevation: 3,
-  },
+    boxShadow: '0px 2px 6px rgba(0,0,0,0.06)',
+    elevation: 3 },
   animalListRow: { flexDirection: 'row', alignItems: 'flex-start' },
   animalListEmoji: { fontSize: 36, marginRight: 12 },
   animalListInfo: { flex: 1 },
@@ -1379,29 +1352,25 @@ const styles = StyleSheet.create({
     paddingTop: 8,
     borderTopWidth: 1,
     borderTopColor: '#f0f0f0',
-    gap: 8,
-  },
+    gap: 8 },
   actionBtnEdit: {
     paddingHorizontal: 14,
     paddingVertical: 6,
     borderRadius: 8,
-    backgroundColor: '#E8F5E9',
-  },
+    backgroundColor: '#E8F5E9' },
   actionBtnEditText: { fontSize: 12, fontWeight: '600', color: '#2d5016' },
   actionBtnDelete: {
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 8,
-    backgroundColor: '#FFEBEE',
-  },
+    backgroundColor: '#FFEBEE' },
   actionBtnDeleteText: { fontSize: 12 },
 
   // ── Status badge ──
   statusBadge: {
     paddingHorizontal: 8,
     paddingVertical: 3,
-    borderRadius: 8,
-  },
+    borderRadius: 8 },
   statusBadgeText: { fontSize: 10, fontWeight: '700' },
 
   // ── FAB ──
@@ -1414,12 +1383,8 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     paddingVertical: 14,
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 6,
-  },
+    boxShadow: '0px 4px 8px rgba(0,0,0,0.2)',
+    elevation: 6 },
   fabText: { color: '#fff', fontSize: 16, fontWeight: '700' },
 
   // ── Empty state ──
@@ -1428,8 +1393,7 @@ const styles = StyleSheet.create({
     paddingVertical: 50,
     backgroundColor: '#fff',
     borderRadius: 16,
-    marginTop: 16,
-  },
+    marginTop: 16 },
   emptyTitle: { fontSize: 16, fontWeight: '700', color: AppColors.grayDark, marginTop: 8 },
   emptySubtitle: { fontSize: 13, color: AppColors.gray, marginTop: 4 },
   emptyText: {
@@ -1437,8 +1401,7 @@ const styles = StyleSheet.create({
     color: AppColors.gray,
     fontStyle: 'italic',
     textAlign: 'center',
-    paddingVertical: 20,
-  },
+    paddingVertical: 20 },
 
   // ── Modal shared ──
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
@@ -1447,8 +1410,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     padding: 24,
-    maxHeight: '85%',
-  },
+    maxHeight: '85%' },
   modalTitle: { fontSize: 20, fontWeight: '800', color: '#1A1A1A', marginBottom: 12 },
   label: { fontSize: 13, fontWeight: '600', color: AppColors.grayDark, marginBottom: 6, marginTop: 12 },
   typeSelector: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
@@ -1458,8 +1420,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     borderWidth: 1.5,
     borderColor: AppColors.grayMedium,
-    alignItems: 'center',
-  },
+    alignItems: 'center' },
   typeBtnActive: { borderColor: '#2d5016', backgroundColor: '#E8F5E9' },
   typeBtnEmoji: { fontSize: 20 },
   typeBtnLabel: { fontSize: 11, color: AppColors.grayDark, marginTop: 2 },
@@ -1471,8 +1432,7 @@ const styles = StyleSheet.create({
     padding: 12,
     fontSize: 15,
     color: '#1A1A1A',
-    backgroundColor: '#FAFAFA',
-  },
+    backgroundColor: '#FAFAFA' },
   modalActions: { flexDirection: 'row', gap: 10, marginTop: 24 },
   cancelBtn: {
     flex: 1,
@@ -1480,8 +1440,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     borderWidth: 1.5,
     borderColor: AppColors.grayMedium,
-    alignItems: 'center',
-  },
+    alignItems: 'center' },
   cancelBtnText: { fontSize: 15, fontWeight: '600', color: AppColors.grayDark },
   saveBtn: { flex: 1, padding: 14, borderRadius: 12, backgroundColor: '#2d5016', alignItems: 'center' },
   saveBtnText: { fontSize: 15, fontWeight: '700', color: '#fff' },
@@ -1496,8 +1455,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     borderWidth: 1.5,
     borderColor: AppColors.grayMedium,
-    alignItems: 'center',
-  },
+    alignItems: 'center' },
   genderBtnActive: { borderColor: '#2d5016', backgroundColor: '#E8F5E9' },
   genderBtnText: { fontSize: 14, fontWeight: '600', color: AppColors.grayDark },
   genderBtnTextActive: { color: '#2d5016' },
@@ -1506,8 +1464,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     borderRadius: 10,
     borderWidth: 1.5,
-    borderColor: AppColors.grayMedium,
-  },
+    borderColor: AppColors.grayMedium },
   originBtnActive: { borderColor: '#2d5016', backgroundColor: '#E8F5E9' },
   originBtnText: { fontSize: 12, fontWeight: '600', color: AppColors.grayDark },
   originBtnTextActive: { color: '#2d5016' },
@@ -1518,8 +1475,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: AppColors.grayMedium,
     marginRight: 6,
-    backgroundColor: '#fff',
-  },
+    backgroundColor: '#fff' },
   parentChipActive: { borderColor: '#2d5016', backgroundColor: '#E8F5E9' },
   parentChipText: { fontSize: 12, color: AppColors.grayDark },
   parentChipTextActive: { color: '#2d5016', fontWeight: '600' },
@@ -1532,24 +1488,21 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 8,
-    marginBottom: 16,
-  },
+    marginBottom: 16 },
   detailGridItem: {
     backgroundColor: '#f5f7f0',
     borderRadius: 10,
     paddingHorizontal: 12,
     paddingVertical: 8,
     minWidth: '45%',
-    flexGrow: 1,
-  },
+    flexGrow: 1 },
   detailGridLabel: { fontSize: 10, color: AppColors.gray, fontWeight: '600', textTransform: 'uppercase' },
   detailGridValue: { fontSize: 14, fontWeight: '700', color: '#2d5016', marginTop: 2 },
   detailSection: {
     marginBottom: 16,
     paddingTop: 12,
     borderTopWidth: 1,
-    borderTopColor: '#f0f0f0',
-  },
+    borderTopColor: '#f0f0f0' },
   detailSectionTitle: { fontSize: 16, fontWeight: '700', color: '#1A1A1A', marginBottom: 10 },
   genealogyItem: { flexDirection: 'row', alignItems: 'center', marginBottom: 4, marginLeft: 8 },
   genealogyRole: { fontSize: 13, fontWeight: '600', color: AppColors.grayDark, marginRight: 6 },
@@ -1558,8 +1511,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f5f7f0',
     borderRadius: 10,
     padding: 10,
-    marginBottom: 6,
-  },
+    marginBottom: 6 },
   healthTitle: { fontSize: 13, fontWeight: '600', color: '#1A1A1A' },
   healthMeta: { fontSize: 11, color: AppColors.grayDark, marginTop: 2 },
   notesText: { fontSize: 13, color: AppColors.grayDark, lineHeight: 20 },
@@ -1569,22 +1521,19 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderRadius: 12,
     backgroundColor: '#E8F5E9',
-    alignItems: 'center',
-  },
+    alignItems: 'center' },
   detailEditBtnText: { fontSize: 14, fontWeight: '700', color: '#2d5016' },
   detailDeleteBtn: {
     flex: 1,
     paddingVertical: 12,
     borderRadius: 12,
     backgroundColor: '#FFEBEE',
-    alignItems: 'center',
-  },
+    alignItems: 'center' },
   detailDeleteBtnText: { fontSize: 14, fontWeight: '700', color: '#C62828' },
   closeBtn: {
     marginTop: 12,
     paddingVertical: 10,
-    alignItems: 'center',
-  },
+    alignItems: 'center' },
   closeBtnText: { fontSize: 14, fontWeight: '600', color: AppColors.grayDark },
 
   // ── Aggregate tab (Tab 2) ──
@@ -1594,8 +1543,7 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     paddingHorizontal: 16,
     gap: 10,
-    marginTop: 12,
-  },
+    marginTop: 12 },
   aggAnimalCard: {
     backgroundColor: '#fff',
     borderRadius: 16,
@@ -1603,12 +1551,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     width: '30%',
     flexGrow: 1,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 3,
-  },
+    boxShadow: '0px 2px 8px rgba(0,0,0,0.06)',
+    elevation: 3 },
   aggAnimalEmoji: { fontSize: 36 },
   aggAnimalCount: { fontSize: 22, fontWeight: '800', color: '#1A1A1A', marginTop: 6 },
   aggAnimalLabel: { fontSize: 13, color: AppColors.grayDark, marginTop: 2 },
@@ -1618,8 +1562,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#2d5016',
     borderRadius: 12,
     padding: 14,
-    alignItems: 'center',
-  },
+    alignItems: 'center' },
   aggAddBtnText: { color: '#fff', fontSize: 15, fontWeight: '700' },
   aggSection: { paddingHorizontal: 16, marginTop: 24 },
   aggSectionTitle: { fontSize: 18, fontWeight: '700', color: '#1A1A1A', marginBottom: 12 },
@@ -1630,14 +1573,9 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 12,
     marginBottom: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.04,
-    shadowRadius: 4,
-    elevation: 2,
-  },
+    boxShadow: '0px 1px 4px rgba(0,0,0,0.04)',
+    elevation: 2 },
   aggEventEmoji: { fontSize: 24, marginRight: 12 },
   aggEventText: { fontSize: 14, fontWeight: '600', color: '#1A1A1A' },
   aggEventNote: { fontSize: 12, color: AppColors.grayDark, marginTop: 2 },
-  aggEventDate: { fontSize: 11, color: AppColors.gray, marginTop: 4 },
-});
+  aggEventDate: { fontSize: 11, color: AppColors.gray, marginTop: 4 } });

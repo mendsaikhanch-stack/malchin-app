@@ -8,8 +8,7 @@ import {
   TextInput,
   ActivityIndicator,
   Alert,
-  Image,
-} from 'react-native';
+  Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as ImagePicker from 'expo-image-picker';
 import { AppColors } from '@/constants/theme';
@@ -92,8 +91,7 @@ const symptomsByAnimal: Record<string, { key: string; label: string; emoji: stri
     { key: 'diarrhea', label: 'Суулгах', emoji: '\uD83D\uDCA9' },
     { key: 'appetite', label: 'Хоол иддэггүй', emoji: '\uD83D\uDEAB' },
     { key: 'mouth_sore', label: 'Ам шарх', emoji: '\uD83D\uDC44' },
-  ],
-};
+  ] };
 
 const symptomTextMap: Record<string, string> = {
   fever: 'халуурах', mouth_sore: 'ам шарх', hoof: 'туурай өвдөх', drool: 'шүлс гоожих',
@@ -104,15 +102,13 @@ const symptomTextMap: Record<string, string> = {
   udder: 'дэлэнг хавдах', milk_drop: 'сүү буурах', limp: 'доголонтох', lymph: 'булчирхай томрох',
   nose_discharge: 'хамраас идээ', hoof_hot: 'туурай халуун', skin_nodule: 'арьсанд зангилаа',
   back_weak: 'арын хөл сулдах', swelling: 'хөлд хавдар', refuse_move: 'хөдлөхгүй',
-  hump: 'бөх зулайрах', belly: 'хэвлий хавдах',
-};
+  hump: 'бөх зулайрах', belly: 'хэвлий хавдах' };
 
 const symptomText: Record<string, string> = {
   fever: 'халуурч байна', diarrhea: 'суулгаж байна', cough: 'ханиаж байна',
   limp: 'доголонтож байна', skin: 'арьсан дээр тууралт гарсан', eye: 'нүднээс нулимс гарч байна',
   appetite: 'хоол иддэггүй болсон', bloat: 'гэдэс хавдсан', nose: 'хамраас шүүрэл гарч байна',
-  weak: 'сулдаж турж байна', breathing: 'амьсгал давчдаж байна', hair: 'үс/ноос унаж байна',
-};
+  weak: 'сулдаж турж байна', breathing: 'амьсгал давчдаж байна', hair: 'үс/ноос унаж байна' };
 
 export default function DiagnoseScreen() {
   const [mode, setMode] = useState<'symptoms' | 'image'>('symptoms');
@@ -143,8 +139,7 @@ export default function DiagnoseScreen() {
         animal_type: animalLabel,
         symptoms: symptomsStr,
         age: age || undefined,
-        description: extraDesc.trim() || undefined,
-      });
+        description: extraDesc.trim() || undefined });
       setResult(res.diagnosis);
       setResultSource(res.source);
     } catch {
@@ -163,8 +158,7 @@ export default function DiagnoseScreen() {
     const result = await ImagePicker.launchCameraAsync({
       base64: true,
       quality: 0.5,
-      allowsEditing: true,
-    });
+      allowsEditing: true });
     if (!result.canceled && result.assets[0]) {
       setSelectedImage(result.assets[0].uri);
       if (result.assets[0].base64) {
@@ -182,8 +176,7 @@ export default function DiagnoseScreen() {
     const result = await ImagePicker.launchImageLibraryAsync({
       base64: true,
       quality: 0.5,
-      allowsEditing: true,
-    });
+      allowsEditing: true });
     if (!result.canceled && result.assets[0]) {
       setSelectedImage(result.assets[0].uri);
       if (result.assets[0].base64) {
@@ -200,8 +193,7 @@ export default function DiagnoseScreen() {
       const res = await aiApi.diagnoseImage({
         image_base64: base64,
         animal_type: animalLabel,
-        description: extraDesc.trim() || undefined,
-      });
+        description: extraDesc.trim() || undefined });
       setResult(res.diagnosis);
       setResultSource(res.source);
     } catch {
@@ -352,7 +344,7 @@ const styles = StyleSheet.create({
   // Mode toggle
   modeToggle: { flexDirection: 'row', marginHorizontal: 16, marginTop: 12, backgroundColor: '#EEEEEE', borderRadius: 12, padding: 3 },
   modeBtn: { flex: 1, paddingVertical: 10, alignItems: 'center', borderRadius: 10 },
-  modeBtnActive: { backgroundColor: AppColors.white, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.1, shadowRadius: 4, elevation: 2 },
+  modeBtnActive: { backgroundColor: AppColors.white, boxShadow: '0px 1px 4px rgba(0,0,0,0.1)',     elevation: 2 },
   modeBtnText: { fontSize: 13, fontWeight: '600', color: AppColors.grayDark },
   modeBtnTextActive: { color: AppColors.primary, fontWeight: '700' },
   // Sections
@@ -388,7 +380,7 @@ const styles = StyleSheet.create({
   loadingCard: { marginHorizontal: 16, marginTop: 16, padding: 24, backgroundColor: AppColors.white, borderRadius: 14, alignItems: 'center' },
   loadingText: { marginTop: 10, fontSize: 14, color: AppColors.grayDark },
   // Result
-  resultCard: { marginHorizontal: 16, marginTop: 20, backgroundColor: AppColors.white, borderRadius: 16, padding: 16, borderWidth: 2, borderColor: '#E8F5E9', shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.08, shadowRadius: 12, elevation: 4 },
+  resultCard: { marginHorizontal: 16, marginTop: 20, backgroundColor: AppColors.white, borderRadius: 16, padding: 16, borderWidth: 2, borderColor: '#E8F5E9', boxShadow: '0px 2px 12px rgba(0,0,0,0.08)',     elevation: 4 },
   resultHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 },
   resultTitle: { fontSize: 17, fontWeight: '800', color: AppColors.black },
   sourceBadge: { backgroundColor: AppColors.primary, paddingHorizontal: 10, paddingVertical: 3, borderRadius: 8 },
@@ -398,5 +390,4 @@ const styles = StyleSheet.create({
   disclaimerText: { fontSize: 11, color: '#E65100', lineHeight: 16 },
   // Reset
   resetBtn: { marginHorizontal: 16, marginTop: 12, padding: 14, borderRadius: 12, borderWidth: 1.5, borderColor: AppColors.grayMedium, alignItems: 'center' },
-  resetBtnText: { fontSize: 14, fontWeight: '600', color: AppColors.grayDark },
-});
+  resetBtnText: { fontSize: 14, fontWeight: '600', color: AppColors.grayDark } });

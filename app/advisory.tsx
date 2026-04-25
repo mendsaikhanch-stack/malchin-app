@@ -4,8 +4,7 @@ import {
   Text,
   ScrollView,
   StyleSheet,
-  TouchableOpacity,
-} from 'react-native';
+  TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { AppColors } from '@/constants/theme';
@@ -14,8 +13,7 @@ import {
   ADVISORY_CATEGORIES,
   CATEGORY_LABELS,
   type AdvisoryCategory,
-  type AdvisoryTemplate,
-} from '@/services/advisory-templates';
+  type AdvisoryTemplate } from '@/services/advisory-templates';
 import { getSeasonKeyForDate } from '@/hooks/use-seasonal';
 import { useQuota } from '@/hooks/use-quota';
 import { UpgradePrompt } from '@/components/feature-gate';
@@ -26,8 +24,7 @@ const CATEGORY_EMOJI: Record<AdvisoryCategory, string> = {
   health: '🩺',
   reproduction: '🐑',
   processing: '🧈',
-  emergency: '⚠️',
-};
+  emergency: '⚠️' };
 
 type Filter = AdvisoryCategory | 'all';
 
@@ -146,8 +143,7 @@ function FilterPill({
   label,
   emoji,
   active,
-  onPress,
-}: {
+  onPress }: {
   label: string;
   emoji: string;
   active: boolean;
@@ -174,8 +170,7 @@ function TemplateRow({
   template,
   open,
   seasonMatch,
-  onToggle,
-}: {
+  onToggle }: {
   template: AdvisoryTemplate;
   open: boolean;
   seasonMatch: boolean;
@@ -251,8 +246,7 @@ function TemplateRow({
 function Block({
   label,
   color,
-  text,
-}: {
+  text }: {
   label: string;
   color: string;
   text: string;
@@ -268,8 +262,7 @@ function Block({
 function ListBlock({
   title,
   items,
-  accent,
-}: {
+  accent }: {
   title: string;
   items: string[];
   accent: string;
@@ -299,16 +292,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: 12,
     paddingBottom: 8,
-    gap: 8,
-  },
+    gap: 8 },
   backBtn: {
     width: 36,
     height: 36,
     borderRadius: 18,
     backgroundColor: AppColors.grayLight,
     alignItems: 'center',
-    justifyContent: 'center',
-  },
+    justifyContent: 'center' },
   backArrow: { fontSize: 22, fontWeight: '700', color: AppColors.black },
   title: { fontSize: 20, fontWeight: '800', color: AppColors.black },
   subtitle: { fontSize: 12, color: AppColors.grayDark, marginTop: 2 },
@@ -318,24 +309,20 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     backgroundColor: '#F1F8E9',
     borderBottomWidth: 1,
-    borderBottomColor: '#DCEDC8',
-  },
+    borderBottomColor: '#DCEDC8' },
   quotaText: {
     fontSize: 12,
     color: AppColors.grayDark,
-    fontWeight: '600',
-  },
+    fontWeight: '600' },
   filterScroll: {
     flexGrow: 0,
-    flexShrink: 0,
-  },
+    flexShrink: 0 },
   filterRow: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 16,
     paddingVertical: 10,
-    gap: 8,
-  },
+    gap: 8 },
   pill: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -345,12 +332,10 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     gap: 6,
     borderWidth: 1,
-    borderColor: AppColors.grayLight,
-  },
+    borderColor: AppColors.grayLight },
   pillActive: {
     backgroundColor: AppColors.primary,
-    borderColor: AppColors.primary,
-  },
+    borderColor: AppColors.primary },
   pillEmoji: { fontSize: 14 },
   pillText: { fontSize: 13, fontWeight: '600', color: AppColors.grayDark },
   pillTextActive: { color: AppColors.white },
@@ -361,46 +346,37 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 40,
     color: AppColors.gray,
-    fontSize: 14,
-  },
+    fontSize: 14 },
 
   card: {
     backgroundColor: AppColors.white,
     borderRadius: 14,
     marginBottom: 10,
     overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
-  },
+    boxShadow: '0px 1px 4px rgba(0,0,0,0.05)',
+    elevation: 2 },
   cardHead: {
     flexDirection: 'row',
     alignItems: 'center',
     padding: 14,
-    gap: 12,
-  },
+    gap: 12 },
   cardEmoji: { fontSize: 24 },
   cardQ: { fontSize: 15, fontWeight: '700', color: AppColors.black },
   cardMetaRow: {
     flexDirection: 'row',
     alignItems: 'center',
     marginTop: 4,
-    gap: 8,
-  },
+    gap: 8 },
   cardMeta: { fontSize: 11, color: AppColors.grayDark },
   seasonBadge: {
     paddingHorizontal: 8,
     paddingVertical: 2,
     backgroundColor: '#E8F5E9',
-    borderRadius: 10,
-  },
+    borderRadius: 10 },
   seasonBadgeText: {
     fontSize: 10,
     fontWeight: '700',
-    color: AppColors.primary,
-  },
+    color: AppColors.primary },
   chev: { fontSize: 18, color: AppColors.gray },
 
   answer: {
@@ -408,28 +384,24 @@ const styles = StyleSheet.create({
     paddingBottom: 16,
     paddingTop: 0,
     borderTopWidth: 1,
-    borderTopColor: AppColors.grayLight,
-  },
+    borderTopColor: AppColors.grayLight },
   block: { marginTop: 12 },
   blockTitle: {
     fontSize: 13,
     fontWeight: '800',
     marginBottom: 6,
     textTransform: 'uppercase',
-    letterSpacing: 0.5,
-  },
+    letterSpacing: 0.5 },
   blockText: {
     fontSize: 14,
     lineHeight: 20,
-    color: AppColors.black,
-  },
+    color: AppColors.black },
 
   stepRow: {
     flexDirection: 'row',
     alignItems: 'flex-start',
     gap: 10,
-    marginBottom: 6,
-  },
+    marginBottom: 6 },
   stepBullet: {
     width: 22,
     height: 22,
@@ -437,8 +409,7 @@ const styles = StyleSheet.create({
     backgroundColor: AppColors.primary,
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 1,
-  },
+    marginTop: 1 },
   stepBulletText: { color: AppColors.white, fontSize: 12, fontWeight: '700' },
   stepText: { flex: 1, fontSize: 14, lineHeight: 20, color: AppColors.black },
 
@@ -446,13 +417,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'flex-start',
     gap: 8,
-    marginBottom: 4,
-  },
+    marginBottom: 4 },
   listDot: {
     width: 6,
     height: 6,
     borderRadius: 3,
-    marginTop: 8,
-  },
-  listText: { flex: 1, fontSize: 13, lineHeight: 19, color: AppColors.black },
-});
+    marginTop: 8 },
+  listText: { flex: 1, fontSize: 13, lineHeight: 19, color: AppColors.black } });

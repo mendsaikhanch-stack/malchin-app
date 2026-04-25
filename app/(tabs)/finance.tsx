@@ -10,8 +10,7 @@ import {
   Alert,
   RefreshControl,
   ActivityIndicator,
-  Dimensions,
-} from 'react-native';
+  Dimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { AppColors } from '@/constants/theme';
 import { financeApi } from '@/services/api';
@@ -21,8 +20,7 @@ import { financeApi } from '@/services/api';
 const BRAND = {
   primary: '#2d5016',
   primaryLight: '#4a7c28',
-  bg: '#f5f7f0',
-};
+  bg: '#f5f7f0' };
 
 const MONTHS_MN = [
   'I сар', 'II сар', 'III сар', 'IV сар', 'V сар', 'VI сар',
@@ -49,8 +47,7 @@ const categories = {
     { key: 'equipment', label: 'Тоног төхөөрөмж', emoji: '🔧' },
     { key: 'labor', label: 'Хөдөлмөр', emoji: '👷' },
     { key: 'other_ex', label: 'Бусад', emoji: '💰' },
-  ],
-};
+  ] };
 
 type TabKey = 'overview' | 'records' | 'report';
 type RecordType = 'income' | 'expense';
@@ -150,15 +147,13 @@ export default function FinanceScreen() {
           type: recordType,
           category: selectedCat,
           amount: num,
-          note: note.trim(),
-        });
+          note: note.trim() });
       } else {
         await financeApi.add({
           type: recordType,
           category: selectedCat,
           amount: num,
-          note: note.trim(),
-        });
+          note: note.trim() });
       }
       setShowModal(false);
       setEditingRecord(null);
@@ -195,8 +190,7 @@ export default function FinanceScreen() {
             } catch {
               Alert.alert('Алдаа', 'Устгахад алдаа гарлаа');
             }
-          },
-        },
+          } },
       ]
     );
   };
@@ -272,8 +266,7 @@ export default function FinanceScreen() {
         month: m,
         label: MONTHS_MN[m - 1],
         income: monthlyData[m]?.income || 0,
-        expense: monthlyData[m]?.expense || 0,
-      });
+        expense: monthlyData[m]?.expense || 0 });
     }
     return result;
   }, [monthlyData]);
@@ -375,12 +368,10 @@ export default function FinanceScreen() {
         {/* Profit Card */}
         <View style={[styles.bigProfitCard, {
           backgroundColor: summary.profit >= 0 ? '#e8f5e9' : '#ffebee',
-          borderColor: summary.profit >= 0 ? BRAND.primaryLight : AppColors.danger,
-        }]}>
+          borderColor: summary.profit >= 0 ? BRAND.primaryLight : AppColors.danger }]}>
           <Text style={styles.bigProfitTitle}>💰 Нийт ашиг/алдагдал</Text>
           <Text style={[styles.bigProfitAmount, {
-            color: summary.profit >= 0 ? BRAND.primary : AppColors.danger,
-          }]}>
+            color: summary.profit >= 0 ? BRAND.primary : AppColors.danger }]}>
             {summary.profit >= 0 ? '+' : ''}{formatPrice(summary.profit)}
           </Text>
           <View style={styles.profitBreakdown}>
@@ -409,11 +400,9 @@ export default function FinanceScreen() {
               <View key={idx} style={styles.trendColumn}>
                 <View style={styles.trendBars}>
                   <View style={[styles.trendBar, styles.trendBarIncome, {
-                    height: Math.max((m.income / maxBar) * 80, 2),
-                  }]} />
+                    height: Math.max((m.income / maxBar) * 80, 2) }]} />
                   <View style={[styles.trendBar, styles.trendBarExpense, {
-                    height: Math.max((m.expense / maxBar) * 80, 2),
-                  }]} />
+                    height: Math.max((m.expense / maxBar) * 80, 2) }]} />
                 </View>
                 <Text style={styles.trendLabel}>{m.label}</Text>
                 <Text style={styles.trendValue}>{formatPriceShort(m.income)}</Text>
@@ -449,8 +438,7 @@ export default function FinanceScreen() {
                     <View style={styles.catBarBg}>
                       <View style={[styles.catBarFill, {
                         width: `${Math.min(pct, 100)}%`,
-                        backgroundColor: idx === 0 ? AppColors.danger : idx < 3 ? AppColors.warning : AppColors.gray,
-                      }]} />
+                        backgroundColor: idx === 0 ? AppColors.danger : idx < 3 ? AppColors.warning : AppColors.gray }]} />
                     </View>
                     <Text style={styles.catPctText}>{pct.toFixed(1)}%</Text>
                   </View>
@@ -574,8 +562,7 @@ export default function FinanceScreen() {
             return (
               <TouchableOpacity key={rec.id} style={styles.recordItem} onPress={() => handleEdit(rec)} onLongPress={() => handleDelete(rec)}>
                 <View style={[styles.recordEmojiBox, {
-                  backgroundColor: isIncome ? '#e8f5e9' : '#ffebee',
-                }]}>
+                  backgroundColor: isIncome ? '#e8f5e9' : '#ffebee' }]}>
                   <Text style={styles.recordEmoji}>{cat.emoji}</Text>
                 </View>
                 <View style={styles.recordInfo}>
@@ -654,12 +641,10 @@ export default function FinanceScreen() {
             </View>
           </View>
           <View style={[styles.reportProfitBox, {
-            backgroundColor: profit >= 0 ? '#e8f5e9' : '#ffebee',
-          }]}>
+            backgroundColor: profit >= 0 ? '#e8f5e9' : '#ffebee' }]}>
             <Text style={styles.reportSummaryLabel}>Цэвэр ашиг</Text>
             <Text style={[styles.reportProfitVal, {
-              color: profit >= 0 ? BRAND.primary : AppColors.danger,
-            }]}>
+              color: profit >= 0 ? BRAND.primary : AppColors.danger }]}>
               {profit >= 0 ? '+' : ''}{formatPrice(profit)}
             </Text>
           </View>
@@ -718,8 +703,7 @@ export default function FinanceScreen() {
                 <Text style={[styles.tableCell, {
                   flex: 1,
                   fontWeight: '700',
-                  color: row.profit >= 0 ? BRAND.primary : AppColors.danger,
-                }]}>
+                  color: row.profit >= 0 ? BRAND.primary : AppColors.danger }]}>
                   {hasData ? (row.profit >= 0 ? '+' : '') + formatPriceShort(row.profit) : '-'}
                 </Text>
               </View>
@@ -736,8 +720,7 @@ export default function FinanceScreen() {
             </Text>
             <Text style={[styles.tableTotalCell, {
               flex: 1,
-              color: profit >= 0 ? BRAND.primary : AppColors.danger,
-            }]}>
+              color: profit >= 0 ? BRAND.primary : AppColors.danger }]}>
               {profit >= 0 ? '+' : ''}{formatPriceShort(profit)}
             </Text>
           </View>
@@ -763,12 +746,10 @@ export default function FinanceScreen() {
           </View>
           <View style={[styles.perAnimalBoxWide, {
             backgroundColor: perAnimalProfit >= 0 ? '#e8f5e9' : '#ffebee',
-            borderColor: perAnimalProfit >= 0 ? BRAND.primaryLight : AppColors.danger,
-          }]}>
+            borderColor: perAnimalProfit >= 0 ? BRAND.primaryLight : AppColors.danger }]}>
             <Text style={styles.perAnimalLabel}>Цэвэр ашиг / мал</Text>
             <Text style={[styles.perAnimalValBig, {
-              color: perAnimalProfit >= 0 ? BRAND.primary : AppColors.danger,
-            }]}>
+              color: perAnimalProfit >= 0 ? BRAND.primary : AppColors.danger }]}>
               {perAnimalProfit >= 0 ? '+' : ''}{formatPrice(perAnimalProfit)}
             </Text>
           </View>
@@ -872,8 +853,7 @@ export default function FinanceScreen() {
               </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.saveBtn, {
-                  backgroundColor: recordType === 'income' ? BRAND.primaryLight : AppColors.danger,
-                }]}
+                  backgroundColor: recordType === 'income' ? BRAND.primaryLight : AppColors.danger }]}
                 onPress={handleSave}
               >
                 <Text style={styles.saveBtnText}>{editingRecord ? '✓ Хадгалах' : '✓ Бүртгэх'}</Text>
@@ -905,22 +885,16 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     backgroundColor: '#e8ede2',
     borderRadius: 14,
-    padding: 3,
-  },
+    padding: 3 },
   tabItem: {
     flex: 1,
     paddingVertical: 10,
     borderRadius: 12,
-    alignItems: 'center',
-  },
+    alignItems: 'center' },
   tabItemActive: {
     backgroundColor: AppColors.white,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.08,
-    shadowRadius: 4,
-    elevation: 3,
-  },
+    boxShadow: '0px 1px 4px rgba(0,0,0,0.08)',
+    elevation: 3 },
   tabText: { fontSize: 13, fontWeight: '600', color: AppColors.grayDark },
   tabTextActive: { color: BRAND.primary, fontWeight: '700' },
 
@@ -930,15 +904,13 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 20,
     alignItems: 'center',
-    borderWidth: 1.5,
-  },
+    borderWidth: 1.5 },
   bigProfitTitle: { fontSize: 14, fontWeight: '600', color: AppColors.grayDark },
   bigProfitAmount: { fontSize: 32, fontWeight: '900', marginTop: 4 },
   profitBreakdown: {
     flexDirection: 'row',
     marginTop: 16,
-    gap: 24,
-  },
+    gap: 24 },
   profitBreakdownItem: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   profitDot: { width: 8, height: 8, borderRadius: 4 },
   profitBreakdownLabel: { fontSize: 13, color: AppColors.grayDark },
@@ -951,12 +923,8 @@ const styles = StyleSheet.create({
     backgroundColor: AppColors.white,
     borderRadius: 16,
     padding: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 6,
-    elevation: 2,
-  },
+    boxShadow: '0px 1px 6px rgba(0,0,0,0.05)',
+    elevation: 2 },
   sectionCardTitle: { fontSize: 16, fontWeight: '700', color: BRAND.primary, marginBottom: 12 },
 
   // Trend chart
@@ -1003,8 +971,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
-    backgroundColor: '#e8ede2',
-  },
+    backgroundColor: '#e8ede2' },
   filterChipActive: { backgroundColor: BRAND.primary },
   filterChipText: { fontSize: 13, fontWeight: '600', color: AppColors.grayDark },
   filterChipTextActive: { color: AppColors.white },
@@ -1013,8 +980,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 6,
     borderRadius: 16,
-    backgroundColor: '#e8ede2',
-  },
+    backgroundColor: '#e8ede2' },
   monthChipActive: { backgroundColor: BRAND.primaryLight },
   monthChipText: { fontSize: 12, fontWeight: '600', color: AppColors.grayDark },
   monthChipTextActive: { color: AppColors.white },
@@ -1035,20 +1001,15 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     padding: 12,
     marginBottom: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.04,
-    shadowRadius: 4,
-    elevation: 2,
-  },
+    boxShadow: '0px 1px 4px rgba(0,0,0,0.04)',
+    elevation: 2 },
   recordEmojiBox: {
     width: 44,
     height: 44,
     borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 12,
-  },
+    marginRight: 12 },
   recordEmoji: { fontSize: 22 },
   recordInfo: { flex: 1 },
   recordCat: { fontSize: 14, fontWeight: '600', color: AppColors.black },
@@ -1068,8 +1029,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 8,
     borderRadius: 20,
-    backgroundColor: '#e8ede2',
-  },
+    backgroundColor: '#e8ede2' },
   yearChipActive: { backgroundColor: BRAND.primary },
   yearChipText: { fontSize: 14, fontWeight: '700', color: AppColors.grayDark },
   yearChipTextActive: { color: AppColors.white },
@@ -1082,8 +1042,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
     borderRadius: 12,
     padding: 14,
-    alignItems: 'center',
-  },
+    alignItems: 'center' },
   reportProfitVal: { fontSize: 22, fontWeight: '900', marginTop: 4 },
 
   reportCatRow: {
@@ -1091,8 +1050,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 8,
     borderBottomWidth: 1,
-    borderBottomColor: '#f5f5f5',
-  },
+    borderBottomColor: '#f5f5f5' },
   reportCatEmoji: { fontSize: 20, marginRight: 8, width: 28, textAlign: 'center' },
   reportCatLabel: { flex: 1, fontSize: 13, fontWeight: '600', color: AppColors.black },
   reportCatVal: { fontSize: 14, fontWeight: '700' },
@@ -1103,15 +1061,13 @@ const styles = StyleSheet.create({
     borderBottomWidth: 2,
     borderBottomColor: BRAND.primary,
     paddingBottom: 8,
-    marginBottom: 4,
-  },
+    marginBottom: 4 },
   tableHeaderCell: { fontSize: 11, fontWeight: '700', color: BRAND.primary, textAlign: 'center' },
   tableRow: {
     flexDirection: 'row',
     paddingVertical: 7,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
-  },
+    borderBottomColor: '#f0f0f0' },
   tableRowEmpty: { opacity: 0.4 },
   tableCell: { fontSize: 12, color: AppColors.black, textAlign: 'center' },
   tableTotalRow: {
@@ -1119,8 +1075,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     borderTopWidth: 2,
     borderTopColor: BRAND.primary,
-    marginTop: 4,
-  },
+    marginTop: 4 },
   tableTotalCell: { fontSize: 13, fontWeight: '800', textAlign: 'center' },
 
   // Per animal
@@ -1133,8 +1088,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 16,
     alignItems: 'center',
-    borderWidth: 1.5,
-  },
+    borderWidth: 1.5 },
   perAnimalValBig: { fontSize: 24, fontWeight: '900', marginTop: 4 },
 
   // ─── Modal ───
@@ -1144,16 +1098,14 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     padding: 24,
-    maxHeight: '90%',
-  },
+    maxHeight: '90%' },
   modalHandle: {
     width: 40,
     height: 4,
     borderRadius: 2,
     backgroundColor: AppColors.grayMedium,
     alignSelf: 'center',
-    marginBottom: 12,
-  },
+    marginBottom: 12 },
   modalTitle: { fontSize: 20, fontWeight: '800', color: BRAND.primary, marginBottom: 12 },
   toggleRow: { flexDirection: 'row', gap: 8, marginBottom: 8 },
   toggleBtn: {
@@ -1162,8 +1114,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     borderWidth: 1.5,
     borderColor: AppColors.grayMedium,
-    alignItems: 'center',
-  },
+    alignItems: 'center' },
   toggleIncome: { borderColor: BRAND.primaryLight, backgroundColor: '#e8f5e9' },
   toggleExpense: { borderColor: AppColors.danger, backgroundColor: '#ffebee' },
   toggleText: { fontSize: 14, fontWeight: '600', color: AppColors.grayDark },
@@ -1176,8 +1127,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     borderWidth: 1.5,
     borderColor: AppColors.grayMedium,
-    alignItems: 'center',
-  },
+    alignItems: 'center' },
   catBtnActive: { borderColor: BRAND.primary, backgroundColor: '#e8f5e9' },
   catBtnEmoji: { fontSize: 18 },
   catBtnLabel: { fontSize: 10, color: AppColors.grayDark, marginTop: 2 },
@@ -1189,8 +1139,7 @@ const styles = StyleSheet.create({
     padding: 12,
     fontSize: 15,
     color: AppColors.black,
-    backgroundColor: '#fafafa',
-  },
+    backgroundColor: '#fafafa' },
   modalActions: { flexDirection: 'row', gap: 10, marginTop: 24 },
   cancelBtn: {
     flex: 1,
@@ -1198,9 +1147,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     borderWidth: 1.5,
     borderColor: AppColors.grayMedium,
-    alignItems: 'center',
-  },
+    alignItems: 'center' },
   cancelBtnText: { fontSize: 15, fontWeight: '600', color: AppColors.grayDark },
   saveBtn: { flex: 1, padding: 14, borderRadius: 12, alignItems: 'center' },
-  saveBtnText: { fontSize: 15, fontWeight: '700', color: AppColors.white },
-});
+  saveBtnText: { fontSize: 15, fontWeight: '700', color: AppColors.white } });
