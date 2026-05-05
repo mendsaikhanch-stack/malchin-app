@@ -11,6 +11,14 @@ from pptx.enum.shapes import MSO_SHAPE
 from pptx.enum.text import PP_ALIGN
 import os
 
+MOCKUP_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..',
+                                          'docs', 'mockups'))
+
+
+def mockup(name):
+    """mockups/<name> руу абсолют зам буцаах"""
+    return os.path.join(MOCKUP_DIR, name)
+
 # ----- Өнгө (theme) -----
 GREEN_DARK = RGBColor(0x1B, 0x5E, 0x20)  # Гол өнгө — хээр тал
 GREEN_MID = RGBColor(0x2E, 0x7D, 0x32)
@@ -73,8 +81,13 @@ def add_header_bar(slide, title, subtitle=None):
                  subtitle, size=14, color=CREAM)
 
 
-def add_image_placeholder(slide, left, top, width, height, label):
-    """Зурагны байрлал — алтлаг хүрээтэй хайрцаг"""
+def add_image_placeholder(slide, left, top, width, height, label,
+                          image_name=None):
+    """Зурагны байрлал. image_name өгсөн бол жинхэнэ зургийг оруулна.
+    Эс бөгөөс алтлаг хүрээтэй текст placeholder."""
+    if image_name and os.path.exists(mockup(image_name)):
+        return add_phone_screenshot(slide, left, top, width, height,
+                                    image_name)
     box = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE, left, top, width, height)
     box.fill.solid()
     box.fill.fore_color.rgb = WHITE
@@ -84,15 +97,12 @@ def add_image_placeholder(slide, left, top, width, height, label):
     tf.word_wrap = True
     p = tf.paragraphs[0]
     p.alignment = PP_ALIGN.CENTER
-    p.text = ""  # clear default
-    # эхний мөр
     run1 = p.add_run()
     run1.text = "📷 ЗУРАГ"
     run1.font.name = 'Arial'
     run1.font.size = Pt(24)
     run1.font.bold = True
     run1.font.color.rgb = GOLD
-    # дараагийн мөр
     p2 = tf.add_paragraph()
     p2.alignment = PP_ALIGN.CENTER
     r2 = p2.add_run()
@@ -101,6 +111,40 @@ def add_image_placeholder(slide, left, top, width, height, label):
     r2.font.size = Pt(14)
     r2.font.color.rgb = GRAY
     return box
+
+
+def add_phone_screenshot(slide, area_left, area_top, area_w, area_h,
+                         image_name):
+    """Утасны frame дотор screenshot оруулах.
+    area_left/top/w/h — зургийг байрлуулах нийт талбар.
+    Зураг 720x1280 (9:16) тул талбарын дотор төвлөрөх ба
+    хар утасны хүрээтэй харагдана."""
+    # Утасны зургийн ratio 720/1280
+    ratio = 720 / 1280
+    # Хамгийн их хэмжээ — area-д багтахаар
+    if (area_w / area_h) > ratio:
+        # area нь өргөн — өндөрт нь тулгуурлана
+        img_h = area_h
+        img_w = int(img_h * ratio)
+    else:
+        img_w = area_w
+        img_h = int(img_w / ratio)
+    img_left = area_left + (area_w - img_w) // 2
+    img_top = area_top + (area_h - img_h) // 2
+    # Хар утасны frame (зургаас 6% том)
+    pad = int(img_w * 0.04)
+    frame = slide.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE,
+                                   img_left - pad, img_top - pad,
+                                   img_w + pad * 2, img_h + pad * 2)
+    frame.fill.solid()
+    frame.fill.fore_color.rgb = BLACK
+    frame.line.color.rgb = GRAY
+    frame.line.width = Pt(2)
+    frame.adjustments[0] = 0.05
+    # Жинхэнэ зураг
+    pic = slide.shapes.add_picture(mockup(image_name),
+                                   img_left, img_top, img_w, img_h)
+    return pic
 
 
 def add_bullet_box(slide, left, top, width, height, items, *, size=18,
@@ -275,7 +319,8 @@ add_text(s, Inches(0.5), Inches(6.4), Inches(12.3), Inches(0.9),
 # ============================================================
 # СЛАЙДЫН ҮНДСЭН ТУСЛАГЧ — Хуудас бүрд нэг слайд
 # ============================================================
-def add_screen_slide(num, title, image_label, description, advantages):
+def add_screen_slide(num, title, image_label, description, advantages,
+                     image_name=None):
     """Аппын нэг хуудсыг танилцуулах слайд:
     зүүн талд зурагны байрлал, баруун талд тайлбар + давуу тал"""
     s = prs.slides.add_slide(BLANK)
@@ -284,7 +329,8 @@ def add_screen_slide(num, title, image_label, description, advantages):
 
     # Зүүн тал — зурагны байрлал
     add_image_placeholder(s, Inches(0.5), Inches(1.4),
-                          Inches(5.2), Inches(5.7), image_label)
+                          Inches(5.2), Inches(5.7), image_label,
+                          image_name=image_name)
 
     # Баруун тал — тайлбар
     add_text(s, Inches(6.0), Inches(1.4), Inches(7), Inches(0.5),
@@ -318,6 +364,7 @@ add_screen_slide(
         "Хөгшин малчин ч ойлгож, өөрөө бүртгүүлж чадна",
         "Имэйл бий болгох шаардлагагүй",
     ],
+    image_name="01-phone.png",
 )
 
 
@@ -341,6 +388,7 @@ add_screen_slide(
         "Нэг л удаа бөглөнө — дараа нь дахин асуухгүй",
         "Апп өөрөө таны нутаг, малыг таниад мэдээлэл өгнө",
     ],
+    image_name="02-role.png",
 )
 
 
@@ -355,7 +403,8 @@ add_header_bar(s, "3.3  НҮҮР ХУУДАС — «ӨНӨӨДӨР»",
 # Зүүн дээр — зурагны байрлал
 add_image_placeholder(s, Inches(0.5), Inches(1.4),
                       Inches(4.5), Inches(5.7),
-                      "Нүүр хуудас\n\nЦаг агаар, өнөөдөр хийх ажил, мэдэгдэл")
+                      "Нүүр хуудас\n\nЦаг агаар, өнөөдөр хийх ажил, мэдэгдэл",
+                      image_name="03-home.png")
 
 # Баруун — 9 картын жагсаалт
 cards = [
@@ -427,6 +476,7 @@ add_screen_slide(
         "«Хэдэн толгой малтай вэ?» гэхэд 3 секундэд хариулна",
         "Толгойдоо барих, хуучин дэвтэрт хайх шаардлагагүй",
     ],
+    image_name="04-livestock.png",
 )
 
 
@@ -446,6 +496,7 @@ add_screen_slide(
         "Яг газрыг бусдад харуулахгүй — зөвхөн «энэ багт» түвшинд",
         "Хувийн нууц хадгалагдана",
     ],
+    image_name="05-pasture.png",
 )
 
 
@@ -465,6 +516,7 @@ add_screen_slide(
         "Урт өгүүлэл биш — богино тодорхой алхмууд",
         "Малчинд шууд хэрэгцээтэй формат",
     ],
+    image_name="06-advisory.png",
 )
 
 
@@ -484,6 +536,7 @@ add_screen_slide(
         "Хуучин ёс заншил, малын ухаан залуу үед дамжина",
         "Ахмадууд өөрсдөө хүндлэгдэж байгаагаа мэдэрнэ",
     ],
+    image_name="07-elder.png",
 )
 
 
@@ -502,6 +555,7 @@ add_screen_slide(
         "Урьд сум сум руу яриулж байсан зүйл одоо 2 минутад",
         "Хол хүртэлх айлуудад нэг дор хүрнэ",
     ],
+    image_name="08-lost-found.png",
 )
 
 
@@ -523,6 +577,7 @@ add_screen_slide(
         "Хол явалгүй сум, аймгийн мэдээлэл харна",
         "Үнэ ил тод, дундын зуучлагч хэрэггүй",
     ],
+    image_name="09-market.png",
 )
 
 
@@ -543,6 +598,7 @@ add_screen_slide(
         "«Эмч сум руу очно уу?» гэж хүлээх биш",
         "Апп дотроос шууд ярина",
     ],
+    image_name="10-vet.png",
 )
 
 
@@ -563,6 +619,7 @@ add_screen_slide(
         "«Сонссонгүй, мэдсэнгүй» гэх асуудал тэглэдэг",
         "Хэн уншсан, хэн уншаагүй харагдана",
     ],
+    image_name="11-news.png",
 )
 
 
@@ -583,6 +640,7 @@ add_screen_slide(
         "Орлого зарлагаа толгойдоо барилгүй харна",
         "Жилийн тооцоо хийхэд хялбар",
     ],
+    image_name="12-household.png",
 )
 
 
@@ -679,7 +737,8 @@ add_header_bar(s, "4. БАГИЙН ДАРГЫН ТУСГАЙ САМБАР",
 
 add_image_placeholder(s, Inches(0.5), Inches(1.4),
                       Inches(5), Inches(5.7),
-                      "Багийн даргын самбар\n\nӨрхүүдийн жагсаалт, эрсдэл,\nмэдэгдэл явуулах товч")
+                      "Багийн даргын самбар\n\nӨрхүүдийн жагсаалт, эрсдэл,\nмэдэгдэл явуулах товч",
+                      image_name="14-bag-dashboard.png")
 
 # 4 ач холбогдол
 benefits = [
