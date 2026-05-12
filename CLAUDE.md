@@ -107,7 +107,7 @@ Single-glance асуулт: Хэн? Хаанаас? Яаж? Хэн төлж? А�
 
 ---
 
-## 5. MVP Scope (14 feature)
+## 5. MVP Scope (15 feature)
 
 1. Phone + OTP
 2. Role + profile (овог/нэр/аймаг/сум/баг)
@@ -123,8 +123,9 @@ Single-glance асуулт: Хэн? Хаанаас? Яаж? Хэн төлж? А�
 12. Bag darga + sum admin dashboard basic
 13. Owner dashboard basic
 14. Package/pricing/billing basic + offline sync
+15. **Insurance basic** — хүний даатгал (ЭМД/НДШ мэдээлэл, тооцоолуур, бичиг баримтын жагсаалт) + малын даатгал (мэдээлэл, package харьцуулалт). Read-only мэдээлэл + calculator. Бодит худалдан авалт/claim flow MVP-д орохгүй.
 
-**MVP-д орохгүй:** extra income deep, health/insurance module, family/education module, verified provider, cooperative commerce, advanced analytics, AI reco engine, payout/commission engine, B2G deep integration, predictive risk.
+**MVP-д орохгүй:** extra income deep, family/education module, verified provider, cooperative commerce, advanced analytics, AI reco engine, payout/commission engine, B2G deep integration, predictive risk, insurance claim/purchase flow.
 
 ---
 
@@ -149,6 +150,7 @@ Home (Өнөөдөр)         — briefing, weather, shortcuts
 Сум & баг             — мэдэгдэл, баг мэдээлэл, баталгаажуулалт
 Зах зээл              — зар/солилцоо, алдсан/олдсон, нэмэлт орлого
 Малчин хүн            — эрүүл мэнд/ЭМД/НДШ, өрх/хүүхэд, ур чадвар
+Даатгал               — хүний даатгал (ЭМД/НДШ), малын даатгал, тооцоолуур, бичиг баримт
 Профайл               — багц/төлбөр, тохиргоо, privacy
 ```
 
