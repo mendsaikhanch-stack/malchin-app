@@ -10,6 +10,7 @@ import {
   ActivityIndicator,
   Share } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import * as Clipboard from 'expo-clipboard';
 import { AppColors } from '@/constants/theme';
@@ -149,7 +150,10 @@ export default function ScannerScreen() {
       >
         {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.title}>🔍 Мал хайх</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+            <MaterialCommunityIcons name="magnify" size={24} color="#2D7D3F" />
+            <Text style={styles.title}>Мал хайх</Text>
+          </View>
           <Text style={styles.subtitle}>
             Ээмэгний дугаар эсвэл RFID чипний дугаар оруулж малаа хайна уу
           </Text>
@@ -159,7 +163,7 @@ export default function ScannerScreen() {
         <View style={styles.searchSection}>
           <View style={styles.searchInputRow}>
             <View style={styles.searchInputContainer}>
-              <Text style={styles.searchIcon}>🏷️</Text>
+              <MaterialCommunityIcons name="tag-outline" size={20} color="#616161" style={styles.searchIcon} />
               <TextInput
                 style={styles.searchInput}
                 placeholder={batchMode ? "Дугааруудыг таслалаар тусгаарлана (жнь: MN001, MN002)" : "Ээмэг/чип дугаар оруулна уу"}
@@ -192,13 +196,19 @@ export default function ScannerScreen() {
               style={[styles.modeBtn, !batchMode && styles.modeBtnActive]}
               onPress={() => { setBatchMode(false); setBatchResults([]); }}
             >
-              <Text style={[styles.modeBtnText, !batchMode && styles.modeBtnTextActive]}>🔍 Нэг хайлт</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                <MaterialCommunityIcons name="magnify" size={15} color={!batchMode ? '#fff' : '#616161'} />
+                <Text style={[styles.modeBtnText, !batchMode && styles.modeBtnTextActive]}>Нэг хайлт</Text>
+              </View>
             </TouchableOpacity>
             <TouchableOpacity
               style={[styles.modeBtn, batchMode && styles.modeBtnActive]}
               onPress={() => { setBatchMode(true); setAnimal(null); setNotFound(false); }}
             >
-              <Text style={[styles.modeBtnText, batchMode && styles.modeBtnTextActive]}>📋 Олон хайлт</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                <MaterialCommunityIcons name="clipboard-text-outline" size={15} color={batchMode ? '#fff' : '#616161'} />
+                <Text style={[styles.modeBtnText, batchMode && styles.modeBtnTextActive]}>Олон хайлт</Text>
+              </View>
             </TouchableOpacity>
           </View>
         </View>
@@ -237,7 +247,7 @@ export default function ScannerScreen() {
         {/* Not Found */}
         {notFound && !loading && (
           <View style={styles.notFoundCard}>
-            <Text style={styles.notFoundEmoji}>🔍</Text>
+            <MaterialCommunityIcons name="magnify" size={48} color="#616161" style={styles.notFoundEmoji} />
             <Text style={styles.notFoundTitle}>Олдсонгүй</Text>
             <Text style={styles.notFoundText}>
               Энэ дугаартай мал бүртгэлд олдсонгүй. Шинэ мал бүртгэхийг хүсвэл мал бүртгэл хэсэгт очно уу.
@@ -252,7 +262,7 @@ export default function ScannerScreen() {
         {batchMode && batchResults.length > 0 && !loading && (
           <View style={styles.batchSection}>
             <Text style={styles.batchTitle}>
-              📋 Хайлтын үр дүн ({batchResults.filter(r => r.found).length}/{batchResults.length} олдсон)
+              <MaterialCommunityIcons name="clipboard-text-outline" size={16} color="#1A1A1A" /> Хайлтын үр дүн ({batchResults.filter(r => r.found).length}/{batchResults.length} олдсон)
             </Text>
             {batchResults.map((r, i) => {
               const info = r.animal ? getAnimalInfo(r.animal.animal_type) : { emoji: '❓', label: '' };
@@ -269,7 +279,11 @@ export default function ScannerScreen() {
                     }
                   }}
                 >
-                  <Text style={styles.batchEmoji}>{r.found ? info.emoji : '❌'}</Text>
+                  {r.found ? (
+                    <Text style={styles.batchEmoji}>{info.emoji}</Text>
+                  ) : (
+                    <MaterialCommunityIcons name="close-circle-outline" size={28} color="#E53935" style={styles.batchEmoji} />
+                  )}
                   <View style={{ flex: 1 }}>
                     <Text style={styles.batchTag}>{r.tag}</Text>
                     {r.found ? (
@@ -294,13 +308,15 @@ export default function ScannerScreen() {
         {/* Шуурхай үйлдлүүд */}
         {!animal && !loading && !notFound && batchResults.length === 0 && (
           <View style={styles.quickActions}>
-            <Text style={styles.quickActionsTitle}>⚡ Шуурхай үйлдлүүд</Text>
+            <Text style={styles.quickActionsTitle}>
+              <MaterialCommunityIcons name="flash-outline" size={16} color="#FF8F00" /> Шуурхай үйлдлүүд
+            </Text>
             <TouchableOpacity style={styles.quickActionBtn} onPress={() => router.push('/(tabs)/livestock')}>
               <Text style={styles.quickActionEmoji}>🐑</Text>
               <Text style={styles.quickActionLabel}>Мал бүртгэл</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.quickActionBtn} onPress={() => router.push('/(tabs)/health')}>
-              <Text style={styles.quickActionEmoji}>🏥</Text>
+              <MaterialCommunityIcons name="hospital-box-outline" size={24} color="#E53935" style={styles.quickActionEmoji} />
               <Text style={styles.quickActionLabel}>Эрүүл мэнд</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.quickActionBtn} onPress={() => router.push('/(tabs)/breeding')}>
@@ -355,7 +371,9 @@ function AnimalDetailCard({ animal, router }: { animal: any; router: any }) {
       {/* Genealogy */}
       {(genealogy.mother || genealogy.father || offspring.length > 0) && (
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>🧬 Удам угсаа</Text>
+          <Text style={styles.sectionTitle}>
+            <MaterialCommunityIcons name="dna" size={16} color="#5C6BC0" /> Удам угсаа
+          </Text>
           {genealogy.mother && (
             <View style={styles.genealogyRow}>
               <Text style={styles.genealogyRole}>Эх:</Text>
@@ -386,7 +404,9 @@ function AnimalDetailCard({ animal, router }: { animal: any; router: any }) {
       {/* Health Records */}
       {healthRecords.length > 0 && (
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>🏥 Эрүүл мэндийн бүртгэл</Text>
+          <Text style={styles.sectionTitle}>
+            <MaterialCommunityIcons name="hospital-box-outline" size={16} color="#E53935" /> Эрүүл мэндийн бүртгэл
+          </Text>
           {healthRecords.map((record: any, index: number) => {
             const severity = severityLabels[record.severity] || null;
             return (
@@ -404,7 +424,7 @@ function AnimalDetailCard({ animal, router }: { animal: any; router: any }) {
                   )}
                 </View>
                 <Text style={styles.healthItemDate}>
-                  📅 {formatDate(record.record_date || record.date)}
+                  <MaterialCommunityIcons name="calendar" size={11} color="#616161" /> {formatDate(record.record_date || record.date)}
                 </Text>
               </View>
             );
@@ -415,14 +435,16 @@ function AnimalDetailCard({ animal, router }: { animal: any; router: any }) {
       {/* Vaccinations */}
       {vaccinations.length > 0 && (
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>💉 Вакцинжуулалт</Text>
+          <Text style={styles.sectionTitle}>
+            <MaterialCommunityIcons name="needle" size={16} color="#5C6BC0" /> Вакцинжуулалт
+          </Text>
           {vaccinations.map((vac: any, index: number) => (
             <View key={vac.id || index} style={styles.vaccinationItem}>
               <Text style={styles.vaccinationName}>
                 {vac.vaccine_name || vac.name || 'Вакцин'}
               </Text>
               <Text style={styles.vaccinationDate}>
-                📅 {formatDate(vac.vaccination_date || vac.date)}
+                <MaterialCommunityIcons name="calendar" size={11} color="#616161" /> {formatDate(vac.vaccination_date || vac.date)}
               </Text>
             </View>
           ))}
@@ -435,13 +457,17 @@ function AnimalDetailCard({ animal, router }: { animal: any; router: any }) {
           style={styles.editButton}
           onPress={() => router.push('/(tabs)/livestock')}
         >
-          <Text style={styles.editButtonText}>✏️ Засах</Text>
+          <Text style={styles.editButtonText}>
+            <MaterialCommunityIcons name="pencil" size={14} color="#2d5016" /> Засах
+          </Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.healthButton}
           onPress={() => router.push('/(tabs)/health')}
         >
-          <Text style={styles.healthButtonText}>🏥 Эрүүл мэнд</Text>
+          <Text style={styles.healthButtonText}>
+            <MaterialCommunityIcons name="hospital-box-outline" size={14} color="#1565C0" /> Эрүүл мэнд
+          </Text>
         </TouchableOpacity>
       </View>
       <View style={[styles.actionButtons, { marginTop: 8, borderTopWidth: 0, paddingTop: 0 }]}>
@@ -465,7 +491,9 @@ function AnimalDetailCard({ animal, router }: { animal: any; router: any }) {
             }
           }}
         >
-          <Text style={styles.copyButtonText}>📋 Дугаар хуулах</Text>
+          <Text style={styles.copyButtonText}>
+            <MaterialCommunityIcons name="clipboard-text-outline" size={14} color="#6A1B9A" /> Дугаар хуулах
+          </Text>
         </TouchableOpacity>
       </View>
     </View>

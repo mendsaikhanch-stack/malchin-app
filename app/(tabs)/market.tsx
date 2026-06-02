@@ -13,6 +13,7 @@ import {
   Linking,
   Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { AppColors } from '@/constants/theme';
 import { ScreenBackdrop } from '@/components/screen-background';
 import { marketApi, pricesApi } from '@/services/api';
@@ -393,16 +394,27 @@ export default function MarketScreen() {
         {item.description ? <Text style={styles.listingDesc}>{item.description}</Text> : null}
         <View style={styles.listingContactRow}>
           <View style={{ flex: 1 }}>
-            <Text style={styles.footerText}>📍 {item.location || '-'}</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+              <MaterialCommunityIcons name="map-marker" size={12} color="#616161" />
+              <Text style={styles.footerText}>{item.location || '-'}</Text>
+            </View>
             <Text style={styles.footerText}>{item.created_at?.split(' ')[0]}</Text>
           </View>
           {item.phone ? (
             <TouchableOpacity style={styles.listingCallBtn} onPress={() => handleCallListing(item.phone)}>
-              <Text style={styles.listingCallBtnText}>📞 Утасдах</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                <MaterialCommunityIcons name="phone" size={14} color={AppColors.primaryDark} />
+                <Text style={styles.listingCallBtnText}>Утасдах</Text>
+              </View>
             </TouchableOpacity>
           ) : null}
         </View>
-        {item.phone ? <Text style={styles.listingPhone}>📱 {item.phone}</Text> : null}
+        {item.phone ? (
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 6 }}>
+            <MaterialCommunityIcons name="cellphone" size={12} color={AppColors.gray} />
+            <Text style={styles.listingPhone}>{item.phone}</Text>
+          </View>
+        ) : null}
         {!showActions && (
           <View style={{ flexDirection: 'row', justifyContent: 'flex-end', marginTop: 8 }}>
             <ReportButton listingId={item.id} kind="market" compact />
@@ -411,19 +423,28 @@ export default function MarketScreen() {
         {showActions && (
           <View style={styles.listingActions}>
             <TouchableOpacity style={styles.actionBtnEdit} onPress={() => handleEdit(item)}>
-              <Text style={styles.actionBtnEditText}>✏️ Засах</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                <MaterialCommunityIcons name="pencil" size={14} color="#1565C0" />
+                <Text style={styles.actionBtnEditText}>Засах</Text>
+              </View>
             </TouchableOpacity>
             {item.status === 'active' ? (
               <TouchableOpacity style={styles.actionBtnSold} onPress={() => handleStatusChange(item.id, 'sold')}>
-                <Text style={styles.actionBtnSoldText}>✅ Зарагдсан</Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                  <MaterialCommunityIcons name="check-circle" size={14} color="#2E7D32" />
+                  <Text style={styles.actionBtnSoldText}>Зарагдсан</Text>
+                </View>
               </TouchableOpacity>
             ) : (
               <TouchableOpacity style={styles.actionBtnSold} onPress={() => handleStatusChange(item.id, 'active')}>
-                <Text style={styles.actionBtnSoldText}>🔄 Идэвхжүүлэх</Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                  <MaterialCommunityIcons name="refresh" size={14} color="#2E7D32" />
+                  <Text style={styles.actionBtnSoldText}>Идэвхжүүлэх</Text>
+                </View>
               </TouchableOpacity>
             )}
             <TouchableOpacity style={styles.actionBtnDel} onPress={() => handleDelete(item.id)}>
-              <Text style={styles.actionBtnDelText}>🗑️</Text>
+              <MaterialCommunityIcons name="delete-outline" size={16} color="#E53935" />
             </TouchableOpacity>
           </View>
         )}
@@ -445,7 +466,7 @@ export default function MarketScreen() {
           returnKeyType="search"
         />
         <TouchableOpacity style={styles.searchBtn} onPress={handleSearch}>
-          <Text style={styles.searchBtnText}>🔍</Text>
+          <MaterialCommunityIcons name="magnify" size={20} color={AppColors.white} />
         </TouchableOpacity>
       </View>
 
@@ -467,10 +488,16 @@ export default function MarketScreen() {
           <Text style={[styles.chipSmallText, !sortBy && styles.chipSmallTextActive]}>Шинэ</Text>
         </TouchableOpacity>
         <TouchableOpacity style={[styles.chipSmall, sortBy === 'price_asc' && styles.chipSmallActive]} onPress={() => setSortBy('price_asc')}>
-          <Text style={[styles.chipSmallText, sortBy === 'price_asc' && styles.chipSmallTextActive]}>Үнэ ↑</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 2 }}>
+            <Text style={[styles.chipSmallText, sortBy === 'price_asc' && styles.chipSmallTextActive]}>Үнэ</Text>
+            <MaterialCommunityIcons name="arrow-up" size={12} color={sortBy === 'price_asc' ? AppColors.white : AppColors.grayDark} />
+          </View>
         </TouchableOpacity>
         <TouchableOpacity style={[styles.chipSmall, sortBy === 'price_desc' && styles.chipSmallActive]} onPress={() => setSortBy('price_desc')}>
-          <Text style={[styles.chipSmallText, sortBy === 'price_desc' && styles.chipSmallTextActive]}>Үнэ ↓</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 2 }}>
+            <Text style={[styles.chipSmallText, sortBy === 'price_desc' && styles.chipSmallTextActive]}>Үнэ</Text>
+            <MaterialCommunityIcons name="arrow-down" size={12} color={sortBy === 'price_desc' ? AppColors.white : AppColors.grayDark} />
+          </View>
         </TouchableOpacity>
       </ScrollView>
 
@@ -479,7 +506,7 @@ export default function MarketScreen() {
       </TouchableOpacity>
       {listings.length === 0 ? (
         <View style={styles.emptyCard}>
-          <Text style={{ fontSize: 40 }}>📦</Text>
+          <MaterialCommunityIcons name="package-variant" size={40} color={AppColors.gray} />
           <Text style={styles.emptyTitle}>Зар байхгүй</Text>
         </View>
       ) : (
@@ -511,7 +538,7 @@ export default function MarketScreen() {
       </TouchableOpacity>
       {myListings.length === 0 ? (
         <View style={styles.emptyCard}>
-          <Text style={{ fontSize: 40 }}>📋</Text>
+          <MaterialCommunityIcons name="clipboard-text-outline" size={40} color={AppColors.gray} />
           <Text style={styles.emptyTitle}>Танд зар байхгүй</Text>
           <Text style={styles.emptySubtext}>Мал, бүтээгдэхүүнээ зарахын тулд зар нэмнэ ү��</Text>
         </View>

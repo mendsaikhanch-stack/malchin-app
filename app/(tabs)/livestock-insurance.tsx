@@ -9,6 +9,7 @@ import {
   RefreshControl,
   ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { AppColors } from '@/constants/theme';
 import { ScreenBackdrop } from '@/components/screen-background';
 import { insuranceApi } from '@/services/api';
@@ -140,7 +141,7 @@ export default function LivestockInsuranceScreen() {
           <View style={styles.docList}>
             {livestockDocs.items?.map((item: string, idx: number) => (
               <View key={idx} style={styles.docItem}>
-                <Text style={styles.docBullet}>✓</Text>
+                <MaterialCommunityIcons name="check" size={14} color={BRAND.primaryLight} style={{ marginTop: 1 }} />
                 <Text style={styles.docText}>{item}</Text>
               </View>
             ))}
@@ -150,17 +151,20 @@ export default function LivestockInsuranceScreen() {
 
       {/* Жилийн хуанли */}
       <View style={styles.card}>
-        <Text style={styles.sectionTitle}>📅 Малын даатгалын хуанли</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+          <MaterialCommunityIcons name="calendar" size={18} color="#2D7D3F" />
+          <Text style={styles.sectionTitle}>Малын даатгалын хуанли</Text>
+        </View>
         {[
-          { month: '4-6 сар', event: 'IBLI даатгалд бүртгүүлэх хугацаа', emoji: '📝' },
-          { month: '6 сарын 1', event: 'Даатгалын хугацаа эхлэх', emoji: '🟢' },
-          { month: '10-12 сар', event: 'Өвөлжилтийн бэлтгэл, нөхцөл шалгах', emoji: '❄️' },
-          { month: '1-3 сар', event: 'Зудын мониторинг, хохирлын үнэлгээ', emoji: '📊' },
-          { month: '5 сарын 31', event: 'Даатгалын хугацаа дуусах', emoji: '🔴' },
-          { month: '5-6 сар', event: 'Нөхөн олговор олгох (босго давсан бол)', emoji: '💰' },
+          { month: '4-6 сар', event: 'IBLI даатгалд бүртгүүлэх хугацаа', icon: 'note-edit-outline', color: '#616161' },
+          { month: '6 сарын 1', event: 'Даатгалын хугацаа эхлэх', icon: 'circle', color: '#2D7D3F' },
+          { month: '10-12 сар', event: 'Өвөлжилтийн бэлтгэл, нөхцөл шалгах', icon: 'snowflake', color: '#5C6BC0' },
+          { month: '1-3 сар', event: 'Зудын мониторинг, хохирлын үнэлгээ', icon: 'chart-bar', color: '#2D7D3F' },
+          { month: '5 сарын 31', event: 'Даатгалын хугацаа дуусах', icon: 'circle', color: '#E53935' },
+          { month: '5-6 сар', event: 'Нөхөн олговор олгох (босго давсан бол)', icon: 'cash', color: '#FF8F00' },
         ].map((item, idx) => (
           <View key={idx} style={styles.calendarRow}>
-            <Text style={styles.calendarEmoji}>{item.emoji}</Text>
+            <MaterialCommunityIcons name={item.icon as any} size={20} color={item.color} />
             <View style={{ flex: 1 }}>
               <Text style={styles.calendarMonth}>{item.month}</Text>
               <Text style={styles.calendarEvent}>{item.event}</Text>
@@ -175,7 +179,10 @@ export default function LivestockInsuranceScreen() {
   const renderCalc = () => (
     <>
       <View style={styles.card}>
-        <Text style={styles.sectionTitle}>🧮 Малын даатгалын тооцоолуур</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+          <MaterialCommunityIcons name="calculator-variant-outline" size={18} color="#2D7D3F" />
+          <Text style={styles.sectionTitle}>Малын даатгалын тооцоолуур</Text>
+        </View>
         <Text style={styles.calcHint}>
           Бод, бог малын тоогоо оруулж IBLI даатгалын шимтгэл болон нөхөн олговрыг тооцоолно.
         </Text>
@@ -215,7 +222,10 @@ export default function LivestockInsuranceScreen() {
         <>
           {/* Шимтгэлийн тооцоо */}
           <View style={styles.card}>
-            <Text style={styles.sectionTitle}>💳 Жилийн шимтгэл</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+              <MaterialCommunityIcons name="credit-card-outline" size={18} color="#2D7D3F" />
+              <Text style={styles.sectionTitle}>Жилийн шимтгэл</Text>
+            </View>
             <Text style={styles.calcSubtitle}>
               Нийт: {calcResult.total_head} толгой ({calcResult.bod_count} бод + {calcResult.bog_count} бог)
             </Text>
@@ -244,9 +254,12 @@ export default function LivestockInsuranceScreen() {
 
           {/* Нөхөн олговрын тооцоо */}
           <View style={styles.card}>
-            <Text style={styles.sectionTitle}>💰 Нөхөн олговор (ойролцоо)</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+              <MaterialCommunityIcons name="cash" size={18} color="#2D7D3F" />
+              <Text style={styles.sectionTitle}>Нөхөн олговор (ойролцоо)</Text>
+            </View>
             <View style={styles.infoBox}>
-              <Text style={styles.infoEmoji}>💡</Text>
+              <MaterialCommunityIcons name="lightbulb-on-outline" size={20} color="#FF8F00" />
               <Text style={styles.infoText}>
                 Аймаг/сумын хэмжээнд малын хорогдол 6%-иас давсан тохиолдолд нөхөн олговор олгоно.
               </Text>
@@ -275,7 +288,10 @@ export default function LivestockInsuranceScreen() {
 
             {/* ROI */}
             <View style={styles.roiBox}>
-              <Text style={styles.roiTitle}>📈 Үр ашгийн харьцуулалт</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                <MaterialCommunityIcons name="trending-up" size={16} color="#FF8F00" />
+                <Text style={styles.roiTitle}>Үр ашгийн харьцуулалт</Text>
+              </View>
               <Text style={styles.roiText}>
                 Шимтгэл: {formatPrice(calcResult.total_premium)} → Олговор: {formatPrice(calcResult.estimated_compensation.total)}
               </Text>
@@ -287,7 +303,10 @@ export default function LivestockInsuranceScreen() {
 
           {/* Түгээмэл жишээ */}
           <View style={styles.card}>
-            <Text style={styles.sectionTitle}>📋 Түгээмэл малын тоогоор</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+              <MaterialCommunityIcons name="clipboard-text-outline" size={18} color="#2D7D3F" />
+              <Text style={styles.sectionTitle}>Түгээмэл малын тоогоор</Text>
+            </View>
             {[
               { bod: 5, bog: 30, label: 'Жижиг малчин' },
               { bod: 15, bog: 100, label: 'Дунд малчин' },
@@ -323,20 +342,26 @@ export default function LivestockInsuranceScreen() {
   const renderGuide = () => (
     <>
       <View style={styles.card}>
-        <Text style={styles.sectionTitle}>📝 IBLI даатгалд бүртгүүлэх</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+          <MaterialCommunityIcons name="note-edit-outline" size={18} color="#2D7D3F" />
+          <Text style={styles.sectionTitle}>IBLI даатгалд бүртгүүлэх</Text>
+        </View>
         {[
-          { step: '1', title: 'Мал тооллогын бүртгэл (А данс) бэлдэх', desc: 'Сумын мал эмнэлэг, ЗДТГ-аас мал тооллогын бүртгэлээ авна', icon: '📄' },
-          { step: '2', title: 'Сумын ЗДТГ-д хандах', desc: 'Малчин гэсэн тодорхойлолт авах. Иргэний үнэмлэх, А данс авч очих', icon: '🏢' },
-          { step: '3', title: 'Даатгалын байгууллагад бүртгүүлэх', desc: 'Сумын НД-ын байцаагч эсвэл даатгалын компани руу хандана', icon: '🏦' },
-          { step: '4', title: 'Шимтгэл төлөх', desc: 'Банкны шилжүүлэг, утасны банк, эсвэл бэлнээр. Жилд нэг удаа', icon: '💳' },
-          { step: '5', title: 'Гэрээ авах', desc: 'Даатгалын гэрээ, баталгааны хуудас авч хадгална', icon: '📋' },
+          { step: '1', title: 'Мал тооллогын бүртгэл (А данс) бэлдэх', desc: 'Сумын мал эмнэлэг, ЗДТГ-аас мал тооллогын бүртгэлээ авна', icon: 'file-document-outline' },
+          { step: '2', title: 'Сумын ЗДТГ-д хандах', desc: 'Малчин гэсэн тодорхойлолт авах. Иргэний үнэмлэх, А данс авч очих', icon: 'bank' },
+          { step: '3', title: 'Даатгалын байгууллагад бүртгүүлэх', desc: 'Сумын НД-ын байцаагч эсвэл даатгалын компани руу хандана', icon: 'bank-outline' },
+          { step: '4', title: 'Шимтгэл төлөх', desc: 'Банкны шилжүүлэг, утасны банк, эсвэл бэлнээр. Жилд нэг удаа', icon: 'credit-card-outline' },
+          { step: '5', title: 'Гэрээ авах', desc: 'Даатгалын гэрээ, баталгааны хуудас авч хадгална', icon: 'clipboard-text-outline' },
         ].map((item) => (
           <View key={item.step} style={styles.stepRow}>
             <View style={styles.stepCircle}>
               <Text style={styles.stepNumber}>{item.step}</Text>
             </View>
             <View style={styles.stepContent}>
-              <Text style={styles.stepTitle}>{item.icon} {item.title}</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                <MaterialCommunityIcons name={item.icon as any} size={16} color="#616161" />
+                <Text style={styles.stepTitle}>{item.title}</Text>
+              </View>
               <Text style={styles.stepDesc}>{item.desc}</Text>
             </View>
           </View>
@@ -345,7 +370,10 @@ export default function LivestockInsuranceScreen() {
 
       {/* Бүрдүүлэх бичиг баримт */}
       <View style={styles.card}>
-        <Text style={styles.sectionTitle}>📎 Бүрдүүлэх бичиг баримт</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+          <MaterialCommunityIcons name="file-document-outline" size={18} color="#2D7D3F" />
+          <Text style={styles.sectionTitle}>Бүрдүүлэх бичиг баримт</Text>
+        </View>
         {[
           'Иргэний үнэмлэх (эх хувь)',
           'Мал тооллогын бүртгэл (А данс)',
@@ -355,7 +383,7 @@ export default function LivestockInsuranceScreen() {
           'Өмнөх жилийн малын тоо толгойн мэдээ',
         ].map((doc, idx) => (
           <View key={idx} style={styles.docItem}>
-            <Text style={styles.docBullet}>✓</Text>
+            <MaterialCommunityIcons name="check" size={14} color={BRAND.primaryLight} style={{ marginTop: 1 }} />
             <Text style={styles.docText}>{doc}</Text>
           </View>
         ))}
@@ -363,19 +391,25 @@ export default function LivestockInsuranceScreen() {
 
       {/* Нөхөн олговор авах */}
       <View style={styles.card}>
-        <Text style={styles.sectionTitle}>💰 Нөхөн олговор авах заавар</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+          <MaterialCommunityIcons name="cash" size={18} color="#2D7D3F" />
+          <Text style={styles.sectionTitle}>Нөхөн олговор авах заавар</Text>
+        </View>
         {[
-          { step: '1', title: 'Хохирлын мэдэгдэл өгөх', desc: 'Малын хорогдол гарсан тухай сумын ЗДТГ, мал эмнэлэгт мэдэгдэнэ', icon: '📢' },
-          { step: '2', title: 'Хохирлын үнэлгээ', desc: 'Аймаг/сумын хэмжээнд малын хорогдлын индекс тооцогдоно', icon: '📊' },
-          { step: '3', title: 'Босго хувь шалгах', desc: '6%-иас дээш хорогдол байвал нөхөн олговор олгоно', icon: '📏' },
-          { step: '4', title: 'Олговор олгох', desc: 'Бүртгэлтэй банкны дансанд шилжүүлнэ (5-6 сард)', icon: '💳' },
+          { step: '1', title: 'Хохирлын мэдэгдэл өгөх', desc: 'Малын хорогдол гарсан тухай сумын ЗДТГ, мал эмнэлэгт мэдэгдэнэ', icon: 'alert' },
+          { step: '2', title: 'Хохирлын үнэлгээ', desc: 'Аймаг/сумын хэмжээнд малын хорогдлын индекс тооцогдоно', icon: 'chart-bar' },
+          { step: '3', title: 'Босго хувь шалгах', desc: '6%-иас дээш хорогдол байвал нөхөн олговор олгоно', icon: 'ruler' },
+          { step: '4', title: 'Олговор олгох', desc: 'Бүртгэлтэй банкны дансанд шилжүүлнэ (5-6 сард)', icon: 'credit-card-outline' },
         ].map((item) => (
           <View key={item.step} style={styles.stepRow}>
             <View style={[styles.stepCircle, { backgroundColor: '#E65100' }]}>
               <Text style={styles.stepNumber}>{item.step}</Text>
             </View>
             <View style={styles.stepContent}>
-              <Text style={styles.stepTitle}>{item.icon} {item.title}</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                <MaterialCommunityIcons name={item.icon as any} size={16} color="#616161" />
+                <Text style={styles.stepTitle}>{item.title}</Text>
+              </View>
               <Text style={styles.stepDesc}>{item.desc}</Text>
             </View>
           </View>
@@ -384,7 +418,10 @@ export default function LivestockInsuranceScreen() {
 
       {/* Түгээмэл асуулт */}
       <View style={styles.card}>
-        <Text style={styles.sectionTitle}>❓ Түгээмэл асуулт</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+          <MaterialCommunityIcons name="help-circle-outline" size={18} color="#2D7D3F" />
+          <Text style={styles.sectionTitle}>Түгээмэл асуулт</Text>
+        </View>
         {[
           { q: 'IBLI даатгал гэж юу вэ?', a: 'Индексжүүлсэн малын даатгал. Бүс нутгийн дундаж хорогдлоор тооцож, босго давсан бол автомат олговор олгоно.' },
           { q: 'Хэзээ бүртгүүлэх вэ?', a: 'Жил бүрийн 4-6 сард бүртгүүлнэ. Бусад хугацаанд бүртгүүлэх боломжгүй.' },
@@ -416,20 +453,26 @@ export default function LivestockInsuranceScreen() {
         {/* Tab bar */}
         <View style={styles.tabBar}>
           {([
-            { key: 'types' as TabKey, label: '📋 Даатгалууд' },
-            { key: 'calc' as TabKey, label: '🧮 Тооцоолуур' },
-            { key: 'guide' as TabKey, label: '📝 Заавар' },
-          ]).map(tab => (
-            <TouchableOpacity
-              key={tab.key}
-              style={[styles.tabItem, activeTab === tab.key && styles.tabItemActive]}
-              onPress={() => setActiveTab(tab.key)}
-            >
-              <Text style={[styles.tabText, activeTab === tab.key && styles.tabTextActive]}>
-                {tab.label}
-              </Text>
-            </TouchableOpacity>
-          ))}
+            { key: 'types' as TabKey, label: 'Даатгалууд', icon: 'clipboard-text-outline' },
+            { key: 'calc' as TabKey, label: 'Тооцоолуур', icon: 'calculator-variant-outline' },
+            { key: 'guide' as TabKey, label: 'Заавар', icon: 'note-edit-outline' },
+          ]).map(tab => {
+            const active = activeTab === tab.key;
+            return (
+              <TouchableOpacity
+                key={tab.key}
+                style={[styles.tabItem, active && styles.tabItemActive]}
+                onPress={() => setActiveTab(tab.key)}
+              >
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                  <MaterialCommunityIcons name={tab.icon as any} size={14} color={active ? BRAND.primary : AppColors.grayDark} />
+                  <Text style={[styles.tabText, active && styles.tabTextActive]}>
+                    {tab.label}
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            );
+          })}
         </View>
 
         {activeTab === 'types' && renderTypes()}

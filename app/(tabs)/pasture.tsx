@@ -3,6 +3,7 @@ import {
   View, Text, ScrollView, StyleSheet, TouchableOpacity, TextInput,
   Modal, Alert, RefreshControl, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { AppColors } from '@/constants/theme';
 import { ScreenBackdrop } from '@/components/screen-background';
 import { pastureApi } from '@/services/api';
@@ -12,11 +13,11 @@ import { useLocation } from '@/hooks/use-location';
 const tabs = ['Бэлчээр', 'Бэлчээрлэлт', 'Нүүдэл'];
 
 const pastureTypes = [
-  { key: 'summer', label: 'Зуслан', emoji: '\�\�' },
-  { key: 'winter', label: 'Өвөлжөө', emoji: '\❄\️' },
-  { key: 'spring', label: 'Хаваржаа', emoji: '\�\�' },
-  { key: 'autumn', label: 'Намаржаа', emoji: '\�\�' },
-  { key: 'reserve', label: 'Нөөц', emoji: '\�\�' },
+  { key: 'summer', label: 'Зуслан', icon: 'white-balance-sunny' as const },
+  { key: 'winter', label: 'Өвөлжөө', icon: 'snowflake' as const },
+  { key: 'spring', label: 'Хаваржаа', icon: 'flower-outline' as const },
+  { key: 'autumn', label: 'Намаржаа', icon: 'leaf-maple' as const },
+  { key: 'reserve', label: 'Нөөц', icon: 'sprout-outline' as const },
 ];
 
 const grassQualityMap: Record<string, { label: string; color: string }> = {
@@ -273,7 +274,7 @@ export default function PastureScreen() {
   };
 
   // ===== Бэлчээр дүрслэл =====
-  const getTypeInfo = (type: string) => pastureTypes.find(t => t.key === type) || { key: type, label: type, emoji: '\�\�' };
+  const getTypeInfo = (type: string) => pastureTypes.find(t => t.key === type) || { key: type, label: type, icon: 'sprout-outline' as const };
 
   const getPastureName = (id: number | null | undefined) => {
     if (!id) return '';
@@ -310,9 +311,12 @@ export default function PastureScreen() {
               style={[styles.filterChip, typeFilter === pt.key && styles.filterChipActive]}
               onPress={() => setTypeFilter(typeFilter === pt.key ? '' : pt.key)}
             >
-              <Text style={[styles.filterChipText, typeFilter === pt.key && styles.filterChipTextActive]}>
-                {pt.emoji} {pt.label}
-              </Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                <MaterialCommunityIcons name={pt.icon} size={13} color={typeFilter === pt.key ? '#2d5016' : '#616161'} />
+                <Text style={[styles.filterChipText, typeFilter === pt.key && styles.filterChipTextActive]}>
+                  {pt.label}
+                </Text>
+              </View>
             </TouchableOpacity>
           ))}
         </View>
@@ -331,8 +335,9 @@ export default function PastureScreen() {
           <TouchableOpacity key={p.id} style={styles.card} onLongPress={() => handleDeletePasture(p.id)} onPress={() => openEditPasture(p)}>
             <View style={styles.cardHeader}>
               <Text style={styles.cardTitle}>{p.name}</Text>
-              <View style={[styles.typeBadge, { backgroundColor: '#E8F5E9' }]}>
-                <Text style={styles.typeBadgeText}>{typeInfo.emoji} {typeInfo.label}</Text>
+              <View style={[styles.typeBadge, { backgroundColor: '#E8F5E9', flexDirection: 'row', alignItems: 'center', gap: 4 }]}>
+                <MaterialCommunityIcons name={typeInfo.icon} size={12} color="#2d5016" />
+                <Text style={styles.typeBadgeText}>{typeInfo.label}</Text>
               </View>
             </View>
 
@@ -359,16 +364,25 @@ export default function PastureScreen() {
 
             {(p.water_source || p.aimag || p.sum) && (
               <View style={styles.cardMeta}>
-                {p.water_source ? <Text style={styles.cardMetaText}>{'\�\�'} {p.water_source}</Text> : null}
+                {p.water_source ? (
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                    <MaterialCommunityIcons name="water-outline" size={11} color="#616161" />
+                    <Text style={styles.cardMetaText}>{p.water_source}</Text>
+                  </View>
+                ) : null}
                 {(p.aimag || p.sum) ? (
-                  <Text style={styles.cardMetaText}>{'\�\�'} {[p.aimag, p.sum].filter(Boolean).join(', ')}</Text>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                    <MaterialCommunityIcons name="map-marker" size={11} color="#616161" />
+                    <Text style={styles.cardMetaText}>{[p.aimag, p.sum].filter(Boolean).join(', ')}</Text>
+                  </View>
                 ) : null}
               </View>
             )}
 
             {p.active_grazing && (
-              <View style={styles.activeIndicator}>
-                <Text style={styles.activeIndicatorText}>{'\�\�'} Одоо бэлчээрлэж байна</Text>
+              <View style={[styles.activeIndicator, { flexDirection: 'row', alignItems: 'center', gap: 4 }]}>
+                <MaterialCommunityIcons name="circle" size={11} color="#43A047" />
+                <Text style={styles.activeIndicatorText}>Одоо бэлчээрлэж байна</Text>
               </View>
             )}
           </TouchableOpacity>
@@ -387,7 +401,7 @@ export default function PastureScreen() {
       {/* Current active grazings */}
       {currentGrazing.length > 0 && (
         <>
-          <Text style={styles.sectionTitle}>{'\�\�'} Идэвхтэй бэлчээрлэлт</Text>
+          <View style={[styles.sectionTitle, { flexDirection: 'row', alignItems: 'center', gap: 6 }]}><MaterialCommunityIcons name="circle" size={14} color="#43A047" /><Text style={styles.sectionTitle}>Идэвхтэй бэлчээрлэлт</Text></View>
           {currentGrazing.map((g: any) => {
             const days = daysBetween(g.start_date);
             const quality = grassQualityMap[g.grass_condition_start] || grassQualityMap.good;
@@ -435,7 +449,7 @@ export default function PastureScreen() {
       {/* Past grazings */}
       {pastGrazing.length > 0 && (
         <>
-          <Text style={styles.sectionTitle}>{'\�\�'} Түүх</Text>
+          <View style={[styles.sectionTitle, { flexDirection: 'row', alignItems: 'center', gap: 6 }]}><MaterialCommunityIcons name="clipboard-text-outline" size={14} color="#1A1A1A" /><Text style={styles.sectionTitle}>Түүх</Text></View>
           {pastGrazing.map((g: any) => {
             const days = daysBetween(g.start_date, g.end_date);
             const qualityStart = grassQualityMap[g.grass_condition_start] || grassQualityMap.good;
@@ -462,7 +476,7 @@ export default function PastureScreen() {
                   <View style={[styles.qualityBadge, { backgroundColor: qualityStart.color + '20' }]}>
                     <Text style={[styles.qualityBadgeText, { color: qualityStart.color }]}>Эхэнд: {qualityStart.label}</Text>
                   </View>
-                  <Text style={{ color: AppColors.gray }}>{'\→'}</Text>
+                  <MaterialCommunityIcons name="arrow-right" size={14} color={AppColors.gray} />
                   <View style={[styles.qualityBadge, { backgroundColor: qualityEnd.color + '20' }]}>
                     <Text style={[styles.qualityBadgeText, { color: qualityEnd.color }]}>Төгсгөл: {qualityEnd.label}</Text>
                   </View>
@@ -520,7 +534,7 @@ export default function PastureScreen() {
           <TouchableOpacity key={m.id} style={styles.card} onLongPress={() => handleDeleteMigration(m.id)}>
             <View style={styles.migRoute}>
               <Text style={styles.migFrom}>{fromName}</Text>
-              <Text style={styles.migArrow}>{'\→'}</Text>
+              <MaterialCommunityIcons name="arrow-right" size={18} color="#9E9E9E" style={styles.migArrow} />
               <Text style={styles.migTo}>{toName}</Text>
             </View>
 
@@ -590,7 +604,10 @@ export default function PastureScreen() {
               style={[styles.typeChip, selectedId === p.id && styles.typeChipActive]}
               onPress={() => onSelect(selectedId === p.id ? null : p.id)}
             >
-              <Text style={styles.typeChipText}>{getTypeInfo(p.type).emoji} {p.name}</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                <MaterialCommunityIcons name={getTypeInfo(p.type).icon} size={13} color="#616161" />
+                <Text style={styles.typeChipText}>{p.name}</Text>
+              </View>
             </TouchableOpacity>
           )) : (
             <Text style={{ color: AppColors.gray, fontSize: 12, paddingVertical: 8 }}>Бэлчээр бүртгэнэ үү</Text>
@@ -604,7 +621,7 @@ export default function PastureScreen() {
     <SafeAreaView style={styles.container}>
       <ScreenBackdrop topic="pasture" />
       <View style={styles.header}>
-        <Text style={styles.title}>{'\�\�'} Бэлчээр</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}><MaterialCommunityIcons name="sprout-outline" size={20} color="#2d5016" /><Text style={styles.title}>Бэлчээр</Text></View>
       </View>
 
       {/* Sub-tabs */}
@@ -652,7 +669,10 @@ export default function PastureScreen() {
                 <View style={{ flexDirection: 'row', gap: 8 }}>
                   {pastureTypes.map(pt => (
                     <TouchableOpacity key={pt.key} style={[styles.typeChip, pType === pt.key && styles.typeChipActive]} onPress={() => setPType(pt.key)}>
-                      <Text style={styles.typeChipText}>{pt.emoji} {pt.label}</Text>
+                      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                        <MaterialCommunityIcons name={pt.icon} size={13} color={pType === pt.key ? '#2d5016' : '#616161'} />
+                        <Text style={styles.typeChipText}>{pt.label}</Text>
+                      </View>
                     </TouchableOpacity>
                   ))}
                 </View>

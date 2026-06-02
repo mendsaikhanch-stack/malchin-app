@@ -8,9 +8,11 @@ import {
   ActivityIndicator,
   RefreshControl } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AppColors } from '@/constants/theme';
 import { ScreenBackdrop } from '@/components/screen-background';
+import { weatherIcon } from '@/constants/icon-map';
 import { weatherApi } from '@/services/api';
 import { getAimagList, getSumsByAimag } from '@/services/mongolia-geo';
 import {
@@ -102,16 +104,6 @@ export default function WeatherScreen() {
     return condition;
   };
 
-  const weatherIcon = (condition: string) => {
-    const c = (condition || '').toLowerCase();
-    if (c.includes('clear') || c.includes('sunny')) return '☀️';
-    if (c.includes('cloud')) return '☁️';
-    if (c.includes('rain')) return '🌧️';
-    if (c.includes('snow')) return '🌨️';
-    if (c.includes('wind')) return '🌬️';
-    return '⛅';
-  };
-
   const isOwnLocation = userAimag === selectedAimag && userSum === selectedSum;
 
   if (loading) {
@@ -130,21 +122,28 @@ export default function WeatherScreen() {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.header}>
-          <Text style={styles.title}>{'⛅'} Цаг агаар</Text>
-          <Text style={styles.subtitle}>
-            {'📍'} {selectedAimag}{selectedSum ? ` / ${selectedSum}` : ''}
-            {isOwnLocation && userAimag ? '  (таны байршил)' : ''}
-          </Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+            <MaterialCommunityIcons name="weather-partly-cloudy" size={22} color={AppColors.black} />
+            <Text style={styles.title}>Цаг агаар</Text>
+          </View>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+            <MaterialCommunityIcons name="map-marker" size={14} color={AppColors.grayDark} />
+            <Text style={styles.subtitle}>
+              {selectedAimag}{selectedSum ? ` / ${selectedSum}` : ''}
+              {isOwnLocation && userAimag ? '  (таны байршил)' : ''}
+            </Text>
+          </View>
         </View>
 
         {/* "Өөр газар үзэх" toggle — default хаалттай, malchin өөрийн байршлаа харна */}
         <View style={styles.pickerToggleRow}>
           <TouchableOpacity
-            style={styles.pickerToggle}
+            style={[styles.pickerToggle, { flexDirection: 'row', alignItems: 'center', gap: 4 }]}
             onPress={() => setShowPicker(!showPicker)}
           >
+            <MaterialCommunityIcons name={showPicker ? 'chevron-up' : 'chevron-down'} size={16} color={AppColors.primary} />
             <Text style={styles.pickerToggleText}>
-              {showPicker ? '▲ Газрын сонголт хаах' : '▼ Өөр газрын цаг агаар'}
+              {showPicker ? 'Газрын сонголт хаах' : 'Өөр газрын цаг агаар'}
             </Text>
           </TouchableOpacity>
           {userAimag && !isOwnLocation && (
@@ -154,9 +153,10 @@ export default function WeatherScreen() {
                 setSelectedSum(userSum);
                 setLoading(true);
               }}
-              style={styles.resetLocationBtn}
+              style={[styles.resetLocationBtn, { flexDirection: 'row', alignItems: 'center', gap: 4 }]}
             >
-              <Text style={styles.resetLocationText}>↩ Миний байршил</Text>
+              <MaterialCommunityIcons name="undo" size={13} color={AppColors.primary} />
+              <Text style={styles.resetLocationText}>Миний байршил</Text>
             </TouchableOpacity>
           )}
         </View>
@@ -202,9 +202,10 @@ export default function WeatherScreen() {
         )}
 
         {selectedSum && (
-          <View style={styles.sumBanner}>
-            <Text style={styles.sumBannerText}>
-              {'ℹ️'} Одоогоор <Text style={styles.sumBannerNote}>аймгийн ерөнхий мэдээ</Text> харуулж байна. Сум тус бүрийн нарийн мэдээ удахгүй нэмэгдэнэ.
+          <View style={[styles.sumBanner, { flexDirection: 'row', alignItems: 'flex-start', gap: 6 }]}>
+            <MaterialCommunityIcons name="information-outline" size={15} color="#6D4C00" style={{ marginTop: 1 }} />
+            <Text style={[styles.sumBannerText, { flex: 1 }]}>
+              Одоогоор <Text style={styles.sumBannerNote}>аймгийн ерөнхий мэдээ</Text> харуулж байна. Сум тус бүрийн нарийн мэдээ удахгүй нэмэгдэнэ.
             </Text>
           </View>
         )}
@@ -213,7 +214,7 @@ export default function WeatherScreen() {
           <>
             {/* Current weather */}
             <View style={styles.currentCard}>
-              <Text style={styles.currentIcon}>{weatherIcon(weatherData.condition)}</Text>
+              <MaterialCommunityIcons name={weatherIcon(weatherData.condition)} size={64} color={AppColors.primary} />
               <Text style={styles.currentTemp}>{weatherData.temp}°C</Text>
               <Text style={styles.currentCondition}>{conditionMn(weatherData.condition)}</Text>
               {weatherData.feels_like != null && (
@@ -246,16 +247,22 @@ export default function WeatherScreen() {
             {/* Зудын эрсдэл */}
             <View style={[styles.dzudCard, { borderColor: dzudColor(weatherData.dzud_risk) }]}>
               <View style={styles.dzudHeader}>
-                <Text style={styles.dzudTitle}>{'🌨️'} Зудын эрсдэл</Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                  <MaterialCommunityIcons name="weather-snowy" size={18} color={AppColors.black} />
+                  <Text style={styles.dzudTitle}>Зудын эрсдэл</Text>
+                </View>
                 <View style={[styles.dzudBadge, { backgroundColor: dzudColor(weatherData.dzud_risk) }]}>
                   <Text style={styles.dzudBadgeText}>{weatherData.dzud_risk?.toUpperCase()}</Text>
                 </View>
               </View>
               <Text style={styles.dzudDescription}>{dzudLabel(weatherData.dzud_risk)}</Text>
               {weatherData.dzud_risk === 'high' && (
-                <Text style={styles.dzudWarning}>
-                  {'⚠️'} Малаа дулаан хашаанд оруулж, тэжээл нөөцлөхийг зөвлөж байна!
-                </Text>
+                <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 6, marginTop: 8 }}>
+                  <MaterialCommunityIcons name="alert-outline" size={15} color={AppColors.danger} style={{ marginTop: 1 }} />
+                  <Text style={[styles.dzudWarning, { flex: 1, marginTop: 0 }]}>
+                    Малаа дулаан хашаанд оруулж, тэжээл нөөцлөхийг зөвлөж байна!
+                  </Text>
+                </View>
               )}
             </View>
 
@@ -266,7 +273,8 @@ export default function WeatherScreen() {
                 {forecast.map((day: any, idx: number) => (
                   <View key={idx} style={styles.forecastItem}>
                     <Text style={styles.forecastDate}>{day.date || `${idx + 1}-р өдөр`}</Text>
-                    <Text style={styles.forecastIcon}>{weatherIcon(day.condition)}</Text>
+                    <MaterialCommunityIcons name={weatherIcon(day.condition)} size={22} color={AppColors.primary} />
+
                     <View style={styles.forecastTempCol}>
                       <Text style={styles.forecastTempHigh}>{day.temp_max ?? day.temp}°</Text>
                       <Text style={styles.forecastTempLow}>{day.temp_min != null ? `${day.temp_min}°` : ''}</Text>

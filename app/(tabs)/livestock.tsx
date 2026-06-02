@@ -13,6 +13,7 @@ import {
   RefreshControl,
   Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { AppColors } from '@/constants/theme';
 import { ScreenBackdrop } from '@/components/screen-background';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -241,12 +242,18 @@ function IndividualAnimalsTab() {
               {info.label} · {genderLabels[item.gender] || item.gender || '—'}{item.breed ? ` · ${item.breed}` : ''}
             </Text>
             {item.ear_tag ? (
-              <Text style={styles.animalListTag}>🏷️ {item.ear_tag}</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                <MaterialCommunityIcons name="tag-outline" size={12} color="#4a7c28" />
+                <Text style={styles.animalListTag}>{item.ear_tag}</Text>
+              </View>
             ) : null}
             {item.birth_date ? (
-              <Text style={styles.animalListAge}>
-                📅 {formatDate(item.birth_date)} ({calcAge(item.birth_date)})
-              </Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                <MaterialCommunityIcons name="calendar" size={12} color={AppColors.gray} />
+                <Text style={styles.animalListAge}>
+                  {formatDate(item.birth_date)} ({calcAge(item.birth_date)})
+                </Text>
+              </View>
             ) : null}
           </View>
         </View>
@@ -254,16 +261,17 @@ function IndividualAnimalsTab() {
         {/* Action buttons */}
         <View style={styles.animalListActions}>
           <TouchableOpacity
-            style={styles.actionBtnEdit}
+            style={[styles.actionBtnEdit, { flexDirection: 'row', alignItems: 'center', gap: 4 }]}
             onPress={() => {
               setEditAnimal(item);
               setShowAddModal(true);
             }}
           >
-            <Text style={styles.actionBtnEditText}>✏️ Засах</Text>
+            <MaterialCommunityIcons name="pencil" size={12} color="#2d5016" />
+            <Text style={styles.actionBtnEditText}>Засах</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.actionBtnDelete} onPress={() => handleDelete(item)}>
-            <Text style={styles.actionBtnDeleteText}>🗑️</Text>
+            <MaterialCommunityIcons name="delete-outline" size={14} color="#C62828" />
           </TouchableOpacity>
         </View>
       </TouchableOpacity>
@@ -512,7 +520,16 @@ function AddEditAnimalModal({
       <View style={styles.modalOverlay}>
         <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-end' }}>
           <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>{isEdit ? '✏️ Мал засах' : '➕ Мал бүртгэх'}</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 12 }}>
+              <MaterialCommunityIcons
+                name={isEdit ? 'pencil' : 'plus-circle-outline'}
+                size={20}
+                color="#2d5016"
+              />
+              <Text style={[styles.modalTitle, { marginBottom: 0 }]}>
+                {isEdit ? 'Мал засах' : 'Мал бүртгэх'}
+              </Text>
+            </View>
 
             {/* Animal type */}
             <Text style={styles.label}>Малын төрөл *</Text>
@@ -858,7 +875,10 @@ function AnimalDetailModal({
               {/* Genealogy */}
               {(animal.mother || animal.father || (animal.offspring && animal.offspring.length > 0)) && (
                 <View style={styles.detailSection}>
-                  <Text style={styles.detailSectionTitle}>🧬 Удам угсаа</Text>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 10 }}>
+                    <MaterialCommunityIcons name="dna" size={18} color="#2d5016" />
+                    <Text style={[styles.detailSectionTitle, { marginBottom: 0 }]}>Удам угсаа</Text>
+                  </View>
                   {animal.mother && (
                     <View style={styles.genealogyItem}>
                       <Text style={styles.genealogyRole}>Эх:</Text>
@@ -899,7 +919,10 @@ function AnimalDetailModal({
               {/* Health records */}
               {animal.health_records && animal.health_records.length > 0 && (
                 <View style={styles.detailSection}>
-                  <Text style={styles.detailSectionTitle}>🏥 Эрүүл мэндийн бүртгэл</Text>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 10 }}>
+                    <MaterialCommunityIcons name="hospital-box-outline" size={18} color="#2d5016" />
+                    <Text style={[styles.detailSectionTitle, { marginBottom: 0 }]}>Эрүүл мэндийн бүртгэл</Text>
+                  </View>
                   {animal.health_records.slice(0, 5).map((h: any) => (
                     <View key={h.id} style={styles.healthItem}>
                       <Text style={styles.healthTitle}>{h.title}</Text>
@@ -915,7 +938,10 @@ function AnimalDetailModal({
               {/* Vaccinations */}
               {animal.vaccinations && animal.vaccinations.length > 0 && (
                 <View style={styles.detailSection}>
-                  <Text style={styles.detailSectionTitle}>💉 Вакцинжуулалт</Text>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 10 }}>
+                    <MaterialCommunityIcons name="needle" size={18} color="#2d5016" />
+                    <Text style={[styles.detailSectionTitle, { marginBottom: 0 }]}>Вакцинжуулалт</Text>
+                  </View>
                   {animal.vaccinations.slice(0, 5).map((v: any, idx: number) => (
                     <View key={v.id || idx} style={styles.healthItem}>
                       <Text style={styles.healthTitle}>{v.vaccine_name}</Text>
@@ -931,18 +957,29 @@ function AnimalDetailModal({
               {/* Notes */}
               {animal.notes ? (
                 <View style={styles.detailSection}>
-                  <Text style={styles.detailSectionTitle}>📝 Тэмдэглэл</Text>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 10 }}>
+                    <MaterialCommunityIcons name="note-edit-outline" size={18} color="#2d5016" />
+                    <Text style={[styles.detailSectionTitle, { marginBottom: 0 }]}>Тэмдэглэл</Text>
+                  </View>
                   <Text style={styles.notesText}>{animal.notes}</Text>
                 </View>
               ) : null}
 
               {/* Action buttons */}
               <View style={styles.detailActions}>
-                <TouchableOpacity style={styles.detailEditBtn} onPress={() => onEdit(animal)}>
-                  <Text style={styles.detailEditBtnText}>✏️ Засах</Text>
+                <TouchableOpacity
+                  style={[styles.detailEditBtn, { flexDirection: 'row', justifyContent: 'center', gap: 6 }]}
+                  onPress={() => onEdit(animal)}
+                >
+                  <MaterialCommunityIcons name="pencil" size={14} color="#2d5016" />
+                  <Text style={styles.detailEditBtnText}>Засах</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.detailDeleteBtn} onPress={handleDelete}>
-                  <Text style={styles.detailDeleteBtnText}>🗑️ Устгах</Text>
+                <TouchableOpacity
+                  style={[styles.detailDeleteBtn, { flexDirection: 'row', justifyContent: 'center', gap: 6 }]}
+                  onPress={handleDelete}
+                >
+                  <MaterialCommunityIcons name="delete-outline" size={14} color="#C62828" />
+                  <Text style={styles.detailDeleteBtnText}>Устгах</Text>
                 </TouchableOpacity>
               </View>
 
@@ -950,8 +987,12 @@ function AnimalDetailModal({
             </ScrollView>
           ) : null}
 
-          <TouchableOpacity style={styles.closeBtn} onPress={onClose}>
-            <Text style={styles.closeBtnText}>✕ Хаах</Text>
+          <TouchableOpacity
+            style={[styles.closeBtn, { flexDirection: 'row', justifyContent: 'center', gap: 4 }]}
+            onPress={onClose}
+          >
+            <MaterialCommunityIcons name="close" size={14} color={AppColors.grayDark} />
+            <Text style={styles.closeBtnText}>Хаах</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -1107,10 +1148,11 @@ function AggregateTab() {
                 <Text style={styles.aggAddBtnText}>+ Мал нэмэх</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={[styles.aggAddBtn, { backgroundColor: AppColors.accent }]}
+                style={[styles.aggAddBtn, { backgroundColor: AppColors.accent, flexDirection: 'row', justifyContent: 'center', gap: 6 }]}
                 onPress={() => setShowEventModal(true)}
               >
-                <Text style={styles.aggAddBtnText}>📋 Үйл явдал</Text>
+                <MaterialCommunityIcons name="clipboard-text-outline" size={16} color="#fff" />
+                <Text style={styles.aggAddBtnText}>Үйл явдал</Text>
               </TouchableOpacity>
             </View>
 

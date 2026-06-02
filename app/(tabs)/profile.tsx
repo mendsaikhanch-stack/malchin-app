@@ -8,9 +8,11 @@ import {
   Alert,
   Switch } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useRouter, useFocusEffect } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AppColors } from '@/constants/theme';
+import { seasonIcon } from '@/constants/icon-map';
 import { ScreenBackdrop } from '@/components/screen-background';
 import { clearCache, getCacheSize } from '@/services/offline';
 import {
@@ -36,30 +38,30 @@ const roleLabels: Record<string, string> = {
   service_provider: 'Үйлчилгээ үзүүлэгч' };
 
 // Role-оос хамаарсан хяналтын самбарын маршрут
-const roleDashboard: Record<string, { route: string; emoji: string; title: string; desc: string }> = {
+const roleDashboard: Record<string, { route: string; icon: React.ComponentProps<typeof MaterialCommunityIcons>['name']; title: string; desc: string }> = {
   malchin: {
     route: '/(tabs)/manage',
-    emoji: '⚙️',
+    icon: 'cog-outline',
     title: 'Миний удирдлага',
     desc: 'Сануулга, бүртгэл, санхүү' },
   bag_darga: {
     route: '/bag-dashboard',
-    emoji: '👥',
+    icon: 'account-group',
     title: 'Багийн даргын самбар',
     desc: 'Өрхийн жагсаалт, мэдэгдэл, эрсдэл' },
   sum_admin: {
     route: '/sum-dashboard',
-    emoji: '🏛️',
+    icon: 'bank',
     title: 'Сумын удирдлагын самбар',
     desc: 'Багуудын тайлан, тооллого, broadcast' },
   khorshoo: {
     route: '/coop-dashboard',
-    emoji: '🤝',
+    icon: 'handshake-outline',
     title: 'Хоршооны самбар',
     desc: 'Гишүүд, бараа, худалдаа' },
   service_provider: {
     route: '/service-dashboard',
-    emoji: '🛠️',
+    icon: 'tools',
     title: 'Үйлчилгээний самбар',
     desc: 'Захиалга, хуваарь, орлого' } };
 
@@ -171,7 +173,7 @@ export default function ProfileScreen() {
           <Text style={styles.userName}>{user.name || '—'}</Text>
           <Text style={styles.userPhone}>{user.phone}</Text>
           <Text style={styles.userLocation}>
-            {'📍'} {user.aimag}
+            <MaterialCommunityIcons name="map-marker" size={13} color="#616161" /> {user.aimag}
             {user.sum ? `, ${user.sum}` : ''}
             {user.bag ? `, ${user.bag}` : ''}
           </Text>
@@ -180,7 +182,11 @@ export default function ProfileScreen() {
           </View>
           <View style={[styles.pkgBadge, pkg !== 'free' && styles.pkgBadgePremium]}>
             <Text style={[styles.pkgBadgeText, pkg !== 'free' && styles.pkgBadgeTextPremium]}>
-              {pkg === 'free' ? '🔒' : '⭐'} {pkgName}
+              <MaterialCommunityIcons
+                name={pkg === 'free' ? 'lock-outline' : 'star'}
+                size={11}
+                color={pkg === 'free' ? '#616161' : '#FF8F00'}
+              /> {pkgName}
             </Text>
           </View>
         </View>
@@ -191,7 +197,7 @@ export default function ProfileScreen() {
             style={styles.dashboardCard}
             onPress={() => router.push(roleDashboard[user.role].route as any)}
           >
-            <Text style={styles.dashboardEmoji}>{roleDashboard[user.role].emoji}</Text>
+            <MaterialCommunityIcons name={roleDashboard[user.role].icon} size={32} color={AppColors.white} style={styles.dashboardEmoji} />
             <View style={{ flex: 1 }}>
               <Text style={styles.dashboardTitle}>{roleDashboard[user.role].title}</Text>
               <Text style={styles.dashboardDesc}>{roleDashboard[user.role].desc}</Text>
@@ -226,14 +232,17 @@ export default function ProfileScreen() {
         {/* 4 улирлын байршил */}
         <View style={styles.card}>
           <View style={styles.cardHeaderRow}>
-            <Text style={styles.cardTitle}>{'🗺️'} 4 улирлын байршил</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+              <MaterialCommunityIcons name="map-marker" size={18} color="#2D7D3F" />
+              <Text style={styles.cardTitle}>4 улирлын байршил</Text>
+            </View>
           </View>
           {seasonMeta.map((s) => {
             const loc = seasonal[s.key];
             const hasData = loc && (loc.lat || loc.note);
             return (
               <View key={s.key} style={styles.seasonRow}>
-                <Text style={styles.seasonEmoji}>{s.emoji}</Text>
+                <MaterialCommunityIcons name={seasonIcon(s.label)} size={18} color="#5C6BC0" style={styles.seasonEmoji} />
                 <Text style={styles.seasonLabel}>{s.label}</Text>
                 <Text style={[styles.seasonValue, !hasData && styles.seasonValueEmpty]}>
                   {hasData
@@ -251,7 +260,7 @@ export default function ProfileScreen() {
             style={styles.menuItem}
             onPress={() => router.push('/pricing' as any)}
           >
-            <Text style={styles.menuIcon}>{'💳'}</Text>
+            <MaterialCommunityIcons name="credit-card-outline" size={20} color="#5C6BC0" style={styles.menuIcon} />
             <Text style={styles.menuText}>Багц ба үнэ</Text>
             <Text style={styles.menuArrow}>{'›'}</Text>
           </TouchableOpacity>
@@ -259,7 +268,7 @@ export default function ProfileScreen() {
             style={styles.menuItem}
             onPress={() => router.push('/privacy-settings' as any)}
           >
-            <Text style={styles.menuIcon}>{'🔒'}</Text>
+            <MaterialCommunityIcons name="lock-outline" size={20} color="#616161" style={styles.menuIcon} />
             <Text style={styles.menuText}>Нууцлал ба эрх</Text>
             <Text style={styles.menuArrow}>{'›'}</Text>
           </TouchableOpacity>
@@ -283,7 +292,11 @@ export default function ProfileScreen() {
             <Text style={styles.menuIcon}>{'📡'}</Text>
             <Text style={styles.menuText}>Сүлжээний төлөв</Text>
             <Text style={[styles.networkText, { color: isConnected ? '#43A047' : '#E53935' }]}>
-              {isConnected ? '✅ Онлайн' : '🟠 Оффлайн'}
+              <MaterialCommunityIcons
+                name={isConnected ? 'check-circle' : 'circle'}
+                size={12}
+                color={isConnected ? '#43A047' : '#E53935'}
+              /> {isConnected ? 'Онлайн' : 'Оффлайн'}
             </Text>
           </View>
           <TouchableOpacity
@@ -312,7 +325,7 @@ export default function ProfileScreen() {
               ]);
             }}
           >
-            <Text style={styles.menuIcon}>{'🗑️'}</Text>
+            <MaterialCommunityIcons name="delete-outline" size={20} color="#E53935" style={styles.menuIcon} />
             <Text style={styles.menuText}>Cache цэвэрлэх</Text>
             <Text style={styles.menuArrow}>{'›'}</Text>
           </TouchableOpacity>

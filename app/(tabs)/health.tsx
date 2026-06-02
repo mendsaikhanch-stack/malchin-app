@@ -3,6 +3,7 @@ import {
   View, Text, ScrollView, StyleSheet, TouchableOpacity, TextInput,
   Modal, Alert, RefreshControl, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { AppColors } from '@/constants/theme';
 import { ScreenBackdrop } from '@/components/screen-background';
 import { healthApi, animalsApi } from '@/services/api';
@@ -11,19 +12,19 @@ import { AdBanner } from '@/components/ad-banner';
 const tabs = ['Эрүүл мэнд', 'Вакцин', 'Хуваарь'];
 
 const animalTypes = [
-  { key: 'sheep', label: 'Хонь', emoji: '\�\�' },
-  { key: 'goat', label: 'Ямаа', emoji: '\�\�' },
-  { key: 'cattle', label: 'Үхэр', emoji: '\�\�' },
-  { key: 'horse', label: 'Адуу', emoji: '\�\�' },
-  { key: 'camel', label: 'Тэмээ', emoji: '\�\�' },
+  { key: 'sheep', label: 'Хонь', emoji: '🐑' },
+  { key: 'goat', label: 'Ямаа', emoji: '🐐' },
+  { key: 'cattle', label: 'Үхэр', emoji: '🐄' },
+  { key: 'horse', label: 'Адуу', emoji: '🐎' },
+  { key: 'camel', label: 'Тэмээ', emoji: '🐫' },
 ];
 
 const recordTypes = [
-  { key: 'illness', label: 'Өвчин', emoji: '\�\�' },
-  { key: 'injury', label: 'Гэмтэл', emoji: '\�\�' },
-  { key: 'checkup', label: 'Үзлэг', emoji: '\�\�' },
-  { key: 'treatment', label: 'Эмчилгээ', emoji: '\�\�' },
-  { key: 'deworming', label: 'Туулга', emoji: '\�\�' },
+  { key: 'illness', label: 'Өвчин', icon: 'medical-bag' as const },
+  { key: 'injury', label: 'Гэмтэл', icon: 'alert-outline' as const },
+  { key: 'checkup', label: 'Үзлэг', icon: 'clipboard-text-outline' as const },
+  { key: 'treatment', label: 'Эмчилгээ', icon: 'pill' as const },
+  { key: 'deworming', label: 'Туулга', icon: 'needle' as const },
 ];
 
 const severityLevels = [
@@ -40,7 +41,7 @@ const statusLabels: Record<string, string> = {
 function fmt(n: number) { return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
 
 function getAnimalEmoji(type: string) {
-  return animalTypes.find(a => a.key === type)?.emoji || '\�\�';
+  return animalTypes.find(a => a.key === type)?.emoji || '🐾';
 }
 
 function getAnimalLabel(type: string) {
@@ -299,7 +300,7 @@ export default function HealthScreen() {
         {/* Stats cards */}
         <View style={styles.statsRow}>
           <View style={[styles.statCard, { backgroundColor: '#E8F5E9' }]}>
-            <Text style={styles.statEmoji}>{'\�\�'}</Text>
+            <MaterialCommunityIcons name="medical-bag" size={20} color="#2d5016" />
             <Text style={styles.statValue}>{healthStats.total_records || 0}</Text>
             <Text style={styles.statLabel}>Нийт эмчилгээ</Text>
           </View>
@@ -309,7 +310,7 @@ export default function HealthScreen() {
             <Text style={styles.statLabel}>Мал эмчийн зардал</Text>
           </View>
           <View style={[styles.statCard, { backgroundColor: '#E3F2FD' }]}>
-            <Text style={styles.statEmoji}>{'\�\�'}</Text>
+            <MaterialCommunityIcons name="calendar" size={20} color="#2d5016" />
             <Text style={styles.statValue}>{healthStats.pending_checkups || 0}</Text>
             <Text style={styles.statLabel}>Шалгуулах мал</Text>
           </View>
@@ -330,9 +331,12 @@ export default function HealthScreen() {
                 style={[styles.filterChip, filterType === rt.key && styles.filterChipActive]}
                 onPress={() => setFilterType(filterType === rt.key ? '' : rt.key)}
               >
-                <Text style={[styles.filterChipText, filterType === rt.key && styles.filterChipTextActive]}>
-                  {rt.emoji} {rt.label}
-                </Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                  <MaterialCommunityIcons name={rt.icon} size={13} color={filterType === rt.key ? '#2d5016' : AppColors.grayDark} />
+                  <Text style={[styles.filterChipText, filterType === rt.key && styles.filterChipTextActive]}>
+                    {rt.label}
+                  </Text>
+                </View>
               </TouchableOpacity>
             ))}
           </View>
@@ -345,7 +349,7 @@ export default function HealthScreen() {
 
         {/* Records list */}
         {healthRecords.length > 0 ? healthRecords.map((r: any) => {
-          const rtInfo = recordTypes.find(rt => rt.key === r.record_type) || { emoji: '\�\�', label: r.record_type };
+          const rtInfo = recordTypes.find(rt => rt.key === r.record_type) || { icon: 'medical-bag' as const, label: r.record_type };
           const sev = severityLevels.find(sv => sv.key === r.severity);
           return (
             <TouchableOpacity key={r.id} style={styles.recordCard} onPress={() => openEditHealth(r)} onLongPress={() => handleDeleteHealth(r.id)}>
@@ -357,7 +361,10 @@ export default function HealthScreen() {
                   </View>
                 )}
               </View>
-              <Text style={styles.recordTitle}>{rtInfo.emoji} {r.title}</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                <MaterialCommunityIcons name={rtInfo.icon} size={15} color={AppColors.black} />
+                <Text style={styles.recordTitle}>{r.title}</Text>
+              </View>
               {r.diagnosis ? <Text style={styles.recordDiagnosis}>Онош: {r.diagnosis}</Text> : null}
               <View style={styles.recordFooter}>
                 <Text style={styles.recordDate}>{r.record_date?.split(' ')[0]}</Text>
@@ -391,18 +398,18 @@ export default function HealthScreen() {
         return (
           <TouchableOpacity key={v.id} style={styles.vaccineCard} onPress={() => openEditVaccine(v)} onLongPress={() => handleDeleteVaccine(v.id)}>
             <View style={styles.vaccineCardHeader}>
-              <Text style={styles.vaccineCardName}>{'\�\�'} {v.vaccine_name}</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}><MaterialCommunityIcons name="needle" size={15} color="#2d5016" /><Text style={styles.vaccineCardName}>{v.vaccine_name}</Text></View>
               {v.cost > 0 && <Text style={styles.vaccineCardCost}>{'\₮'}{fmt(v.cost)}</Text>}
             </View>
             {v.disease ? <Text style={styles.vaccineCardDisease}>Өвчин: {v.disease}</Text> : null}
             <Text style={styles.vaccineCardAnimal}>{animalDisplay}</Text>
             <View style={styles.vaccineCardFooter}>
-              <Text style={styles.vaccineCardDate}>{'\�\�'} {v.vaccination_date?.split(' ')[0]}</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}><MaterialCommunityIcons name="calendar" size={11} color={AppColors.gray} /><Text style={styles.vaccineCardDate}>{v.vaccination_date?.split(' ')[0]}</Text></View>
               {v.next_due_date && (
                 <Text style={styles.vaccineCardNext}>Дараагийн: {v.next_due_date}</Text>
               )}
             </View>
-            {v.administered_by ? <Text style={styles.vaccineCardVet}>{'\�\�\‍\⚕\️'} {v.administered_by}</Text> : null}
+            {v.administered_by ? (<View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 4 }}><MaterialCommunityIcons name="medical-bag" size={11} color={AppColors.grayDark} /><Text style={styles.vaccineCardVet}>{v.administered_by}</Text></View>) : null}
           </TouchableOpacity>
         );
       }) : <Text style={styles.emptyText}>Вакцины бүртгэл байхгүй</Text>}
@@ -414,7 +421,7 @@ export default function HealthScreen() {
     const today = new Date();
     return (
       <>
-        <Text style={styles.sectionTitle}>{'\�\�'} Удахгүй хийгдэх вакцин</Text>
+        <View style={[styles.sectionTitle, { flexDirection: 'row', alignItems: 'center', gap: 6 }]}><MaterialCommunityIcons name="calendar" size={16} color={AppColors.black} /><Text style={styles.sectionTitle}>Удахгүй хийгдэх вакцин</Text></View>
         {dueVaccinations.length > 0 ? dueVaccinations.map((v: any, i: number) => {
           const dueDate = new Date(v.next_due_date);
           const diffMs = dueDate.getTime() - today.getTime();
@@ -435,7 +442,7 @@ export default function HealthScreen() {
             <View key={v.id || i} style={[styles.dueCard, { borderLeftColor: urgencyColor }]}>
               <View style={styles.dueCardMain}>
                 <View style={{ flex: 1 }}>
-                  <Text style={styles.dueVaccineName}>{'\�\�'} {v.vaccine_name}</Text>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}><MaterialCommunityIcons name="needle" size={14} color={AppColors.black} /><Text style={styles.dueVaccineName}>{v.vaccine_name}</Text></View>
                   {animalDisplay ? <Text style={styles.dueAnimal}>{animalDisplay}</Text> : null}
                   <Text style={styles.dueDate}>Хугацаа: {v.next_due_date}</Text>
                 </View>
@@ -455,7 +462,7 @@ export default function HealthScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <ScreenBackdrop topic="health" />
-      <View style={styles.header}><Text style={styles.title}>{'\�\�'} Эрүүл мэнд</Text></View>
+      <View style={styles.header}><View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}><MaterialCommunityIcons name="hospital-box-outline" size={20} color="#2d5016" /><Text style={styles.title}>Эрүүл мэнд</Text></View></View>
 
       <View style={styles.tabBar}>
         {tabs.map((t, i) => (
@@ -498,7 +505,10 @@ export default function HealthScreen() {
                 <View style={{ flexDirection: 'row', gap: 8 }}>
                   {recordTypes.map(rt => (
                     <TouchableOpacity key={rt.key} style={[styles.typeChip, hRecordType === rt.key && styles.typeChipActive]} onPress={() => setHRecordType(rt.key)}>
-                      <Text style={hRecordType === rt.key ? styles.typeChipTextActive : undefined}>{rt.emoji} {rt.label}</Text>
+                      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                        <MaterialCommunityIcons name={rt.icon} size={14} color={hRecordType === rt.key ? '#2d5016' : AppColors.grayDark} />
+                        <Text style={hRecordType === rt.key ? styles.typeChipTextActive : undefined}>{rt.label}</Text>
+                      </View>
                     </TouchableOpacity>
                   ))}
                 </View>

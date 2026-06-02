@@ -55,12 +55,13 @@ describe('Weather — initial load', () => {
   });
 
   it('"Өөр газар" toggle дарахад 21 аймгийн chip wrap grid-д render', async () => {
-    const { findByText, getByText } = render(<WeatherScreen />);
+    const { findByText, getByText, getAllByText } = render(<WeatherScreen />);
     await findByText(/Цаг агаар/);
     // Default: picker хаалттай, аймгийн chip-үүд харагдахгүй
     fireEvent.press(getByText(/Өөр газрын цаг агаар/));
-    // Нээсний дараа 21 аймгийн chip-үүд render
-    expect(getByText('Төв')).toBeTruthy();
+    // Нээсний дараа 21 аймгийн chip-үүд render.
+    // Сонгогдсон аймаг (Төв) subtitle + chip-д хоёуланд гарч болзошгүй тул getAllByText.
+    expect(getAllByText('Төв').length).toBeGreaterThan(0);
     expect(getByText('Увс')).toBeTruthy();
     expect(getByText('Ховд')).toBeTruthy();
     expect(getByText('Баян-Өлгий')).toBeTruthy();

@@ -3,6 +3,7 @@ import {
   View, Text, ScrollView, StyleSheet, TouchableOpacity, TextInput,
   Modal, Alert, RefreshControl, ActivityIndicator, FlatList } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { AppColors } from '@/constants/theme';
 import { ScreenBackdrop } from '@/components/screen-background';
 import { breedingApi, animalsApi } from '@/services/api';
@@ -56,7 +57,7 @@ function SimplePicker({ label, items, selectedValue, onValueChange, placeholder 
         <Text style={selected ? s.pickerBtnText : s.pickerBtnPlaceholder}>
           {selected ? selected.label : (placeholder || 'Сонгох...')}
         </Text>
-        <Text style={{ color: AppColors.gray }}>{'\▼'}</Text>
+        <MaterialCommunityIcons name="chevron-down" size={18} color={AppColors.gray} />
       </TouchableOpacity>
       <Modal visible={open} animationType="slide" transparent>
         <View style={s.pickerOverlay}>
@@ -64,7 +65,7 @@ function SimplePicker({ label, items, selectedValue, onValueChange, placeholder 
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
               <Text style={s.pickerModalTitle}>{label}</Text>
               <TouchableOpacity onPress={() => { setOpen(false); setSearch(''); }}>
-                <Text style={{ fontSize: 16, color: AppColors.danger, fontWeight: '700' }}>{'\✕'}</Text>
+                <MaterialCommunityIcons name="close" size={18} color={AppColors.danger} />
               </TouchableOpacity>
             </View>
             {items.length > 6 && (
@@ -339,23 +340,44 @@ export default function BreedingScreen() {
           <View key={rec.id} style={s.card}>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
               <View style={{ flex: 1 }}>
-                <Text style={s.cardTitle}>{'\♀\️'} {animalName(rec.female_id)}</Text>
-                {rec.male_id && <Text style={s.cardSub}>{'\♂\️'} {animalName(rec.male_id)}</Text>}
+                <View style={s.cardTitleRow}>
+                  <MaterialCommunityIcons name="gender-female" size={15} color={AppColors.black} />
+                  <Text style={s.cardTitle}>{animalName(rec.female_id)}</Text>
+                </View>
+                {rec.male_id && (
+                  <View style={s.cardSubRow}>
+                    <MaterialCommunityIcons name="gender-male" size={13} color={AppColors.grayDark} />
+                    <Text style={s.cardSub}>{animalName(rec.male_id)}</Text>
+                  </View>
+                )}
               </View>
               <StatusBadge map={breedingStatusMap} value={rec.status} />
             </View>
             <View style={s.cardInfo}>
-              <Text style={s.cardInfoText}>{'\�\�'} {rec.breeding_date}</Text>
-              {rec.expected_due_date && <Text style={s.cardInfoText}>{'\�\�'} Төллөх: {rec.expected_due_date}</Text>}
-              <Text style={s.cardInfoText}>{rec.breeding_method === 'artificial' ? '\�\� Зохиомлоор' : '\�\� Байгалийн'}</Text>
+              <View style={s.cardInfoItem}>
+                <MaterialCommunityIcons name="calendar" size={13} color={AppColors.grayDark} />
+                <Text style={s.cardInfoText}>{rec.breeding_date}</Text>
+              </View>
+              {rec.expected_due_date && (
+                <View style={s.cardInfoItem}>
+                  <MaterialCommunityIcons name="calendar" size={13} color={AppColors.grayDark} />
+                  <Text style={s.cardInfoText}>Төллөх: {rec.expected_due_date}</Text>
+                </View>
+              )}
+              <View style={s.cardInfoItem}>
+                <MaterialCommunityIcons name={rec.breeding_method === 'artificial' ? 'needle' : 'dna'} size={13} color={AppColors.grayDark} />
+                <Text style={s.cardInfoText}>{rec.breeding_method === 'artificial' ? 'Зохиомлоор' : 'Байгалийн'}</Text>
+              </View>
             </View>
             {rec.notes ? <Text style={s.cardNotes}>{rec.notes}</Text> : null}
             <View style={s.cardActions}>
-              <TouchableOpacity style={s.editBtn} onPress={() => openEditBreeding(rec)}>
-                <Text style={s.editBtnText}>{'\✏\️'} Засах</Text>
+              <TouchableOpacity style={[s.editBtn, s.actionBtnRow]} onPress={() => openEditBreeding(rec)}>
+                <MaterialCommunityIcons name="pencil" size={13} color="#1565C0" />
+                <Text style={s.editBtnText}>Засах</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={s.deleteBtn} onPress={() => handleDeleteBreeding(rec.id)}>
-                <Text style={s.deleteBtnText}>{'\�\�\️'} Устгах</Text>
+              <TouchableOpacity style={[s.deleteBtn, s.actionBtnRow]} onPress={() => handleDeleteBreeding(rec.id)}>
+                <MaterialCommunityIcons name="delete-outline" size={13} color="#C62828" />
+                <Text style={s.deleteBtnText}>Устгах</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -400,22 +422,38 @@ export default function BreedingScreen() {
           <View key={rec.id} style={s.card}>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
               <View style={{ flex: 1 }}>
-                <Text style={s.cardTitle}>{'\�\�'} {animalName(rec.mother_id)}</Text>
-                {rec.father_id && <Text style={s.cardSub}>{'\♂\️'} {animalName(rec.father_id)}</Text>}
+                <View style={s.cardTitleRow}>
+                  <MaterialCommunityIcons name="gender-female" size={15} color={AppColors.black} />
+                  <Text style={s.cardTitle}>{animalName(rec.mother_id)}</Text>
+                </View>
+                {rec.father_id && (
+                  <View style={s.cardSubRow}>
+                    <MaterialCommunityIcons name="gender-male" size={13} color={AppColors.grayDark} />
+                    <Text style={s.cardSub}>{animalName(rec.father_id)}</Text>
+                  </View>
+                )}
               </View>
               <StatusBadge map={difficultyMap} value={rec.difficulty || 'normal'} />
             </View>
             <View style={s.cardInfo}>
-              <Text style={s.cardInfoText}>{'\�\�'} {rec.birth_date}</Text>
-              <Text style={s.cardInfoText}>{'\�\�'} Төл: {rec.offspring_count || 0} | Амьд: {rec.alive_count || 0}</Text>
+              <View style={s.cardInfoItem}>
+                <MaterialCommunityIcons name="calendar" size={13} color={AppColors.grayDark} />
+                <Text style={s.cardInfoText}>{rec.birth_date}</Text>
+              </View>
+              <View style={s.cardInfoItem}>
+                <MaterialCommunityIcons name="clipboard-text-outline" size={13} color={AppColors.grayDark} />
+                <Text style={s.cardInfoText}>Төл: {rec.offspring_count || 0} | Амьд: {rec.alive_count || 0}</Text>
+              </View>
             </View>
             {rec.notes ? <Text style={s.cardNotes}>{rec.notes}</Text> : null}
             <View style={s.cardActions}>
-              <TouchableOpacity style={s.editBtn} onPress={() => openEditBirth(rec)}>
-                <Text style={s.editBtnText}>{'\✏\️'} Засах</Text>
+              <TouchableOpacity style={[s.editBtn, s.actionBtnRow]} onPress={() => openEditBirth(rec)}>
+                <MaterialCommunityIcons name="pencil" size={13} color="#1565C0" />
+                <Text style={s.editBtnText}>Засах</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={s.deleteBtn} onPress={() => handleDeleteBirth(rec.id)}>
-                <Text style={s.deleteBtnText}>{'\�\�\️'} Устгах</Text>
+              <TouchableOpacity style={[s.deleteBtn, s.actionBtnRow]} onPress={() => handleDeleteBirth(rec.id)}>
+                <MaterialCommunityIcons name="delete-outline" size={13} color="#C62828" />
+                <Text style={s.deleteBtnText}>Устгах</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -435,7 +473,10 @@ export default function BreedingScreen() {
 
     return (
       <>
-        <Text style={s.sectionTitle}>{'\�\�'} Төллөх хуваарь</Text>
+        <View style={s.sectionTitleRow}>
+          <MaterialCommunityIcons name="calendar" size={16} color={AppColors.black} />
+          <Text style={[s.sectionTitle, { marginTop: 0, marginBottom: 0 }]}>Төллөх хуваарь</Text>
+        </View>
         {sorted.length > 0 ? sorted.map((entry: any, idx: number) => {
           const dueDate = new Date(entry.expected_due_date || entry.due_date || entry.date);
           const diffMs = dueDate.getTime() - today.getTime();
@@ -462,8 +503,14 @@ export default function BreedingScreen() {
             <View key={entry.id || idx} style={[s.calendarCard, { borderLeftColor: urgencyColor }]}>
               <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                 <View style={{ flex: 1 }}>
-                  <Text style={s.calendarAnimal}>{'\♀\️'} {femaleName}</Text>
-                  <Text style={s.calendarDate}>{'\�\�'} Төллөх огноо: {dateStr}</Text>
+                  <View style={s.cardTitleRow}>
+                    <MaterialCommunityIcons name="gender-female" size={15} color={AppColors.black} />
+                    <Text style={s.calendarAnimal}>{femaleName}</Text>
+                  </View>
+                  <View style={[s.cardSubRow, { marginTop: 4 }]}>
+                    <MaterialCommunityIcons name="calendar" size={13} color={AppColors.grayDark} />
+                    <Text style={[s.calendarDate, { marginTop: 0 }]}>Төллөх огноо: {dateStr}</Text>
+                  </View>
                 </View>
                 <View style={[s.urgencyBadge, { backgroundColor: urgencyBg }]}>
                   <Text style={[s.urgencyText, { color: urgencyColor }]}>{urgencyLabel}</Text>
@@ -481,7 +528,10 @@ export default function BreedingScreen() {
     <SafeAreaView style={s.container}>
       <ScreenBackdrop topic="breeding" />
       <View style={s.header}>
-        <Text style={s.title}>{'\�\�'} Хээлтүүлэг & Төллөлт</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+          <MaterialCommunityIcons name="account-group" size={22} color={AppColors.black} />
+          <Text style={s.title}>Хээлтүүлэг & Төллөлт</Text>
+        </View>
       </View>
 
       {/* Sub-tab bar */}
@@ -538,19 +588,21 @@ export default function BreedingScreen() {
               <Text style={s.label}>{'Арга'}</Text>
               <View style={{ flexDirection: 'row', gap: 8 }}>
                 <TouchableOpacity
-                  style={[s.methodChip, bMethod === 'natural' && s.methodChipActive]}
+                  style={[s.methodChip, s.methodChipRow, bMethod === 'natural' && s.methodChipActive]}
                   onPress={() => setBMethod('natural')}
                 >
+                  <MaterialCommunityIcons name="dna" size={14} color={bMethod === 'natural' ? COLORS.primary : AppColors.grayDark} />
                   <Text style={bMethod === 'natural' ? s.methodChipTextActive : s.methodChipText}>
-                    {'\�\�'} Байгалийн
+                    Байгалийн
                   </Text>
                 </TouchableOpacity>
                 <TouchableOpacity
-                  style={[s.methodChip, bMethod === 'artificial' && s.methodChipActive]}
+                  style={[s.methodChip, s.methodChipRow, bMethod === 'artificial' && s.methodChipActive]}
                   onPress={() => setBMethod('artificial')}
                 >
+                  <MaterialCommunityIcons name="needle" size={14} color={bMethod === 'artificial' ? COLORS.primary : AppColors.grayDark} />
                   <Text style={bMethod === 'artificial' ? s.methodChipTextActive : s.methodChipText}>
-                    {'\�\�'} Зохиомлоор
+                    Зохиомлоор
                   </Text>
                 </TouchableOpacity>
               </View>
@@ -689,11 +741,15 @@ const s = StyleSheet.create({
   // Card
   card: { backgroundColor: '#FFF', borderRadius: 14, padding: 14, marginTop: 10, elevation: 2, boxShadow: '0px 1px 4px rgba(0,0,0,0.05)' },
   cardTitle: { fontSize: 15, fontWeight: '700', color: AppColors.black },
+  cardTitleRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   cardSub: { fontSize: 13, color: AppColors.grayDark, marginTop: 2 },
+  cardSubRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   cardInfo: { flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginTop: 8 },
+  cardInfoItem: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   cardInfoText: { fontSize: 12, color: AppColors.grayDark },
   cardNotes: { fontSize: 12, color: AppColors.gray, marginTop: 6, fontStyle: 'italic' },
   cardActions: { flexDirection: 'row', justifyContent: 'flex-end', gap: 12, marginTop: 10, borderTopWidth: 1, borderTopColor: '#F0F0F0', paddingTop: 8 },
+  actionBtnRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   editBtn: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8, backgroundColor: '#E3F2FD' },
   editBtnText: { fontSize: 12, fontWeight: '600', color: '#1565C0' },
   deleteBtn: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8, backgroundColor: '#FFEBEE' },
@@ -705,6 +761,7 @@ const s = StyleSheet.create({
 
   // Calendar
   sectionTitle: { fontSize: 16, fontWeight: '700', color: AppColors.black, marginTop: 12, marginBottom: 10 },
+  sectionTitleRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 12, marginBottom: 10 },
   calendarCard: { backgroundColor: '#FFF', borderRadius: 12, padding: 14, marginBottom: 8, borderLeftWidth: 4, elevation: 2, boxShadow: '0px 1px 4px rgba(0,0,0,0.05)' },
   calendarAnimal: { fontSize: 15, fontWeight: '700', color: AppColors.black },
   calendarDate: { fontSize: 12, color: AppColors.grayDark, marginTop: 4 },
@@ -722,6 +779,7 @@ const s = StyleSheet.create({
 
   // Method chips
   methodChip: { flex: 1, paddingVertical: 10, borderRadius: 10, borderWidth: 1.5, borderColor: AppColors.grayMedium, alignItems: 'center', backgroundColor: '#FFF' },
+  methodChipRow: { flexDirection: 'row', justifyContent: 'center', gap: 4 },
   methodChipActive: { borderColor: COLORS.primary, backgroundColor: COLORS.bg },
   methodChipText: { fontSize: 13, color: AppColors.grayDark },
   methodChipTextActive: { fontSize: 13, color: COLORS.primary, fontWeight: '700' },

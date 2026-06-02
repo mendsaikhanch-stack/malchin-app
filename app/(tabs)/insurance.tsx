@@ -10,6 +10,7 @@ import {
   ActivityIndicator,
   Linking } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { AppColors } from '@/constants/theme';
 import { ScreenBackdrop } from '@/components/screen-background';
@@ -95,22 +96,31 @@ export default function InsuranceScreen() {
   const renderTabBar = () => (
     <View style={styles.tabBar}>
       {([
-        { key: 'insurance' as TabKey, label: '🏦 НД' },
-        { key: 'livestock' as TabKey, label: '🐑 Малын' },
-        { key: 'welfare' as TabKey, label: '🤝 Халамж' },
-        { key: 'docs' as TabKey, label: '📄 Баримт' },
-        { key: 'calc' as TabKey, label: '🧮 Тооцоо' },
-      ]).map(tab => (
-        <TouchableOpacity
-          key={tab.key}
-          style={[styles.tabItem, activeTab === tab.key && styles.tabItemActive]}
-          onPress={() => setActiveTab(tab.key)}
-        >
-          <Text style={[styles.tabText, activeTab === tab.key && styles.tabTextActive]}>
-            {tab.label}
-          </Text>
-        </TouchableOpacity>
-      ))}
+        { key: 'insurance' as TabKey, icon: 'bank-outline' as const, label: 'НД' },
+        { key: 'livestock' as TabKey, emoji: '🐑', label: 'Малын' },
+        { key: 'welfare' as TabKey, icon: 'handshake-outline' as const, label: 'Халамж' },
+        { key: 'docs' as TabKey, icon: 'file-document-outline' as const, label: 'Баримт' },
+        { key: 'calc' as TabKey, icon: 'calculator-variant-outline' as const, label: 'Тооцоо' },
+      ]).map(tab => {
+        const isActive = activeTab === tab.key;
+        const tint = isActive ? BRAND.primary : AppColors.grayDark;
+        return (
+          <TouchableOpacity
+            key={tab.key}
+            style={[styles.tabItem, isActive && styles.tabItemActive]}
+            onPress={() => setActiveTab(tab.key)}
+          >
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 3 }}>
+              {'emoji' in tab && tab.emoji
+                ? <Text style={{ fontSize: 12 }}>{tab.emoji}</Text>
+                : <MaterialCommunityIcons name={tab.icon} size={13} color={tint} />}
+              <Text style={[styles.tabText, isActive && styles.tabTextActive]}>
+                {tab.label}
+              </Text>
+            </View>
+          </TouchableOpacity>
+        );
+      })}
     </View>
   );
 
@@ -118,7 +128,7 @@ export default function InsuranceScreen() {
   const renderInsurance = () => (
     <>
       <View style={styles.infoBox}>
-        <Text style={styles.infoEmoji}>💡</Text>
+        <MaterialCommunityIcons name="lightbulb-on-outline" size={20} color={BRAND.primary} />
         <Text style={styles.infoText}>
           Малчид нийгмийн даатгалд сайн дурын даатгуулагчаар хамрагдана. Нийт шимтгэл нь орлогын 11.5%.
         </Text>
@@ -139,7 +149,7 @@ export default function InsuranceScreen() {
                 <Text style={styles.cardTitle}>{ins.title}</Text>
                 <Text style={styles.cardDesc} numberOfLines={isExpanded ? undefined : 2}>{ins.description}</Text>
               </View>
-              <Text style={styles.expandIcon}>{isExpanded ? '▲' : '▼'}</Text>
+              <MaterialCommunityIcons name={isExpanded ? 'chevron-up' : 'chevron-down'} size={16} color={AppColors.gray} style={styles.expandIcon} />
             </View>
 
             {isExpanded && (
@@ -187,7 +197,7 @@ export default function InsuranceScreen() {
                 <Text style={styles.cardTitle}>{prog.title}</Text>
                 <Text style={styles.cardDesc} numberOfLines={isExpanded ? undefined : 2}>{prog.description}</Text>
               </View>
-              <Text style={styles.expandIcon}>{isExpanded ? '▲' : '▼'}</Text>
+              <MaterialCommunityIcons name={isExpanded ? 'chevron-up' : 'chevron-down'} size={16} color={AppColors.gray} style={styles.expandIcon} />
             </View>
 
             {isExpanded && (
@@ -230,7 +240,7 @@ export default function InsuranceScreen() {
           <View style={styles.docList}>
             {doc.items?.map((item: string, idx: number) => (
               <View key={idx} style={styles.docItem}>
-                <Text style={styles.docBullet}>✓</Text>
+                <MaterialCommunityIcons name="check" size={14} color={BRAND.primaryLight} style={styles.docBullet} />
                 <Text style={styles.docText}>{item}</Text>
               </View>
             ))}
@@ -240,7 +250,10 @@ export default function InsuranceScreen() {
 
       {/* Холбоо барих */}
       <View style={[styles.card, { marginTop: 8 }]}>
-        <Text style={styles.sectionTitle}>📞 Холбоо барих</Text>
+        <View style={styles.sectionTitleRow}>
+          <MaterialCommunityIcons name="phone" size={16} color={BRAND.primary} />
+          <Text style={styles.sectionTitle}>Холбоо барих</Text>
+        </View>
         {contacts.map((c: any, idx: number) => (
           <TouchableOpacity
             key={idx}
@@ -268,7 +281,10 @@ export default function InsuranceScreen() {
     <>
       {/* НД шимтгэлийн тооцоолуур */}
       <View style={styles.card}>
-        <Text style={styles.sectionTitle}>🧮 НД шимтгэлийн тооцоолуур</Text>
+        <View style={styles.sectionTitleRow}>
+          <MaterialCommunityIcons name="calculator-variant-outline" size={16} color={BRAND.primary} />
+          <Text style={styles.sectionTitle}>НД шимтгэлийн тооцоолуур</Text>
+        </View>
         <Text style={styles.calcHint}>
           Сарын орлогоо оруулбал нийгмийн даатгалын шимтгэлийг тооцоолно.
         </Text>
@@ -291,30 +307,48 @@ export default function InsuranceScreen() {
 
       {calcResult && (
         <View style={styles.card}>
-          <Text style={styles.sectionTitle}>📊 НД тооцооны үр дүн</Text>
+          <View style={styles.sectionTitleRow}>
+            <MaterialCommunityIcons name="chart-bar" size={16} color={BRAND.primary} />
+            <Text style={styles.sectionTitle}>НД тооцооны үр дүн</Text>
+          </View>
           <Text style={styles.calcSubtitle}>
             Сарын орлого: {formatPrice(calcResult.monthly_income)}
           </Text>
 
           <View style={styles.calcResultBox}>
             <View style={styles.calcRow}>
-              <Text style={styles.calcLabel}>🏦 Тэтгэврийн (7%)</Text>
+              <View style={styles.calcLabelRow}>
+                <MaterialCommunityIcons name="bank-outline" size={14} color={AppColors.grayDark} />
+                <Text style={styles.calcLabel}>Тэтгэврийн (7%)</Text>
+              </View>
               <Text style={styles.calcValue}>{formatPrice(calcResult.pension)}</Text>
             </View>
             <View style={styles.calcRow}>
-              <Text style={styles.calcLabel}>💊 Тэтгэмжийн (1%)</Text>
+              <View style={styles.calcLabelRow}>
+                <MaterialCommunityIcons name="pill" size={14} color={AppColors.grayDark} />
+                <Text style={styles.calcLabel}>Тэтгэмжийн (1%)</Text>
+              </View>
               <Text style={styles.calcValue}>{formatPrice(calcResult.benefit)}</Text>
             </View>
             <View style={styles.calcRow}>
-              <Text style={styles.calcLabel}>⚠️ ҮОМШӨ (1%)</Text>
+              <View style={styles.calcLabelRow}>
+                <MaterialCommunityIcons name="alert-outline" size={14} color={AppColors.grayDark} />
+                <Text style={styles.calcLabel}>ҮОМШӨ (1%)</Text>
+              </View>
               <Text style={styles.calcValue}>{formatPrice(calcResult.accident)}</Text>
             </View>
             <View style={styles.calcRow}>
-              <Text style={styles.calcLabel}>📋 Ажилгүйдлийн (0.5%)</Text>
+              <View style={styles.calcLabelRow}>
+                <MaterialCommunityIcons name="clipboard-text-outline" size={14} color={AppColors.grayDark} />
+                <Text style={styles.calcLabel}>Ажилгүйдлийн (0.5%)</Text>
+              </View>
               <Text style={styles.calcValue}>{formatPrice(calcResult.unemployment)}</Text>
             </View>
             <View style={styles.calcRow}>
-              <Text style={styles.calcLabel}>🏥 ЭМД (2%)</Text>
+              <View style={styles.calcLabelRow}>
+                <MaterialCommunityIcons name="hospital-box-outline" size={14} color={AppColors.grayDark} />
+                <Text style={styles.calcLabel}>ЭМД (2%)</Text>
+              </View>
               <Text style={styles.calcValue}>{formatPrice(calcResult.health)}</Text>
             </View>
 
@@ -332,9 +366,10 @@ export default function InsuranceScreen() {
             </View>
           </View>
 
-          <View style={styles.calcTipBox}>
-            <Text style={styles.calcTipText}>
-              💡 Шимтгэлийг сар бүр эсвэл улирал/жилээр нэг дор төлж болно. Жилээр төлвөл нийт {formatPrice(calcResult.yearly)}.
+          <View style={[styles.calcTipBox, { flexDirection: 'row', alignItems: 'flex-start', gap: 6 }]}>
+            <MaterialCommunityIcons name="lightbulb-on-outline" size={14} color="#f57f17" style={{ marginTop: 1 }} />
+            <Text style={[styles.calcTipText, { flex: 1 }]}>
+              Шимтгэлийг сар бүр эсвэл улирал/жилээр нэг дор төлж болно. Жилээр төлвөл нийт {formatPrice(calcResult.yearly)}.
             </Text>
           </View>
         </View>
@@ -342,7 +377,10 @@ export default function InsuranceScreen() {
 
       {/* Түгээмэл тоо */}
       <View style={styles.card}>
-        <Text style={styles.sectionTitle}>📋 Түгээмэл орлогын түвшин</Text>
+        <View style={styles.sectionTitleRow}>
+          <MaterialCommunityIcons name="clipboard-text-outline" size={16} color={BRAND.primary} />
+          <Text style={styles.sectionTitle}>Түгээмэл орлогын түвшин</Text>
+        </View>
         {[300000, 500000, 800000, 1000000, 1500000].map(income => {
           const total = Math.round(income * 0.115);
           return (
@@ -352,7 +390,7 @@ export default function InsuranceScreen() {
               onPress={() => { setCalcIncome(String(income)); handleCalc(); }}
             >
               <Text style={styles.quickCalcIncome}>{formatPrice(income)}/сар</Text>
-              <Text style={styles.quickCalcArrow}>→</Text>
+              <MaterialCommunityIcons name="arrow-right" size={14} color={AppColors.gray} style={styles.quickCalcArrow} />
               <Text style={styles.quickCalcTotal}>{formatPrice(total)}/сар</Text>
             </TouchableOpacity>
           );
@@ -361,7 +399,10 @@ export default function InsuranceScreen() {
 
       {/* Бүртгүүлэх заавар */}
       <View style={styles.card}>
-        <Text style={styles.sectionTitle}>📝 Бүртгүүлэх алхамууд</Text>
+        <View style={styles.sectionTitleRow}>
+          <MaterialCommunityIcons name="note-edit-outline" size={16} color={BRAND.primary} />
+          <Text style={styles.sectionTitle}>Бүртгүүлэх алхамууд</Text>
+        </View>
         {[
           { step: '1', title: 'Сумын ЗДТГ-аас тодорхойлолт авах', desc: 'Малчин гэсэн тодорхойлолт, мал тооллогын бүртгэл (А данс)' },
           { step: '2', title: 'НД-ын хэлтэст бүртгүүлэх', desc: 'Иргэний үнэмлэх, тодорхойлолт, банкны данс авч очих' },
@@ -391,7 +432,10 @@ export default function InsuranceScreen() {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.header}>
-          <Text style={styles.title}>🛡️ Даатгал & Халамж</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+            <MaterialCommunityIcons name="shield-check-outline" size={24} color={BRAND.primary} />
+            <Text style={styles.title}>Даатгал & Халамж</Text>
+          </View>
           <Text style={styles.subtitle}>Малчны нийгмийн хамгаалал</Text>
         </View>
 
@@ -412,7 +456,7 @@ export default function InsuranceScreen() {
                     IBLI, арилжааны, зудын даатгал, тооцоолуур, бүртгүүлэх заавар, FAQ
                   </Text>
                 </View>
-                <Text style={{ fontSize: 20, color: BRAND.primary }}>{'→'}</Text>
+                <MaterialCommunityIcons name="arrow-right" size={20} color={BRAND.primary} />
               </View>
             </TouchableOpacity>
 
@@ -427,7 +471,7 @@ export default function InsuranceScreen() {
                       <Text style={styles.cardTitle}>{ins.title}</Text>
                       <Text style={styles.cardDesc} numberOfLines={isExpanded ? undefined : 2}>{ins.description}</Text>
                     </View>
-                    <Text style={styles.expandIcon}>{isExpanded ? '▲' : '▼'}</Text>
+                    <MaterialCommunityIcons name={isExpanded ? 'chevron-up' : 'chevron-down'} size={16} color={AppColors.gray} style={styles.expandIcon} />
                   </View>
                   {isExpanded && (
                     <View style={styles.cardBody}>
@@ -549,6 +593,8 @@ const styles = StyleSheet.create({
   docText: { flex: 1, fontSize: 13, color: AppColors.grayDark, lineHeight: 19 },
 
   sectionTitle: { fontSize: 16, fontWeight: '700', color: BRAND.primary, marginBottom: 10 },
+  sectionTitleRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  calcLabelRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
 
   // Contacts
   contactRow: {

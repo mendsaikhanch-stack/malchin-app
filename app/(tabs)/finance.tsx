@@ -12,6 +12,7 @@ import {
   ActivityIndicator,
   Dimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { AppColors } from '@/constants/theme';
 import { ScreenBackdrop } from '@/components/screen-background';
 import { financeApi } from '@/services/api';
@@ -35,19 +36,19 @@ const MONTH_NAMES = [
 
 const categories = {
   income: [
-    { key: 'sale', label: 'Мал борлуулалт', emoji: '🐑' },
-    { key: 'dairy', label: 'Сүү', emoji: '🥛' },
-    { key: 'wool', label: 'Ноос/Ноолуур', emoji: '🧶' },
-    { key: 'subsidy', label: 'Татаас/Тэтгэлэг', emoji: '🏦' },
-    { key: 'other_in', label: 'Бусад', emoji: '💰' },
+    { key: 'sale', label: 'Мал борлуулалт', emoji: '🐑', icon: null },
+    { key: 'dairy', label: 'Сүү', emoji: '🥛', icon: 'cup-water' },
+    { key: 'wool', label: 'Ноос/Ноолуур', emoji: '🧶', icon: 'tshirt-crew-outline' },
+    { key: 'subsidy', label: 'Татаас/Тэтгэлэг', emoji: '🏦', icon: 'bank-outline' },
+    { key: 'other_in', label: 'Бусад', emoji: '💰', icon: 'cash' },
   ],
   expense: [
-    { key: 'feed', label: 'Тэжээл/Өвс', emoji: '🌾' },
-    { key: 'medicine', label: 'Эм/Эмчилгээ', emoji: '💊' },
-    { key: 'transport', label: 'Тээвэр', emoji: '🚚' },
-    { key: 'equipment', label: 'Тоног төхөөрөмж', emoji: '🔧' },
-    { key: 'labor', label: 'Хөдөлмөр', emoji: '👷' },
-    { key: 'other_ex', label: 'Бусад', emoji: '💰' },
+    { key: 'feed', label: 'Тэжээл/Өвс', emoji: '🌾', icon: 'barley' },
+    { key: 'medicine', label: 'Эм/Эмчилгээ', emoji: '💊', icon: 'pill' },
+    { key: 'transport', label: 'Тээвэр', emoji: '🚚', icon: 'truck' },
+    { key: 'equipment', label: 'Тоног төхөөрөмж', emoji: '🔧', icon: 'wrench-outline' },
+    { key: 'labor', label: 'Хөдөлмөр', emoji: '👷', icon: 'account-hard-hat' },
+    { key: 'other_ex', label: 'Бусад', emoji: '💰', icon: 'cash' },
   ] };
 
 type TabKey = 'overview' | 'records' | 'report';
@@ -69,7 +70,7 @@ function formatPriceShort(n: number): string {
 
 function getCatInfo(key: string) {
   const all = [...categories.income, ...categories.expense];
-  return all.find(c => c.key === key) || { label: key, emoji: '💰' };
+  return all.find(c => c.key === key) || { label: key, emoji: '💰', icon: 'cash' };
 }
 
 function getMonthFromDate(dateStr: string): number {
@@ -87,6 +88,14 @@ function getYearFromDate(dateStr: string): number {
 function getDateStr(rec: any): string {
   const d = rec.record_date || rec.created_at || '';
   return d.split(' ')[0] || d.split('T')[0] || '';
+}
+
+// Ангиллын дүрс: icon байвал MCI, үгүй бол emoji (мал 🐑)
+function CatGlyph({ cat, size, style }: { cat: any; size: number; style?: any }) {
+  if (cat?.icon) {
+    return <MaterialCommunityIcons name={cat.icon as any} size={Math.round(size * 0.9)} color="#616161" style={style} />;
+  }
+  return <Text style={style}>{cat?.emoji}</Text>;
 }
 
 // ───────── Component ─────────
@@ -341,20 +350,26 @@ export default function FinanceScreen() {
   const renderTabBar = () => (
     <View style={styles.tabBar}>
       {([
-        { key: 'overview' as TabKey, label: '📊 Тойм' },
-        { key: 'records' as TabKey, label: '📋 Бүртгэл' },
-        { key: 'report' as TabKey, label: '📈 Тайлан' },
-      ]).map(tab => (
-        <TouchableOpacity
-          key={tab.key}
-          style={[styles.tabItem, activeTab === tab.key && styles.tabItemActive]}
-          onPress={() => setActiveTab(tab.key)}
-        >
-          <Text style={[styles.tabText, activeTab === tab.key && styles.tabTextActive]}>
-            {tab.label}
-          </Text>
-        </TouchableOpacity>
-      ))}
+        { key: 'overview' as TabKey, label: 'Тойм', icon: 'chart-bar' },
+        { key: 'records' as TabKey, label: 'Бүртгэл', icon: 'clipboard-text-outline' },
+        { key: 'report' as TabKey, label: 'Тайлан', icon: 'trending-up' },
+      ]).map(tab => {
+        const active = activeTab === tab.key;
+        return (
+          <TouchableOpacity
+            key={tab.key}
+            style={[styles.tabItem, active && styles.tabItemActive]}
+            onPress={() => setActiveTab(tab.key)}
+          >
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+              <MaterialCommunityIcons name={tab.icon as any} size={15} color={active ? BRAND.primary : AppColors.grayDark} />
+              <Text style={[styles.tabText, active && styles.tabTextActive]}>
+                {tab.label}
+              </Text>
+            </View>
+          </TouchableOpacity>
+        );
+      })}
     </View>
   );
 
@@ -370,7 +385,10 @@ export default function FinanceScreen() {
         <View style={[styles.bigProfitCard, {
           backgroundColor: summary.profit >= 0 ? '#e8f5e9' : '#ffebee',
           borderColor: summary.profit >= 0 ? BRAND.primaryLight : AppColors.danger }]}>
-          <Text style={styles.bigProfitTitle}>💰 Нийт ашиг/алдагдал</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+            <MaterialCommunityIcons name="cash" size={16} color="#616161" />
+            <Text style={styles.bigProfitTitle}>Нийт ашиг/алдагдал</Text>
+          </View>
           <Text style={[styles.bigProfitAmount, {
             color: summary.profit >= 0 ? BRAND.primary : AppColors.danger }]}>
             {summary.profit >= 0 ? '+' : ''}{formatPrice(summary.profit)}
@@ -395,7 +413,10 @@ export default function FinanceScreen() {
 
         {/* Monthly Trend */}
         <View style={styles.sectionCard}>
-          <Text style={styles.sectionCardTitle}>📊 Сарын чиг хандлага (сүүлийн 6 сар)</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 12 }}>
+            <MaterialCommunityIcons name="chart-bar" size={18} color="#2D7D3F" />
+            <Text style={[styles.sectionCardTitle, { marginBottom: 0 }]}>Сарын чиг хандлага (сүүлийн 6 сар)</Text>
+          </View>
           <View style={styles.trendContainer}>
             {last6Months.map((m, idx) => (
               <View key={idx} style={styles.trendColumn}>
@@ -425,12 +446,15 @@ export default function FinanceScreen() {
         {/* Category Breakdown */}
         {expenseByCategory.length > 0 && (
           <View style={styles.sectionCard}>
-            <Text style={styles.sectionCardTitle}>📦 Зардлын ангилал (Топ 5)</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 12 }}>
+              <MaterialCommunityIcons name="package-variant" size={18} color="#2D7D3F" />
+              <Text style={[styles.sectionCardTitle, { marginBottom: 0 }]}>Зардлын ангилал (Топ 5)</Text>
+            </View>
             {expenseByCategory.map((cat, idx) => {
               const pct = totalExpense > 0 ? (cat.total / totalExpense) * 100 : 0;
               return (
                 <View key={cat.key} style={styles.catBreakdownRow}>
-                  <Text style={styles.catBreakdownEmoji}>{cat.emoji}</Text>
+                  <CatGlyph cat={cat} size={24} style={styles.catBreakdownEmoji} />
                   <View style={styles.catBreakdownInfo}>
                     <View style={styles.catBreakdownHeader}>
                       <Text style={styles.catBreakdownLabel}>{cat.label}</Text>
@@ -457,7 +481,7 @@ export default function FinanceScreen() {
               const pct = summary.total_income > 0 ? (cat.total / summary.total_income) * 100 : 0;
               return (
                 <View key={cat.key} style={styles.yieldRow}>
-                  <Text style={styles.yieldEmoji}>{cat.emoji}</Text>
+                  <CatGlyph cat={cat} size={22} style={styles.yieldEmoji} />
                   <View style={styles.yieldInfo}>
                     <Text style={styles.yieldLabel}>{cat.label}</Text>
                     <Text style={styles.yieldPct}>{pct.toFixed(1)}%</Text>
@@ -496,20 +520,28 @@ export default function FinanceScreen() {
       <View style={styles.filterSection}>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filterRow}>
           {([
-            { key: 'all' as FilterType, label: 'Бүгд' },
-            { key: 'income' as FilterType, label: '📈 Орлого' },
-            { key: 'expense' as FilterType, label: '📉 Зардал' },
-          ]).map(f => (
-            <TouchableOpacity
-              key={f.key}
-              style={[styles.filterChip, filterType === f.key && styles.filterChipActive]}
-              onPress={() => setFilterType(f.key)}
-            >
-              <Text style={[styles.filterChipText, filterType === f.key && styles.filterChipTextActive]}>
-                {f.label}
-              </Text>
-            </TouchableOpacity>
-          ))}
+            { key: 'all' as FilterType, label: 'Бүгд', icon: null },
+            { key: 'income' as FilterType, label: 'Орлого', icon: 'trending-up' },
+            { key: 'expense' as FilterType, label: 'Зардал', icon: 'trending-down' },
+          ]).map(f => {
+            const active = filterType === f.key;
+            return (
+              <TouchableOpacity
+                key={f.key}
+                style={[styles.filterChip, active && styles.filterChipActive]}
+                onPress={() => setFilterType(f.key)}
+              >
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                  {f.icon && (
+                    <MaterialCommunityIcons name={f.icon as any} size={14} color={active ? AppColors.white : AppColors.grayDark} />
+                  )}
+                  <Text style={[styles.filterChipText, active && styles.filterChipTextActive]}>
+                    {f.label}
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            );
+          })}
         </ScrollView>
       </View>
 
@@ -564,7 +596,7 @@ export default function FinanceScreen() {
               <TouchableOpacity key={rec.id} style={styles.recordItem} onPress={() => handleEdit(rec)} onLongPress={() => handleDelete(rec)}>
                 <View style={[styles.recordEmojiBox, {
                   backgroundColor: isIncome ? '#e8f5e9' : '#ffebee' }]}>
-                  <Text style={styles.recordEmoji}>{cat.emoji}</Text>
+                  <CatGlyph cat={cat} size={22} style={styles.recordEmoji} />
                 </View>
                 <View style={styles.recordInfo}>
                   <Text style={styles.recordCat}>{cat.label}</Text>
@@ -577,10 +609,10 @@ export default function FinanceScreen() {
                   </Text>
                   <View style={styles.recordActions}>
                     <TouchableOpacity onPress={() => handleEdit(rec)} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
-                      <Text style={styles.recordActionEdit}>✏️</Text>
+                      <MaterialCommunityIcons name="pencil" size={16} color="#616161" />
                     </TouchableOpacity>
                     <TouchableOpacity onPress={() => handleDelete(rec)} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
-                      <Text style={styles.recordActionDelete}>🗑️</Text>
+                      <MaterialCommunityIcons name="delete-outline" size={16} color="#E53935" />
                     </TouchableOpacity>
                   </View>
                 </View>
@@ -612,7 +644,10 @@ export default function FinanceScreen() {
       <>
         {/* Year selector */}
         <View style={styles.yearSelector}>
-          <Text style={styles.yearLabel}>📅 Тайлант жил:</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 6 }}>
+            <MaterialCommunityIcons name="calendar" size={16} color="#616161" />
+            <Text style={[styles.yearLabel, { marginBottom: 0 }]}>Тайлант жил:</Text>
+          </View>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.yearRow}>
             {availableYears.map(y => (
               <TouchableOpacity
@@ -630,7 +665,10 @@ export default function FinanceScreen() {
 
         {/* Year Summary */}
         <View style={styles.sectionCard}>
-          <Text style={styles.sectionCardTitle}>📊 {reportYear} оны нийт дүн</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 12 }}>
+            <MaterialCommunityIcons name="chart-bar" size={18} color="#2D7D3F" />
+            <Text style={[styles.sectionCardTitle, { marginBottom: 0 }]}>{reportYear} оны нийт дүн</Text>
+          </View>
           <View style={styles.reportSummaryRow}>
             <View style={[styles.reportSummaryBox, { backgroundColor: '#e8f5e9' }]}>
               <Text style={styles.reportSummaryLabel}>Нийт орлого</Text>
@@ -654,10 +692,13 @@ export default function FinanceScreen() {
         {/* Income by category */}
         {incomeCatEntries.length > 0 && (
           <View style={styles.sectionCard}>
-            <Text style={styles.sectionCardTitle}>📈 Орлогын ангилал</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 12 }}>
+              <MaterialCommunityIcons name="trending-up" size={18} color="#2D7D3F" />
+              <Text style={[styles.sectionCardTitle, { marginBottom: 0 }]}>Орлогын ангилал</Text>
+            </View>
             {incomeCatEntries.map(cat => (
               <View key={cat.label} style={styles.reportCatRow}>
-                <Text style={styles.reportCatEmoji}>{cat.emoji}</Text>
+                <CatGlyph cat={cat} size={20} style={styles.reportCatEmoji} />
                 <Text style={styles.reportCatLabel}>{cat.label}</Text>
                 <Text style={[styles.reportCatVal, { color: BRAND.primary }]}>{formatPrice(cat.total)}</Text>
               </View>
@@ -668,10 +709,13 @@ export default function FinanceScreen() {
         {/* Expense by category */}
         {expenseCatEntries.length > 0 && (
           <View style={styles.sectionCard}>
-            <Text style={styles.sectionCardTitle}>📉 Зардлын ангилал</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 12 }}>
+              <MaterialCommunityIcons name="trending-down" size={18} color="#E53935" />
+              <Text style={[styles.sectionCardTitle, { marginBottom: 0 }]}>Зардлын ангилал</Text>
+            </View>
             {expenseCatEntries.map(cat => (
               <View key={cat.label} style={styles.reportCatRow}>
-                <Text style={styles.reportCatEmoji}>{cat.emoji}</Text>
+                <CatGlyph cat={cat} size={20} style={styles.reportCatEmoji} />
                 <Text style={styles.reportCatLabel}>{cat.label}</Text>
                 <Text style={[styles.reportCatVal, { color: AppColors.danger }]}>{formatPrice(cat.total)}</Text>
               </View>
@@ -681,7 +725,10 @@ export default function FinanceScreen() {
 
         {/* Monthly P&L table */}
         <View style={styles.sectionCard}>
-          <Text style={styles.sectionCardTitle}>📋 Сарын ашиг/алдагдал</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 12 }}>
+            <MaterialCommunityIcons name="clipboard-text-outline" size={18} color="#2D7D3F" />
+            <Text style={[styles.sectionCardTitle, { marginBottom: 0 }]}>Сарын ашиг/алдагдал</Text>
+          </View>
           <View style={styles.tableHeader}>
             <Text style={[styles.tableHeaderCell, { flex: 1.2 }]}>Сар</Text>
             <Text style={[styles.tableHeaderCell, { flex: 1 }]}>Орлого</Text>
@@ -769,7 +816,10 @@ export default function FinanceScreen() {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.header}>
-          <Text style={styles.title}>💰 Санхүү</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+            <MaterialCommunityIcons name="cash" size={26} color={BRAND.primary} />
+            <Text style={styles.title}>Санхүү</Text>
+          </View>
           <Text style={styles.subtitle}>Орлого, зардал, ашгийн тооцоо</Text>
         </View>
 
@@ -787,11 +837,18 @@ export default function FinanceScreen() {
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <View style={styles.modalHandle} />
-            <Text style={styles.modalTitle}>
-              {editingRecord
-                ? (recordType === 'income' ? '📈 Орлого засах' : '📉 Зардал засах')
-                : (recordType === 'income' ? '📈 Орлого нэмэх' : '📉 Зардал нэмэх')}
-            </Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 12 }}>
+              <MaterialCommunityIcons
+                name={recordType === 'income' ? 'trending-up' : 'trending-down'}
+                size={20}
+                color={recordType === 'income' ? BRAND.primaryLight : AppColors.danger}
+              />
+              <Text style={[styles.modalTitle, { marginBottom: 0 }]}>
+                {editingRecord
+                  ? (recordType === 'income' ? 'Орлого засах' : 'Зардал засах')
+                  : (recordType === 'income' ? 'Орлого нэмэх' : 'Зардал нэмэх')}
+              </Text>
+            </View>
 
             {/* Type toggle */}
             <View style={styles.toggleRow}>
@@ -799,17 +856,23 @@ export default function FinanceScreen() {
                 style={[styles.toggleBtn, recordType === 'income' && styles.toggleIncome]}
                 onPress={() => switchType('income')}
               >
-                <Text style={[styles.toggleText, recordType === 'income' && styles.toggleTextActive]}>
-                  📈 Орлого
-                </Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                  <MaterialCommunityIcons name="trending-up" size={16} color={recordType === 'income' ? AppColors.black : AppColors.grayDark} />
+                  <Text style={[styles.toggleText, recordType === 'income' && styles.toggleTextActive]}>
+                    Орлого
+                  </Text>
+                </View>
               </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.toggleBtn, recordType === 'expense' && styles.toggleExpense]}
                 onPress={() => switchType('expense')}
               >
-                <Text style={[styles.toggleText, recordType === 'expense' && styles.toggleTextActive]}>
-                  📉 Зардал
-                </Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                  <MaterialCommunityIcons name="trending-down" size={16} color={recordType === 'expense' ? AppColors.black : AppColors.grayDark} />
+                  <Text style={[styles.toggleText, recordType === 'expense' && styles.toggleTextActive]}>
+                    Зардал
+                  </Text>
+                </View>
               </TouchableOpacity>
             </View>
 
@@ -821,7 +884,7 @@ export default function FinanceScreen() {
                   style={[styles.catBtn, selectedCat === cat.key && styles.catBtnActive]}
                   onPress={() => setSelectedCat(cat.key)}
                 >
-                  <Text style={styles.catBtnEmoji}>{cat.emoji}</Text>
+                  <CatGlyph cat={cat} size={18} style={styles.catBtnEmoji} />
                   <Text style={[styles.catBtnLabel, selectedCat === cat.key && styles.catBtnLabelActive]}>
                     {cat.label}
                   </Text>
@@ -858,7 +921,10 @@ export default function FinanceScreen() {
                   backgroundColor: recordType === 'income' ? BRAND.primaryLight : AppColors.danger }]}
                 onPress={handleSave}
               >
-                <Text style={styles.saveBtnText}>{editingRecord ? '✓ Хадгалах' : '✓ Бүртгэх'}</Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                  <MaterialCommunityIcons name="check" size={16} color={AppColors.white} />
+                  <Text style={styles.saveBtnText}>{editingRecord ? 'Хадгалах' : 'Бүртгэх'}</Text>
+                </View>
               </TouchableOpacity>
             </View>
           </View>

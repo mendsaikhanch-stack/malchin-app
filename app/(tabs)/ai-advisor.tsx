@@ -11,6 +11,7 @@ import {
   ActivityIndicator,
   Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { AppColors } from '@/constants/theme';
 import { ScreenBackdrop } from '@/components/screen-background';
 import { aiApi, livestockApi } from '@/services/api';
@@ -239,18 +240,24 @@ export default function AIAdvisorScreen() {
         onPress={() => setMode('chat')}
         activeOpacity={0.7}
       >
-        <Text style={[styles.toggleBtnText, mode === 'chat' && styles.toggleBtnTextActive]}>
-          {'💬 Асуулт'}
-        </Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+          <MaterialCommunityIcons name="chat-outline" size={16} color={mode === 'chat' ? AppColors.white : AppColors.grayDark} />
+          <Text style={[styles.toggleBtnText, mode === 'chat' && styles.toggleBtnTextActive]}>
+            Асуулт
+          </Text>
+        </View>
       </TouchableOpacity>
       <TouchableOpacity
         style={[styles.toggleBtn, mode === 'command' && styles.toggleBtnActive]}
         onPress={() => setMode('command')}
         activeOpacity={0.7}
       >
-        <Text style={[styles.toggleBtnText, mode === 'command' && styles.toggleBtnTextActive]}>
-          {'🎤 Команд'}
-        </Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+          <MaterialCommunityIcons name="microphone" size={16} color={mode === 'command' ? AppColors.white : AppColors.grayDark} />
+          <Text style={[styles.toggleBtnText, mode === 'command' && styles.toggleBtnTextActive]}>
+            Команд
+          </Text>
+        </View>
       </TouchableOpacity>
     </View>
   );
@@ -404,7 +411,7 @@ export default function AIAdvisorScreen() {
               msg.sender === 'user' ? styles.userBubble : styles.aiBubble,
             ]}
           >
-            {msg.sender === 'ai' && <Text style={styles.aiAvatar}>{'🤖'}</Text>}
+            {msg.sender === 'ai' && <MaterialCommunityIcons name="robot-happy-outline" size={24} color="#2D7D3F" style={styles.aiAvatar} />}
             <View
               style={[
                 styles.bubbleContent,
@@ -423,7 +430,7 @@ export default function AIAdvisorScreen() {
 
         {chatLoading && (
           <View style={[styles.messageBubble, styles.aiBubble]}>
-            <Text style={styles.aiAvatar}>{'🤖'}</Text>
+            <MaterialCommunityIcons name="robot-happy-outline" size={24} color="#2D7D3F" style={styles.aiAvatar} />
             <View style={[styles.bubbleContent, styles.aiContent]}>
               <ActivityIndicator size="small" color={AppColors.primary} />
               <Text style={styles.typingText}>Бодож байна...</Text>
@@ -451,7 +458,7 @@ export default function AIAdvisorScreen() {
           onPress={() => sendMessage(chatInput)}
           disabled={!chatInput.trim() || chatLoading}
         >
-          <Text style={styles.sendBtnText}>{'➤'}</Text>
+          <MaterialCommunityIcons name="send" size={20} color="#FFFFFF" />
         </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>
@@ -540,7 +547,10 @@ export default function AIAdvisorScreen() {
     <SafeAreaView style={styles.container}>
       <ScreenBackdrop topic="advisor" />
       <View style={styles.header}>
-        <Text style={styles.title}>{'🤖'} Ухаалаг Зөвлөгч</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+          <MaterialCommunityIcons name="robot-happy-outline" size={22} color="#2D7D3F" />
+          <Text style={styles.title}>Ухаалаг Зөвлөгч</Text>
+        </View>
         <Text style={styles.subtitle}>Мал аж ахуйн мэргэжлийн зөвлөгөө</Text>
       </View>
 

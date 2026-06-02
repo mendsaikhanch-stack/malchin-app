@@ -10,8 +10,10 @@ import {
   Linking,
   Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { AppColors } from '@/constants/theme';
 import { ScreenBackdrop } from '@/components/screen-background';
+import { seasonIcon } from '@/constants/icon-map';
 import { mapApi, pastureApi } from '@/services/api';
 import { useLocation } from '@/hooks/use-location';
 
@@ -203,7 +205,7 @@ export default function MapViewScreen() {
       {/* Service cards */}
       {services.length === 0 ? (
         <View style={styles.emptyCard}>
-          <Text style={{ fontSize: 40 }}>🔍</Text>
+          <MaterialCommunityIcons name="magnify" size={40} color={AppColors.gray} />
           <Text style={styles.emptyTitle}>Үйлчилгээ олдсонгүй</Text>
           <Text style={styles.emptySubtext}>
             Шүүлтүүрээ өөрчилж үзнэ үү
@@ -214,15 +216,19 @@ export default function MapViewScreen() {
           <View key={idx} style={styles.serviceCard}>
             <View style={styles.serviceHeader}>
               <View style={styles.serviceIconWrap}>
-                <Text style={{ fontSize: 28 }}>
-                  {svc.type === 'vet'
-                    ? '🏥'
-                    : svc.type === 'feed_store'
-                    ? '🌾'
-                    : svc.type === 'transport'
-                    ? '🚚'
-                    : '📍'}
-                </Text>
+                <MaterialCommunityIcons
+                  name={
+                    svc.type === 'vet'
+                      ? 'hospital-box-outline'
+                      : svc.type === 'feed_store'
+                      ? 'barley'
+                      : svc.type === 'transport'
+                      ? 'truck'
+                      : 'map-marker'
+                  }
+                  size={28}
+                  color="#2d5016"
+                />
               </View>
               <View style={{ flex: 1, marginLeft: 12 }}>
                 <Text style={styles.serviceName}>{svc.name}</Text>
@@ -230,17 +236,19 @@ export default function MapViewScreen() {
                   {serviceTypeLabel(svc.type)}
                 </Text>
                 <View style={styles.serviceDetailRow}>
-                  <Text style={styles.serviceAimag}>📍 {svc.aimag}</Text>
+                  <MaterialCommunityIcons name="map-marker" size={12} color={AppColors.gray} />
+                  <Text style={styles.serviceAimag}> {svc.aimag}</Text>
                 </View>
               </View>
             </View>
             {svc.phone && (
               <TouchableOpacity
-                style={styles.callBtn}
+                style={[styles.callBtn, { flexDirection: 'row', justifyContent: 'center', gap: 6 }]}
                 onPress={() => handleCall(svc.phone)}
               >
+                <MaterialCommunityIcons name="phone" size={14} color="#2d5016" />
                 <Text style={styles.callBtnText}>
-                  📞 {svc.phone} - Утасдах
+                  {svc.phone} - Утасдах
                 </Text>
               </TouchableOpacity>
             )}
@@ -257,7 +265,10 @@ export default function MapViewScreen() {
       {userPastures.length > 0 && (
         <>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>🏕️ Миний бэлчээрүүд</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+              <MaterialCommunityIcons name="tent" size={18} color="#2d5016" />
+              <Text style={styles.sectionTitle}>Миний бэлчээрүүд</Text>
+            </View>
             <Text style={styles.sectionCount}>
               {userPastures.length} бэлчээр
             </Text>
@@ -265,26 +276,40 @@ export default function MapViewScreen() {
           {userPastures.map((p: any) => (
             <View key={p.id} style={styles.pastureCard}>
               <View style={styles.pastureHeader}>
-                <Text style={{ fontSize: 24 }}>🌿</Text>
+                <MaterialCommunityIcons name="sprout-outline" size={24} color="#2d5016" />
                 <View style={{ flex: 1, marginLeft: 10 }}>
                   <Text style={styles.pastureName}>{p.name}</Text>
-                  <Text style={styles.pastureType}>
-                    {p.type === 'winter'
-                      ? '❄️ Өвөлжөө'
-                      : p.type === 'spring'
-                      ? '🌸 Хаваржаа'
-                      : p.type === 'summer'
-                      ? '☀️ Зуслан'
-                      : p.type === 'autumn'
-                      ? '🍂 Намаржаа'
-                      : '📍 ' + (p.type || 'Бусад')}
-                  </Text>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                    <MaterialCommunityIcons
+                      name={
+                        p.type === 'winter' || p.type === 'spring' || p.type === 'summer' || p.type === 'autumn'
+                          ? seasonIcon(p.type)
+                          : 'map-marker'
+                      }
+                      size={13}
+                      color={AppColors.grayDark}
+                    />
+                    <Text style={styles.pastureType}>
+                      {p.type === 'winter'
+                        ? 'Өвөлжөө'
+                        : p.type === 'spring'
+                        ? 'Хаваржаа'
+                        : p.type === 'summer'
+                        ? 'Зуслан'
+                        : p.type === 'autumn'
+                        ? 'Намаржаа'
+                        : (p.type || 'Бусад')}
+                    </Text>
+                  </View>
                 </View>
               </View>
               <View style={styles.pastureDetails}>
                 {(p.lat || p.lng) && (
                   <View style={styles.detailRow}>
-                    <Text style={styles.detailLabel}>📍 Байршил:</Text>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                      <MaterialCommunityIcons name="map-marker" size={12} color={AppColors.gray} />
+                      <Text style={styles.detailLabel}>Байршил:</Text>
+                    </View>
                     <Text style={styles.detailValue}>
                       {p.lat?.toFixed(4)}, {p.lng?.toFixed(4)}
                     </Text>
@@ -292,13 +317,19 @@ export default function MapViewScreen() {
                 )}
                 {p.area && (
                   <View style={styles.detailRow}>
-                    <Text style={styles.detailLabel}>📐 Талбай:</Text>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                      <MaterialCommunityIcons name="ruler" size={12} color={AppColors.gray} />
+                      <Text style={styles.detailLabel}>Талбай:</Text>
+                    </View>
                     <Text style={styles.detailValue}>{p.area} га</Text>
                   </View>
                 )}
                 {p.grass_quality && (
                   <View style={styles.detailRow}>
-                    <Text style={styles.detailLabel}>🌱 Өвсний чанар:</Text>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                      <MaterialCommunityIcons name="seed-outline" size={12} color={AppColors.gray} />
+                      <Text style={styles.detailLabel}>Өвсний чанар:</Text>
+                    </View>
                     <Text
                       style={[
                         styles.detailValue,
@@ -311,7 +342,10 @@ export default function MapViewScreen() {
                 )}
                 {p.water_source && (
                   <View style={styles.detailRow}>
-                    <Text style={styles.detailLabel}>💧 Усны эх үүсвэр:</Text>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                      <MaterialCommunityIcons name="water-outline" size={12} color={AppColors.gray} />
+                      <Text style={styles.detailLabel}>Усны эх үүсвэр:</Text>
+                    </View>
                     <Text style={styles.detailValue}>{p.water_source}</Text>
                   </View>
                 )}
@@ -338,7 +372,7 @@ export default function MapViewScreen() {
       </View>
       {mapPastures.length === 0 ? (
         <View style={styles.emptyCard}>
-          <Text style={{ fontSize: 40 }}>🌾</Text>
+          <MaterialCommunityIcons name="barley" size={40} color={AppColors.gray} />
           <Text style={styles.emptyTitle}>Бэлчээрийн мэдээлэл байхгүй</Text>
         </View>
       ) : (
@@ -384,7 +418,10 @@ export default function MapViewScreen() {
             </View>
             <View style={styles.pastureDetails}>
               <View style={styles.detailRow}>
-                <Text style={styles.detailLabel}>📍 Байршил:</Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                  <MaterialCommunityIcons name="map-marker" size={12} color={AppColors.gray} />
+                  <Text style={styles.detailLabel}>Байршил:</Text>
+                </View>
                 <Text style={styles.detailValue}>
                   {p.lat?.toFixed(4)}, {p.lng?.toFixed(4)}
                 </Text>
@@ -417,9 +454,12 @@ export default function MapViewScreen() {
               </View>
               <View style={{ flex: 1, marginLeft: 12 }}>
                 <Text style={styles.marketName}>{m.name}</Text>
-                <Text style={styles.marketLocation}>
-                  📍 {m.lat?.toFixed(4)}, {m.lng?.toFixed(4)}
-                </Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                  <MaterialCommunityIcons name="map-marker" size={12} color={AppColors.gray} />
+                  <Text style={styles.marketLocation}>
+                    {m.lat?.toFixed(4)}, {m.lng?.toFixed(4)}
+                  </Text>
+                </View>
               </View>
             </View>
             {m.products && m.products.length > 0 && (
@@ -444,7 +484,10 @@ export default function MapViewScreen() {
     <SafeAreaView style={styles.container}>
       <ScreenBackdrop topic="map" />
       <View style={styles.header}>
-        <Text style={styles.title}>📍 Байршил & Үйлчилгээ</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+          <MaterialCommunityIcons name="map-marker" size={20} color="#2d5016" />
+          <Text style={styles.title}>Байршил & Үйлчилгээ</Text>
+        </View>
       </View>
 
       {/* GPS байршил */}
@@ -471,7 +514,7 @@ export default function MapViewScreen() {
             )}
           </View>
           <TouchableOpacity onPress={refreshLoc} style={styles.locationRefreshBtn}>
-            <Text style={{ fontSize: 18 }}>🔄</Text>
+            <MaterialCommunityIcons name="refresh" size={18} color="#2d5016" />
           </TouchableOpacity>
         </View>
       </View>
