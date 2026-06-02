@@ -70,7 +70,7 @@ const animalMeta: Array<{ key: keyof NonNullable<OnboardingSnapshot['livestock']
   { key: 'cow', emoji: '🐂', label: 'Үхэр' },
   { key: 'sheep', emoji: '🐑', label: 'Хонь' },
   { key: 'goat', emoji: '🐐', label: 'Ямаа' },
-  { key: 'camel', emoji: '🐪', label: 'Тэмээ' },
+  { key: 'camel', emoji: '🐫', label: 'Тэмээ' },
 ];
 
 const seasonMeta: Array<{ key: string; label: string }> = [

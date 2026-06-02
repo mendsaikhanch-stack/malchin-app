@@ -17,7 +17,7 @@ const TYPES: { key: SpeciesKey; label: string; emoji: string }[] = [
   { key: 'cow', label: 'Үхэр', emoji: '🐄' },
   { key: 'sheep', label: 'Хонь', emoji: '🐑' },
   { key: 'goat', label: 'Ямаа', emoji: '🐐' },
-  { key: 'camel', label: 'Тэмээ', emoji: '🐪' },
+  { key: 'camel', label: 'Тэмээ', emoji: '🐫' },
 ];
 
 const SUBTYPES: { key: SubKey; label: string; emoji: string }[] = [

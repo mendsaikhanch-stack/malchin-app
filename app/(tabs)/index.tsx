@@ -66,7 +66,7 @@ async function loadLivestockFromOnboarding() {
 
 const animalEmojis: Record<string, string> = {
   sheep: '🐑', goat: '🐐', cattle: '🐂',
-  horse: '🐎', camel: '🐪' };
+  horse: '🐎', camel: '🐫' };
 
 // Бодит дүрст вектор icon (MaterialCommunityIcons) + сэдвийн өнгө
 type MCIName = React.ComponentProps<typeof MaterialCommunityIcons>['name'];

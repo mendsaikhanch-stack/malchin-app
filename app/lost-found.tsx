@@ -31,7 +31,7 @@ const SPECIES = [
   { id: 'cow', label: 'Үхэр', emoji: '🐂' },
   { id: 'sheep', label: 'Хонь', emoji: '🐑' },
   { id: 'goat', label: 'Ямаа', emoji: '🐐' },
-  { id: 'camel', label: 'Тэмээ', emoji: '🐪' },
+  { id: 'camel', label: 'Тэмээ', emoji: '🐫' },
 ];
 
 const COLORS = [
