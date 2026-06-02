@@ -8,9 +8,14 @@ import {
   RefreshControl,
   ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AppColors } from '@/constants/theme';
+
+// Брэнд лого — гэр + хонь + нар + ногоон тал (Малчин монгол загвар)
+const BRAND_LOGO = require('@/assets/images/logo1-ger.png');
 import {
   livestockApi,
   weatherApi,
@@ -255,27 +260,46 @@ export default function HomeScreen() {
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={AppColors.primary} />}
         showsVerticalScrollIndicator={false}
       >
-        {/* Header */}
-        <View style={styles.header}>
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+        {/* Header — өнгөлөг монгол hero (мөнх хөх тэнгэр → ногоон тал → алтан нар) */}
+        <LinearGradient
+          colors={['#1B5E20', '#2D7D3F', '#43A047']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.hero}
+        >
+          {/* Алтан нарны гэрэл — баруун дээд буланд */}
+          <View style={styles.heroSunGlow} />
+          <View style={styles.heroRow}>
             <View style={{ flex: 1 }}>
               <Text style={styles.greeting}>
                 {userName ? `Сайн байна уу, ${userName}!` : 'Сайн байна уу!'}
               </Text>
               <Text style={styles.appTitle}>МАЛЧИН</Text>
+              {/* Алтан accent зураас — монгол өнгө аяс */}
+              <View style={styles.heroAccent} />
               {myLocation ? (
                 <Text style={styles.locationText}>📍 {myLocation}</Text>
               ) : null}
             </View>
-            <TouchableOpacity
-              style={styles.inboxBtn}
-              onPress={() => router.push('/inbox' as any)}
-            >
-              <Text style={styles.inboxIcon}>🔔</Text>
-              <View style={styles.inboxDot} />
-            </TouchableOpacity>
+            <View style={styles.heroRight}>
+              <View style={styles.logoBadge}>
+                <Image
+                  source={BRAND_LOGO}
+                  style={styles.logoImage}
+                  contentFit="cover"
+                  transition={300}
+                />
+              </View>
+              <TouchableOpacity
+                style={styles.inboxBtn}
+                onPress={() => router.push('/inbox' as any)}
+              >
+                <Text style={styles.inboxIcon}>🔔</Text>
+                <View style={styles.inboxDot} />
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
+        </LinearGradient>
 
         {/* Role banner — зөвхөн malchin биш role-д харагдана */}
         {role && role !== 'malchin' && (
@@ -700,18 +724,41 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F8F9FA' },
   loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#F8F9FA' },
   loadingText: { marginTop: 12, fontSize: 16, color: AppColors.grayDark },
-  header: { paddingHorizontal: 20, paddingTop: 16, paddingBottom: 8 },
-  greeting: { fontSize: 16, color: AppColors.grayDark },
-  appTitle: { fontSize: 28, fontWeight: '800', color: AppColors.primary, marginTop: 4 },
-  locationText: { fontSize: 13, color: AppColors.grayDark, marginTop: 4 },
+  // Hero — өнгөлөг gradient толгой хэсэг
+  hero: {
+    paddingHorizontal: 20, paddingTop: 18, paddingBottom: 22,
+    borderBottomLeftRadius: 28, borderBottomRightRadius: 28,
+    overflow: 'hidden',
+    boxShadow: '0px 4px 12px rgba(27,94,32,0.25)',
+    elevation: 6 },
+  heroSunGlow: {
+    position: 'absolute', top: -50, right: -40,
+    width: 160, height: 160, borderRadius: 80,
+    backgroundColor: 'rgba(255,193,7,0.22)' },
+  heroRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' },
+  heroRight: { alignItems: 'center', gap: 10 },
+  greeting: { fontSize: 15, color: 'rgba(255,255,255,0.92)', fontWeight: '500' },
+  appTitle: {
+    fontSize: 34, fontWeight: '900', color: AppColors.white, marginTop: 2,
+    letterSpacing: 2 },
+  heroAccent: {
+    width: 54, height: 4, borderRadius: 2,
+    backgroundColor: AppColors.secondary, marginTop: 6, marginBottom: 2 },
+  locationText: { fontSize: 13, color: 'rgba(255,255,255,0.9)', marginTop: 8 },
+  // Логог дугуй badge-д — гэр + хонь + нар
+  logoBadge: {
+    width: 60, height: 60, borderRadius: 30,
+    backgroundColor: AppColors.white, padding: 3,
+    boxShadow: '0px 2px 8px rgba(0,0,0,0.18)', elevation: 4 },
+  logoImage: { width: '100%', height: '100%', borderRadius: 27 },
   inboxBtn: {
-    width: 44, height: 44, borderRadius: 22, backgroundColor: AppColors.white,
+    width: 42, height: 42, borderRadius: 21,
+    backgroundColor: 'rgba(255,255,255,0.2)',
     alignItems: 'center', justifyContent: 'center',
-    boxShadow: '0px 2px 4px rgba(0,0,0,0.1)',  
-      elevation: 3 },
-  inboxIcon: { fontSize: 22 },
+    borderWidth: 1, borderColor: 'rgba(255,255,255,0.35)' },
+  inboxIcon: { fontSize: 20 },
   inboxDot: {
-    position: 'absolute', top: 8, right: 10,
+    position: 'absolute', top: 8, right: 9,
     width: 10, height: 10, borderRadius: 5, backgroundColor: AppColors.danger,
     borderWidth: 2, borderColor: AppColors.white },
   roleBanner: {
