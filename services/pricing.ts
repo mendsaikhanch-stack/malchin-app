@@ -22,6 +22,9 @@ export type PackageId =
 
 export type BillingStream = 'digital' | 'invoice';
 
+// Үнийн мөчлөг. seat_month = суудал тутамд сар бүр (хоршоо).
+export type PricePeriod = 'free' | 'month' | 'year' | 'seat_month';
+
 export type PackageMeta = {
   id: PackageId;
   name: string;          // Mongolian display name
@@ -31,6 +34,11 @@ export type PackageMeta = {
   // — tier biased comparison хийхдээ болгоомжтой. Ihenh feature matrix
   // дээр explicit package list ашиглана.
   tier: number;
+  // Суурь үнэ (₮). free = 0. ТААМАГ үнэ — батлагдаагүй, business-model.md-тэй
+  // хамт шинэчлэгдэнэ (docs/business-model.md). verified_provider дээр нэмж
+  // гүйлгээний шимтгэл (commission) авна — энд зөвхөн суурь төлбөр.
+  priceMnt: number;
+  pricePeriod: PricePeriod;
 };
 
 export const PACKAGES: Record<PackageId, PackageMeta> = {
@@ -39,30 +47,40 @@ export const PACKAGES: Record<PackageId, PackageMeta> = {
     name: 'Үнэгүй',
     billing: 'digital',
     tier: 0,
+    priceMnt: 0,
+    pricePeriod: 'free',
   },
   premium_malchin: {
     id: 'premium_malchin',
     name: 'Премиум Малчин',
     billing: 'digital',
     tier: 1,
+    priceMnt: 5000,
+    pricePeriod: 'month',
   },
   cooperative: {
     id: 'cooperative',
     name: 'Хоршооны багц',
     billing: 'invoice',
     tier: 2,
+    priceMnt: 3000,
+    pricePeriod: 'seat_month',
   },
   sum_license: {
     id: 'sum_license',
     name: 'Сумын лиценз',
     billing: 'invoice',
     tier: 3,
+    priceMnt: 3000000,
+    pricePeriod: 'year',
   },
   verified_provider: {
     id: 'verified_provider',
     name: 'Баталгаажсан үйлчилгээ үзүүлэгч',
     billing: 'digital',
     tier: 2,
+    priceMnt: 30000,
+    pricePeriod: 'month',
   },
 };
 
@@ -166,6 +184,24 @@ export function cheapestUpgrade(feature: FeatureKey): PackageId | null {
 // шаарддаг" мессеж харуулахад).
 export function billingStreamFor(pkg: PackageId): BillingStream {
   return PACKAGES[pkg].billing;
+}
+
+// Үнийг хүний унших Монгол string болгоно (pricing card UI-д).
+// Жишээ: "5,000₮ / сар", "3 сая₮ / жил", "3,000₮ / суудал·сар", "Үнэгүй".
+export function priceLabel(pkg: PackageId): string {
+  const { priceMnt, pricePeriod } = PACKAGES[pkg];
+  if (pricePeriod === 'free' || priceMnt === 0) return 'Үнэгүй';
+  const amount =
+    priceMnt >= 1_000_000
+      ? `${priceMnt / 1_000_000} сая₮`
+      : `${priceMnt.toLocaleString('en-US')}₮`;
+  const period =
+    pricePeriod === 'month'
+      ? 'сар'
+      : pricePeriod === 'year'
+        ? 'жил'
+        : 'суудал·сар';
+  return `${amount} / ${period}`;
 }
 
 // Package-ийн бүх feature-ийг буцаах (pricing page rendering-д хэрэг).

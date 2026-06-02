@@ -5,6 +5,7 @@ import {
   billingStreamFor,
   featuresOfPackage,
   packageMeta,
+  priceLabel,
   PACKAGES,
   type PackageId,
   type FeatureKey,
@@ -39,6 +40,25 @@ describe('pricing / package registry', () => {
     // Org/invoice
     expect(billingStreamFor('cooperative')).toBe('invoice');
     expect(billingStreamFor('sum_license')).toBe('invoice');
+  });
+
+  it('priceMnt: багц бүр үнэтэй (free=0, бусад >0)', () => {
+    expect(packageMeta('free').priceMnt).toBe(0);
+    expect(packageMeta('free').pricePeriod).toBe('free');
+    expect(packageMeta('premium_malchin').priceMnt).toBe(5000);
+    expect(packageMeta('premium_malchin').pricePeriod).toBe('month');
+    expect(packageMeta('cooperative').pricePeriod).toBe('seat_month');
+    expect(packageMeta('sum_license').priceMnt).toBe(3_000_000);
+    expect(packageMeta('sum_license').pricePeriod).toBe('year');
+    expect(packageMeta('verified_provider').priceMnt).toBe(30000);
+  });
+
+  it('priceLabel: хүн унших Монгол string', () => {
+    expect(priceLabel('free')).toBe('Үнэгүй');
+    expect(priceLabel('premium_malchin')).toBe('5,000₮ / сар');
+    expect(priceLabel('sum_license')).toBe('3 сая₮ / жил');
+    expect(priceLabel('cooperative')).toBe('3,000₮ / суудал·сар');
+    expect(priceLabel('verified_provider')).toBe('30,000₮ / сар');
   });
 });
 
