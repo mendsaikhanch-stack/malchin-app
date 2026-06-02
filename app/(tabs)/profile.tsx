@@ -73,11 +73,11 @@ const animalMeta: Array<{ key: keyof NonNullable<OnboardingSnapshot['livestock']
   { key: 'camel', emoji: '🐪', label: 'Тэмээ' },
 ];
 
-const seasonMeta: Array<{ key: string; label: string; emoji: string }> = [
-  { key: 'winter', label: 'Өвөлжөө', emoji: '❄️' },
-  { key: 'spring', label: 'Хаваржаа', emoji: '🌸' },
-  { key: 'summer', label: 'Зуслан', emoji: '☀️' },
-  { key: 'autumn', label: 'Намаржаа', emoji: '🍂' },
+const seasonMeta: Array<{ key: string; label: string }> = [
+  { key: 'winter', label: 'Өвөлжөө' },
+  { key: 'spring', label: 'Хаваржаа' },
+  { key: 'summer', label: 'Зуслан' },
+  { key: 'autumn', label: 'Намаржаа' },
 ];
 
 export default function ProfileScreen() {
@@ -273,7 +273,7 @@ export default function ProfileScreen() {
             <Text style={styles.menuArrow}>{'›'}</Text>
           </TouchableOpacity>
           <View style={styles.menuItem}>
-            <Text style={styles.menuIcon}>{'👴'}</Text>
+            <MaterialCommunityIcons name="account-tie-outline" size={20} color="#FF8F00" style={styles.menuIcon} />
             <Text style={styles.menuText}>Ахмадын ухаан оруулах</Text>
             <Switch
               value={elderEnabled}
@@ -289,7 +289,7 @@ export default function ProfileScreen() {
         {/* Оффлайн */}
         <View style={styles.menuSection}>
           <View style={styles.menuItem}>
-            <Text style={styles.menuIcon}>{'📡'}</Text>
+            <MaterialCommunityIcons name="satellite-variant" size={20} color="#5C6BC0" style={styles.menuIcon} />
             <Text style={styles.menuText}>Сүлжээний төлөв</Text>
             <Text style={[styles.networkText, { color: isConnected ? '#43A047' : '#E53935' }]}>
               <MaterialCommunityIcons
@@ -306,7 +306,7 @@ export default function ProfileScreen() {
               Alert.alert('Хадгалсан мэдээлэл', `${size.count} мэдээлэл хадгалагдсан`);
             }}
           >
-            <Text style={styles.menuIcon}>{'💾'}</Text>
+            <MaterialCommunityIcons name="content-save-outline" size={20} color="#616161" style={styles.menuIcon} />
             <Text style={styles.menuText}>Хадгалсан мэдээлэл</Text>
             <Text style={styles.menuArrow}>{'›'}</Text>
           </TouchableOpacity>

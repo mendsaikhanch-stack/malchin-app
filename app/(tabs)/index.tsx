@@ -83,6 +83,16 @@ const quickActionItems: { icon: MCIName; color: string; label: string; route: st
   { icon: 'cash-multiple', color: '#FF8F00', label: 'Санхүү', route: '/finance' },
 ];
 
+// Card гарчиг — бодит дүрст icon + текст (emoji-г орлоно)
+function CardTitle({ icon, color, children }: { icon: MCIName; color?: string; children: React.ReactNode }) {
+  return (
+    <View style={styles.cardTitleRow}>
+      <MaterialCommunityIcons name={icon} size={19} color={color ?? AppColors.black} />
+      <Text style={styles.cardTitleText}>{children}</Text>
+    </View>
+  );
+}
+
 export default function HomeScreen() {
   const router = useRouter();
   const { address: myLocation, loading: locLoading } = useLocation();
@@ -283,7 +293,10 @@ export default function HomeScreen() {
               {/* Алтан accent зураас — монгол өнгө аяс */}
               <View style={styles.heroAccent} />
               {myLocation ? (
-                <Text style={styles.locationText}>📍 {myLocation}</Text>
+                <View style={styles.locationRow}>
+                  <MaterialCommunityIcons name="map-marker" size={13} color="rgba(255,255,255,0.9)" />
+                  <Text style={styles.locationText}>{myLocation}</Text>
+                </View>
               ) : null}
             </View>
             <View style={styles.heroRight}>
@@ -299,7 +312,7 @@ export default function HomeScreen() {
                 style={styles.inboxBtn}
                 onPress={() => router.push('/inbox' as any)}
               >
-                <Text style={styles.inboxIcon}>🔔</Text>
+                <MaterialCommunityIcons name="bell-outline" size={20} color={AppColors.white} />
                 <View style={styles.inboxDot} />
               </TouchableOpacity>
             </View>
@@ -351,7 +364,7 @@ export default function HomeScreen() {
         {visibleCards.has('weather') && (
         <TouchableOpacity style={styles.card} onPress={() => router.push('/(tabs)/weather')}>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Text style={styles.cardTitle}>⛅ Цаг агаар - {weather?.aimag || 'Төв'}</Text>
+            <CardTitle icon="weather-partly-cloudy" color="#5C6BC0">Цаг агаар - {weather?.aimag || 'Төв'}</CardTitle>
             <StaleBadge {...weatherMeta} compact />
           </View>
           {weather ? (
@@ -374,7 +387,7 @@ export default function HomeScreen() {
         {/* Өнөөдөр хийх 3 ажил — rule engine: бүгдэд харагдана */}
         {dailyTasks.length > 0 && visibleCards.has('daily_tasks') && (
           <View style={styles.card}>
-            <Text style={styles.cardTitle}>✅ Өнөөдөр хийх 3 ажил</Text>
+            <CardTitle icon="check-circle" color="#43A047">Өнөөдөр хийх 3 ажил</CardTitle>
             {dailyTasks.map((t, i) => (
               <View key={t.id} style={styles.taskItem}>
                 <View style={[
@@ -399,7 +412,7 @@ export default function HomeScreen() {
         {alerts.length > 0 && visibleCards.has('risk') && (
           <View style={styles.card}>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-              <Text style={styles.cardTitle}>🚨 Сэрэмжлүүлэг</Text>
+              <CardTitle icon="alert" color="#E53935">Сэрэмжлүүлэг</CardTitle>
               <StaleBadge {...alertsMeta} compact />
             </View>
             {alerts.map((alert: any) => (
@@ -419,11 +432,20 @@ export default function HomeScreen() {
             migrationAdvice.urgency === 'soon' && { borderLeftWidth: 4, borderLeftColor: AppColors.warning },
           ]}>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-              <Text style={styles.cardTitle}>
-                {migrationAdvice.action === 'move' ? '🚶 Нүүх зөвлөгөө' :
-                 migrationAdvice.action === 'prepare' ? '🎒 Нүүдлийн бэлтгэл' :
-                 migrationAdvice.action === 'otor' ? '⚠️ Оторлох санал' : '🏕️ Байрандаа'}
-              </Text>
+              <CardTitle
+                icon={
+                  migrationAdvice.action === 'move' ? 'walk' :
+                  migrationAdvice.action === 'prepare' ? 'bag-personal-outline' :
+                  migrationAdvice.action === 'otor' ? 'alert-outline' : 'tent'
+                }
+                color={
+                  migrationAdvice.action === 'otor' ? '#E53935' : '#2D7D3F'
+                }
+              >
+                {migrationAdvice.action === 'move' ? 'Нүүх зөвлөгөө' :
+                 migrationAdvice.action === 'prepare' ? 'Нүүдлийн бэлтгэл' :
+                 migrationAdvice.action === 'otor' ? 'Оторлох санал' : 'Байрандаа'}
+              </CardTitle>
               <View style={[
                 styles.urgencyBadge,
                 migrationAdvice.urgency === 'now' && { backgroundColor: AppColors.danger },
@@ -457,7 +479,7 @@ export default function HomeScreen() {
           <TouchableOpacity style={[styles.card, styles.tipCard]} onPress={() => router.push('/advisory' as any)}>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                <Text style={styles.cardTitle}>💡 Өдрийн зөвлөгөө</Text>
+                <CardTitle icon="lightbulb-on-outline" color="#FF8F00">Өдрийн зөвлөгөө</CardTitle>
                 <StaleBadge {...tipMeta} compact />
               </View>
               <View style={styles.advisoryCountBadge}>
@@ -468,7 +490,7 @@ export default function HomeScreen() {
               <Text style={styles.tipText}>{tip}</Text>
             ) : (
               <Text style={styles.tipText}>
-                Хэзээ нүүх · Сульдсан малыг тордох · Зудын бэлтгэл... 👉
+                Хэзээ нүүх · Сульдсан малыг тордох · Зудын бэлтгэл...
               </Text>
             )}
           </TouchableOpacity>
@@ -478,7 +500,7 @@ export default function HomeScreen() {
         {healthStats && visibleCards.has('livestock_health') && (
           <TouchableOpacity style={styles.card} onPress={() => router.push('/(tabs)/health')}>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-              <Text style={styles.cardTitle}>🩺 Малын эрүүл мэнд</Text>
+              <CardTitle icon="stethoscope" color="#E53935">Малын эрүүл мэнд</CardTitle>
               <StaleBadge {...healthMeta} compact />
             </View>
             <View style={styles.miniStatsRow}>
@@ -508,7 +530,7 @@ export default function HomeScreen() {
         {announcement && visibleCards.has('sum_announcement') && (
           <TouchableOpacity style={styles.card} onPress={() => router.push('/(tabs)/news')}>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-              <Text style={styles.cardTitle}>📢 Сумын шинэ мэдэгдэл</Text>
+              <CardTitle icon="bullhorn-outline" color="#3F51B5">Сумын шинэ мэдэгдэл</CardTitle>
               <StaleBadge {...announcementMeta} compact />
             </View>
             <Text style={styles.announceTitle} numberOfLines={2}>
@@ -526,7 +548,7 @@ export default function HomeScreen() {
         {marketPrices && visibleCards.has('market_prices') && (
           <TouchableOpacity style={styles.card} onPress={() => router.push('/(tabs)/market')}>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-              <Text style={styles.cardTitle}>💹 Зах зээлийн үнэ</Text>
+              <CardTitle icon="chart-line" color="#FF8F00">Зах зээлийн үнэ</CardTitle>
               <StaleBadge {...marketPricesMeta} compact />
             </View>
             <View style={styles.miniStatsRow}>
@@ -553,7 +575,7 @@ export default function HomeScreen() {
         {listings.length > 0 && visibleCards.has('nearby_listings') && (
           <TouchableOpacity style={styles.card} onPress={() => router.push('/(tabs)/market')}>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-              <Text style={styles.cardTitle}>📣 Ойролцоох зар</Text>
+              <CardTitle icon="bullhorn-variant-outline" color="#5C6BC0">Ойролцоох зар</CardTitle>
               <StaleBadge {...listingsMeta} compact />
             </View>
             {listings.map((l: any, i: number) => (
@@ -572,7 +594,7 @@ export default function HomeScreen() {
 
         {/* Санхүүгийн тойм */}
         <TouchableOpacity style={styles.card} onPress={() => router.push('/(tabs)/finance')}>
-          <Text style={styles.cardTitle}>💰 Санхүүгийн тойм</Text>
+          <CardTitle icon="cash" color="#FF8F00">Санхүүгийн тойм</CardTitle>
           {finance ? (
             <View style={styles.financeContainer}>
               <View style={styles.financeRow}>
@@ -606,7 +628,7 @@ export default function HomeScreen() {
 
         {/* Даатгал & Халамж */}
         <TouchableOpacity style={styles.card} onPress={() => router.push('/(tabs)/insurance')}>
-          <Text style={styles.cardTitle}>🛡️ Даатгал & Халамж</Text>
+          <CardTitle icon="shield-check-outline" color="#2D7D3F">Даатгал & Халамж</CardTitle>
           <View style={styles.insuranceGrid}>
             <View style={styles.insuranceItem}>
               <MaterialCommunityIcons name="bank-outline" size={26} color="#5C6BC0" />
@@ -626,15 +648,17 @@ export default function HomeScreen() {
             </View>
           </View>
           <View style={styles.insuranceTip}>
+            <MaterialCommunityIcons name="lightbulb-on-outline" size={15} color={AppColors.secondary} />
             <Text style={styles.insuranceTipText}>
-              💡 Шимтгэл, тэтгэвэр, малын даатгал, тооцоолуур →
+              Шимтгэл, тэтгэвэр, малын даатгал, тооцоолуур
             </Text>
+            <MaterialCommunityIcons name="arrow-right" size={15} color={AppColors.grayDark} />
           </View>
         </TouchableOpacity>
 
         {/* Шуурхай үйлдэл - 2x3 grid */}
         <View style={styles.card}>
-          <Text style={styles.cardTitle}>⚡ Шуурхай үйлдэл</Text>
+          <CardTitle icon="flash-outline" color="#FF8F00">Шуурхай үйлдэл</CardTitle>
           <View style={styles.quickActionsGrid}>
             {quickActionItems.map((item) => (
               <TouchableOpacity
@@ -673,7 +697,7 @@ export default function HomeScreen() {
 
         {/* Өрхийн хөгжил — шинэ модулиуд */}
         <View style={styles.card}>
-          <Text style={styles.cardTitle}>🌱 Өрхийн хөгжил</Text>
+          <CardTitle icon="sprout" color="#43A047">Өрхийн хөгжил</CardTitle>
           <View style={styles.moduleGrid}>
             <TouchableOpacity
               style={styles.moduleItem}
@@ -751,7 +775,8 @@ const styles = StyleSheet.create({
   heroAccent: {
     width: 54, height: 4, borderRadius: 2,
     backgroundColor: AppColors.secondary, marginTop: 6, marginBottom: 2 },
-  locationText: { fontSize: 13, color: 'rgba(255,255,255,0.9)', marginTop: 8 },
+  locationRow: { flexDirection: 'row', alignItems: 'center', gap: 3, marginTop: 8 },
+  locationText: { fontSize: 13, color: 'rgba(255,255,255,0.9)' },
   // Логог дугуй badge-д — гэр + хонь + нар
   logoBadge: {
     width: 60, height: 60, borderRadius: 30,
@@ -784,6 +809,8 @@ const styles = StyleSheet.create({
        elevation: 3 },
   cardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   cardTitle: { fontSize: 17, fontWeight: '700', color: AppColors.black, marginBottom: 12 },
+  cardTitleRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 12 },
+  cardTitleText: { fontSize: 17, fontWeight: '700', color: AppColors.black },
   totalBadge: {
     backgroundColor: AppColors.primaryLight, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12 },
   totalBadgeText: { color: AppColors.white, fontSize: 13, fontWeight: '600' },
@@ -881,9 +908,10 @@ const styles = StyleSheet.create({
   insuranceLabel: {
     fontSize: 13, fontWeight: '600', color: AppColors.grayDark, marginTop: 6 },
   insuranceTip: {
+    flexDirection: 'row', alignItems: 'center', gap: 6,
     marginTop: 12, padding: 10, backgroundColor: '#FFFBEA',
     borderRadius: 10, borderLeftWidth: 3, borderLeftColor: AppColors.secondary },
-  insuranceTipText: { fontSize: 13, color: AppColors.grayDark, lineHeight: 18 },
+  insuranceTipText: { flex: 1, fontSize: 13, color: AppColors.grayDark, lineHeight: 18 },
   // PRD cards: livestock_health / sum_announcement / market_prices / nearby_listings
   miniStatsRow: {
     flexDirection: 'row',

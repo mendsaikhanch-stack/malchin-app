@@ -20,15 +20,15 @@ import { useLocation } from '@/hooks/use-location';
 const subTabs = ['Үйлчилгээ', 'Бэлчээр', 'Зах'];
 
 const serviceTypes = [
-  { key: '', label: 'Бүгд', emoji: '📋' },
-  { key: 'vet', label: 'Мал эмч', emoji: '🏥' },
-  { key: 'feed_store', label: 'Тэжээлийн дэлгүүр', emoji: '🌾' },
-  { key: 'transport', label: 'Тээвэр', emoji: '🚚' },
+  { key: '', label: 'Бүгд', icon: 'clipboard-text-outline' as const },
+  { key: 'vet', label: 'Мал эмч', icon: 'hospital-box-outline' as const },
+  { key: 'feed_store', label: 'Тэжээлийн дэлгүүр', icon: 'barley' as const },
+  { key: 'transport', label: 'Тээвэр', icon: 'truck' as const },
 ];
 
 const serviceTypeLabel = (type: string) => {
   const found = serviceTypes.find((s) => s.key === type);
-  return found ? `${found.emoji} ${found.label}` : type;
+  return found ? found.label : type;
 };
 
 const qualityColor = (q: string) => {
@@ -149,14 +149,21 @@ export default function MapViewScreen() {
             ]}
             onPress={() => setSelectedServiceType(st.key)}
           >
-            <Text
-              style={[
-                styles.chipText,
-                selectedServiceType === st.key && styles.chipTextActive,
-              ]}
-            >
-              {st.emoji} {st.label}
-            </Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+              <MaterialCommunityIcons
+                name={st.icon}
+                size={15}
+                color={selectedServiceType === st.key ? AppColors.white : AppColors.grayDark}
+              />
+              <Text
+                style={[
+                  styles.chipText,
+                  selectedServiceType === st.key && styles.chipTextActive,
+                ]}
+              >
+                {st.label}
+              </Text>
+            </View>
           </TouchableOpacity>
         ))}
       </ScrollView>
@@ -365,7 +372,10 @@ export default function MapViewScreen() {
 
       {/* Map pastures (sample data) */}
       <View style={styles.sectionHeader}>
-        <Text style={styles.sectionTitle}>🗺️ Бэлчээрийн мэдээлэл</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+          <MaterialCommunityIcons name="map-outline" size={18} color="#2d5016" />
+          <Text style={styles.sectionTitle}>Бэлчээрийн мэдээлэл</Text>
+        </View>
         <Text style={styles.sectionCount}>
           {mapPastures.length} бэлчээр
         </Text>
@@ -379,13 +389,17 @@ export default function MapViewScreen() {
         mapPastures.map((p: any, idx: number) => (
           <View key={idx} style={styles.pastureCard}>
             <View style={styles.pastureHeader}>
-              <Text style={{ fontSize: 24 }}>
-                {p.quality === 'маш сайн'
-                  ? '🌳'
-                  : p.quality === 'сайн'
-                  ? '🌿'
-                  : '🏜️'}
-              </Text>
+              <MaterialCommunityIcons
+                name={
+                  p.quality === 'маш сайн'
+                    ? 'tree-outline'
+                    : p.quality === 'сайн'
+                    ? 'sprout-outline'
+                    : 'image-filter-hdr'
+                }
+                size={24}
+                color={qualityColor(p.quality)}
+              />
               <View style={{ flex: 1, marginLeft: 10 }}>
                 <Text style={styles.pastureName}>{p.name}</Text>
                 <View style={styles.qualityBadge}>
@@ -405,7 +419,11 @@ export default function MapViewScreen() {
                   { backgroundColor: p.water ? '#E3F2FD' : '#FFF3E0' },
                 ]}
               >
-                <Text style={{ fontSize: 16 }}>{p.water ? '💧' : '🏜️'}</Text>
+                <MaterialCommunityIcons
+                  name={p.water ? 'water-outline' : 'image-filter-hdr'}
+                  size={16}
+                  color={p.water ? '#1565C0' : '#E65100'}
+                />
                 <Text
                   style={[
                     styles.waterText,
@@ -437,12 +455,15 @@ export default function MapViewScreen() {
   const renderMarkets = () => (
     <>
       <View style={styles.sectionHeader}>
-        <Text style={styles.sectionTitle}>🏪 Захууд</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+          <MaterialCommunityIcons name="storefront-outline" size={18} color="#2d5016" />
+          <Text style={styles.sectionTitle}>Захууд</Text>
+        </View>
         <Text style={styles.sectionCount}>{markets.length} зах</Text>
       </View>
       {markets.length === 0 ? (
         <View style={styles.emptyCard}>
-          <Text style={{ fontSize: 40 }}>🏪</Text>
+          <MaterialCommunityIcons name="storefront-outline" size={40} color={AppColors.gray} />
           <Text style={styles.emptyTitle}>Захын мэдээлэл байхгүй</Text>
         </View>
       ) : (
@@ -450,7 +471,7 @@ export default function MapViewScreen() {
           <View key={idx} style={styles.marketCard}>
             <View style={styles.marketHeader}>
               <View style={styles.marketIconWrap}>
-                <Text style={{ fontSize: 28 }}>🏪</Text>
+                <MaterialCommunityIcons name="storefront-outline" size={28} color="#FF8F00" />
               </View>
               <View style={{ flex: 1, marginLeft: 12 }}>
                 <Text style={styles.marketName}>{m.name}</Text>
@@ -493,7 +514,8 @@ export default function MapViewScreen() {
       {/* GPS байршил */}
       <View style={styles.locationCard}>
         <View style={styles.locationHeader}>
-          <Text style={styles.locationIcon}>📡</Text>
+          <MaterialCommunityIcons name="satellite-variant" size={28} color="#2d5016" />
+
           <View style={{ flex: 1 }}>
             <Text style={styles.locationLabel}>Миний байршил</Text>
             {locLoading ? (
@@ -527,11 +549,18 @@ export default function MapViewScreen() {
             style={[styles.tab, activeTab === i && styles.tabActive]}
             onPress={() => setActiveTab(i)}
           >
-            <Text
-              style={[styles.tabText, activeTab === i && styles.tabTextActive]}
-            >
-              {i === 0 ? '🛠️' : i === 1 ? '🌿' : '🏪'} {tab}
-            </Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
+              <MaterialCommunityIcons
+                name={i === 0 ? 'tools' : i === 1 ? 'sprout-outline' : 'storefront-outline'}
+                size={15}
+                color={activeTab === i ? '#2d5016' : AppColors.grayDark}
+              />
+              <Text
+                style={[styles.tabText, activeTab === i && styles.tabTextActive]}
+              >
+                {tab}
+              </Text>
+            </View>
           </TouchableOpacity>
         ))}
       </View>

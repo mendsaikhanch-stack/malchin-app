@@ -156,12 +156,12 @@ describe('HomeScreen — цаг агаарын card', () => {
 describe('HomeScreen — daily tasks + tip cards', () => {
   it('Өнөөдөр хийх 3 ажил card render', async () => {
     const { findByText } = render(<HomeScreen />);
-    expect(await findByText('✅ Өнөөдөр хийх 3 ажил')).toBeTruthy();
+    expect(await findByText('Өнөөдөр хийх 3 ажил')).toBeTruthy();
   });
 
   it('Өдрийн зөвлөгөө card — aiApi.tip агуулгатай', async () => {
     const { findByText } = render(<HomeScreen />);
-    expect(await findByText('💡 Өдрийн зөвлөгөө')).toBeTruthy();
+    expect(await findByText('Өдрийн зөвлөгөө')).toBeTruthy();
     expect(await findByText(/малаа ус уулгахыг/)).toBeTruthy();
   });
 });

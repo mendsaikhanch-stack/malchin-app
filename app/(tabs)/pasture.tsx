@@ -511,11 +511,11 @@ export default function PastureScreen() {
       {/* Year filter */}
       <View style={styles.yearFilter}>
         <TouchableOpacity style={styles.yearBtn} onPress={() => setMigYear(y => y - 1)}>
-          <Text style={styles.yearBtnText}>{'\◀'}</Text>
+          <MaterialCommunityIcons name="chevron-left" size={18} color="#2d5016" />
         </TouchableOpacity>
         <Text style={styles.yearText}>{migYear} он</Text>
         <TouchableOpacity style={styles.yearBtn} onPress={() => setMigYear(y => y + 1)}>
-          <Text style={styles.yearBtnText}>{'\▶'}</Text>
+          <MaterialCommunityIcons name="chevron-right" size={18} color="#2d5016" />
         </TouchableOpacity>
       </View>
 

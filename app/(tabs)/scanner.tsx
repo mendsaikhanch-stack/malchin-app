@@ -479,7 +479,9 @@ function AnimalDetailCard({ animal, router }: { animal: any; router: any }) {
             await Share.share({ message: text });
           }}
         >
-          <Text style={styles.shareButtonText}>📤 Хуваалцах</Text>
+          <Text style={styles.shareButtonText}>
+            <MaterialCommunityIcons name="share-variant-outline" size={14} color="#E65100" /> Хуваалцах
+          </Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.copyButton}

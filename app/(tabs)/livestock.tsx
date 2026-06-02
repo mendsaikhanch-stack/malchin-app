@@ -71,10 +71,10 @@ const originLabels: Record<string, string> = {
   exchange: 'Солилцсон' };
 
 const eventTypes = [
-  { key: 'birth', label: 'Төрсөн', emoji: '🎉' },
-  { key: 'death', label: 'Үхсэн', emoji: '☠️' },
-  { key: 'sold', label: 'Зарсан', emoji: '💰' },
-  { key: 'purchased', label: 'Авсан', emoji: '🛒' },
+  { key: 'birth', label: 'Төрсөн', icon: 'party-popper' as const, color: '#2D7D3F' },
+  { key: 'death', label: 'Үхсэн', icon: 'skull-outline' as const, color: '#616161' },
+  { key: 'sold', label: 'Зарсан', icon: 'cash' as const, color: '#FF8F00' },
+  { key: 'purchased', label: 'Авсан', icon: 'cart-outline' as const, color: '#5C6BC0' },
 ];
 
 const tabs = ['Бүртгэл', 'Тоо толгой'];
@@ -84,7 +84,8 @@ const getAnimalInfo = (type: string) =>
   animalTypes.find((a) => a.key === type) || { label: type, emoji: '🐾', key: type };
 
 const getEventInfo = (type: string) =>
-  eventTypes.find((e) => e.key === type) || { label: type, emoji: '📋', key: type };
+  eventTypes.find((e) => e.key === type) ||
+  { label: type, icon: 'clipboard-text-outline' as const, color: '#616161', key: type };
 
 function calcAge(birthDate: string): string {
   if (!birthDate) return '';
@@ -322,9 +323,10 @@ function IndividualAnimalsTab() {
 
       {/* Search */}
       <View style={styles.searchRow}>
+        <MaterialCommunityIcons name="magnify" size={18} color={AppColors.gray} style={{ marginRight: 6 }} />
         <TextInput
           style={styles.searchInput}
-          placeholder="🔍 Нэр, ээмэг, чип..."
+          placeholder="Нэр, ээмэг, чип..."
           placeholderTextColor={AppColors.gray}
           value={searchText}
           onChangeText={setSearchText}
@@ -576,16 +578,18 @@ function AddEditAnimalModal({
             <Text style={styles.label}>Хүйс *</Text>
             <View style={styles.genderRow}>
               <TouchableOpacity
-                style={[styles.genderBtn, gender === 'male' && styles.genderBtnActive]}
+                style={[styles.genderBtn, { flexDirection: 'row', justifyContent: 'center', gap: 4 }, gender === 'male' && styles.genderBtnActive]}
                 onPress={() => setGender('male')}
               >
-                <Text style={[styles.genderBtnText, gender === 'male' && styles.genderBtnTextActive]}>♂ Эр</Text>
+                <MaterialCommunityIcons name="gender-male" size={15} color={gender === 'male' ? '#2d5016' : AppColors.grayDark} />
+                <Text style={[styles.genderBtnText, gender === 'male' && styles.genderBtnTextActive]}>Эр</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={[styles.genderBtn, gender === 'female' && styles.genderBtnActive]}
+                style={[styles.genderBtn, { flexDirection: 'row', justifyContent: 'center', gap: 4 }, gender === 'female' && styles.genderBtnActive]}
                 onPress={() => setGender('female')}
               >
-                <Text style={[styles.genderBtnText, gender === 'female' && styles.genderBtnTextActive]}>♀ Эм</Text>
+                <MaterialCommunityIcons name="gender-female" size={15} color={gender === 'female' ? '#2d5016' : AppColors.grayDark} />
+                <Text style={[styles.genderBtnText, gender === 'female' && styles.genderBtnTextActive]}>Эм</Text>
               </TouchableOpacity>
             </View>
 
@@ -651,7 +655,7 @@ function AddEditAnimalModal({
                   style={styles.input}
                   value={brandMark}
                   onChangeText={setBrandMark}
-                  placeholder="🔥 Б"
+                  placeholder="Тамга / тэмдэг"
                   placeholderTextColor={AppColors.gray}
                 />
               </View>
@@ -1111,7 +1115,8 @@ function AggregateTab() {
   const getAnimalInfoOld = (type: string) =>
     animalTypes.find((a) => a.key === type) || { label: type, emoji: '🐾' };
   const getEventInfoOld = (type: string) =>
-    eventTypes.find((e) => e.key === type) || { label: type, emoji: '📋' };
+    eventTypes.find((e) => e.key === type) ||
+    { label: type, icon: 'clipboard-text-outline' as const, color: '#616161' };
 
   return (
     <View style={{ flex: 1 }}>
@@ -1165,7 +1170,7 @@ function AggregateTab() {
                   const evt = getEventInfoOld(event.event_type);
                   return (
                     <View key={idx} style={styles.aggEventItem}>
-                      <Text style={styles.aggEventEmoji}>{evt.emoji}</Text>
+                      <MaterialCommunityIcons name={evt.icon} size={24} color={evt.color} style={{ marginRight: 12 }} />
                       <View style={{ flex: 1 }}>
                         <Text style={styles.aggEventText}>
                           {animalInf.emoji} {animalInf.label} - {evt.label} ({event.quantity})
@@ -1260,7 +1265,7 @@ function AggregateTab() {
                   style={[styles.typeBtn, selectedEvent === e.key && styles.typeBtnActive]}
                   onPress={() => setSelectedEvent(e.key)}
                 >
-                  <Text style={styles.typeBtnEmoji}>{e.emoji}</Text>
+                  <MaterialCommunityIcons name={e.icon} size={20} color={e.color} />
                   <Text style={[styles.typeBtnLabel, selectedEvent === e.key && styles.typeBtnLabelActive]}>
                     {e.label}
                   </Text>
@@ -1362,15 +1367,19 @@ const styles = StyleSheet.create({
   filterChipTextActive: { color: '#fff' },
 
   // ── Search ──
-  searchRow: { paddingHorizontal: 16, marginTop: 8 },
-  searchInput: {
+  searchRow: {
+    flexDirection: 'row', alignItems: 'center',
+    marginHorizontal: 16, marginTop: 8,
     backgroundColor: '#fff',
     borderRadius: 12,
-    padding: 12,
-    fontSize: 14,
-    color: '#1A1A1A',
+    paddingHorizontal: 12,
     borderWidth: 1.5,
     borderColor: AppColors.grayMedium },
+  searchInput: {
+    flex: 1,
+    paddingVertical: 12,
+    fontSize: 14,
+    color: '#1A1A1A' },
 
   // ── Animal list cards ──
   listContent: { paddingHorizontal: 16, paddingTop: 8, paddingBottom: 100 },

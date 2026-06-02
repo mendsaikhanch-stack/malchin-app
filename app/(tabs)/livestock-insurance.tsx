@@ -105,7 +105,7 @@ export default function LivestockInsuranceScreen() {
                 <Text style={styles.cardTitle}>{ins.title}</Text>
                 <Text style={styles.cardDesc} numberOfLines={isExpanded ? undefined : 2}>{ins.description}</Text>
               </View>
-              <Text style={styles.expandIcon}>{isExpanded ? '▲' : '▼'}</Text>
+              <MaterialCommunityIcons name={isExpanded ? 'chevron-up' : 'chevron-down'} size={18} color={AppColors.gray} style={{ marginTop: 4 }} />
             </View>
 
             {isExpanded && (
@@ -327,7 +327,10 @@ export default function LivestockInsuranceScreen() {
                   </View>
                   <View style={{ alignItems: 'flex-end' }}>
                     <Text style={styles.examplePremium}>{formatPrice(premium)}/жил</Text>
-                    <Text style={styles.exampleComp}>→ {formatPrice(comp)}</Text>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 2 }}>
+                      <MaterialCommunityIcons name="arrow-right" size={12} color="#2E7D32" />
+                      <Text style={styles.exampleComp}>{formatPrice(comp)}</Text>
+                    </View>
                   </View>
                 </TouchableOpacity>
               );

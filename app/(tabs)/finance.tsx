@@ -584,7 +584,7 @@ export default function FinanceScreen() {
       <View style={styles.section}>
         {filteredRecords.length === 0 ? (
           <View style={styles.emptyBox}>
-            <Text style={styles.emptyEmoji}>📭</Text>
+            <MaterialCommunityIcons name="inbox-outline" size={40} color={AppColors.gray} style={{ marginBottom: 8 }} />
             <Text style={styles.emptyText}>Бүртгэл байхгүй байна</Text>
           </View>
         ) : (
