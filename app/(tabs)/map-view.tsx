@@ -11,6 +11,7 @@ import {
   Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { AppColors } from '@/constants/theme';
+import { ScreenBackdrop } from '@/components/screen-background';
 import { mapApi, pastureApi } from '@/services/api';
 import { useLocation } from '@/hooks/use-location';
 
@@ -441,6 +442,7 @@ export default function MapViewScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      <ScreenBackdrop topic="map" />
       <View style={styles.header}>
         <Text style={styles.title}>📍 Байршил & Үйлчилгээ</Text>
       </View>

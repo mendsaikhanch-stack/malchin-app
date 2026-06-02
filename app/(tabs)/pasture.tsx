@@ -4,6 +4,7 @@ import {
   Modal, Alert, RefreshControl, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { AppColors } from '@/constants/theme';
+import { ScreenBackdrop } from '@/components/screen-background';
 import { pastureApi } from '@/services/api';
 import { AdBanner } from '@/components/ad-banner';
 import { useLocation } from '@/hooks/use-location';
@@ -601,6 +602,7 @@ export default function PastureScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      <ScreenBackdrop topic="pasture" />
       <View style={styles.header}>
         <Text style={styles.title}>{'\�\�'} Бэлчээр</Text>
       </View>

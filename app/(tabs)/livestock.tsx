@@ -14,6 +14,7 @@ import {
   Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { AppColors } from '@/constants/theme';
+import { ScreenBackdrop } from '@/components/screen-background';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { animalsApi, livestockApi } from '@/services/api';
 import { queueOnFailure } from '@/services/sync-queue';
@@ -111,6 +112,7 @@ export default function LivestockScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      <ScreenBackdrop topic="livestock" />
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.title}>🐑 Мал бүртгэл</Text>

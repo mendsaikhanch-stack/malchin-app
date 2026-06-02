@@ -12,6 +12,7 @@ import {
   Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { AppColors } from '@/constants/theme';
+import { ScreenBackdrop } from '@/components/screen-background';
 import { aiApi, livestockApi } from '@/services/api';
 import { useVoice, VoiceCommand } from '../../hooks/use-voice';
 
@@ -537,6 +538,7 @@ export default function AIAdvisorScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      <ScreenBackdrop topic="advisor" />
       <View style={styles.header}>
         <Text style={styles.title}>{'🤖'} Ухаалаг Зөвлөгч</Text>
         <Text style={styles.subtitle}>Мал аж ахуйн мэргэжлийн зөвлөгөө</Text>

@@ -14,6 +14,7 @@ import {
   Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { AppColors } from '@/constants/theme';
+import { ScreenBackdrop } from '@/components/screen-background';
 import { marketApi, pricesApi } from '@/services/api';
 import { AdBanner } from '@/components/ad-banner';
 import { ReportButton } from '@/components/report-button';
@@ -522,6 +523,7 @@ export default function MarketScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      <ScreenBackdrop topic="market" />
       {/* Tab bar */}
       <View style={styles.header}>
         <Text style={styles.title}>{'\uD83C\uDFEA'} Зах зээл</Text>

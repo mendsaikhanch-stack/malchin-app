@@ -34,6 +34,7 @@ import {
   normalizeOpenWeather,
   type NormalizedWeather } from '@/services/weather-provider';
 import { StaleBadge } from '@/components/stale-badge';
+import { ScreenBackdrop } from '@/components/screen-background';
 import type { CacheMeta } from '@/services/cache-state';
 import { AdBanner, AdBannerLarge } from '@/components/ad-banner';
 import { useLocation } from '@/hooks/use-location';
@@ -256,6 +257,7 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      <ScreenBackdrop topic="home" />
       <ScrollView
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={AppColors.primary} />}
         showsVerticalScrollIndicator={false}

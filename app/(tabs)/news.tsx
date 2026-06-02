@@ -10,6 +10,7 @@ import {
   Linking } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { AppColors } from '@/constants/theme';
+import { ScreenBackdrop } from '@/components/screen-background';
 import { newsApi } from '@/services/api';
 import { AdBanner } from '@/components/ad-banner';
 
@@ -216,6 +217,7 @@ export default function NewsScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      <ScreenBackdrop topic="news" />
       <View style={styles.header}>
         <Text style={styles.title}>{'\uD83D\uDCF0'} Мэдээ & Боломж</Text>
       </View>

@@ -12,6 +12,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as Clipboard from 'expo-clipboard';
 import { AppColors } from '@/constants/theme';
+import { ScreenBackdrop } from '@/components/screen-background';
 import { householdApi, getToken } from '@/services/api';
 
 const ROLE_LABELS: Record<string, string> = {
@@ -239,6 +240,7 @@ export default function HouseholdScreen() {
   if (loading) {
     return (
       <SafeAreaView style={styles.container}>
+      <ScreenBackdrop topic="household" />
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={PRIMARY} />
           <Text style={styles.loadingText}>Ачааллаж байна...</Text>
@@ -251,6 +253,7 @@ export default function HouseholdScreen() {
   if (!household) {
     return (
       <SafeAreaView style={styles.container}>
+      <ScreenBackdrop topic="household" />
         <ScrollView
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.scrollContent}
@@ -356,6 +359,7 @@ export default function HouseholdScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      <ScreenBackdrop topic="household" />
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}

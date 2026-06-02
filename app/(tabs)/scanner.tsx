@@ -13,6 +13,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import * as Clipboard from 'expo-clipboard';
 import { AppColors } from '@/constants/theme';
+import { ScreenBackdrop } from '@/components/screen-background';
 import { animalsApi } from '@/services/api';
 
 // ─── Constants ───────────────────────────────────────────────────────────────
@@ -140,6 +141,7 @@ export default function ScannerScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      <ScreenBackdrop topic="scanner" />
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}

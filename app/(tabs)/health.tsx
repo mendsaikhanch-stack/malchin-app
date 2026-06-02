@@ -4,6 +4,7 @@ import {
   Modal, Alert, RefreshControl, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { AppColors } from '@/constants/theme';
+import { ScreenBackdrop } from '@/components/screen-background';
 import { healthApi, animalsApi } from '@/services/api';
 import { AdBanner } from '@/components/ad-banner';
 
@@ -453,6 +454,7 @@ export default function HealthScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      <ScreenBackdrop topic="health" />
       <View style={styles.header}><Text style={styles.title}>{'\�\�'} Эрүүл мэнд</Text></View>
 
       <View style={styles.tabBar}>

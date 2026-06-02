@@ -10,6 +10,7 @@ import {
   ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { AppColors } from '@/constants/theme';
+import { ScreenBackdrop } from '@/components/screen-background';
 import { knowledgeApi } from '@/services/api';
 
 const categories = [
@@ -67,6 +68,7 @@ export default function KnowledgeScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      <ScreenBackdrop topic="knowledge" />
       <View style={styles.header}>
         <Text style={styles.title}>{'\uD83D\uDCDA'} Мал маллах ухаан</Text>
       </View>

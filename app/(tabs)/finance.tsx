@@ -13,6 +13,7 @@ import {
   Dimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { AppColors } from '@/constants/theme';
+import { ScreenBackdrop } from '@/components/screen-background';
 import { financeApi } from '@/services/api';
 
 // ───────── Constants ─────────
@@ -762,6 +763,7 @@ export default function FinanceScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      <ScreenBackdrop topic="finance" />
       <ScrollView
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={BRAND.primary} />}
         showsVerticalScrollIndicator={false}

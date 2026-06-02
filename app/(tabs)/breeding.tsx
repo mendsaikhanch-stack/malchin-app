@@ -4,6 +4,7 @@ import {
   Modal, Alert, RefreshControl, ActivityIndicator, FlatList } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { AppColors } from '@/constants/theme';
+import { ScreenBackdrop } from '@/components/screen-background';
 import { breedingApi, animalsApi } from '@/services/api';
 
 const tabs = ['Хээлтүүлэг', 'Төллөлт', 'Календарь'];
@@ -478,6 +479,7 @@ export default function BreedingScreen() {
   // ========== MAIN RENDER ==========
   return (
     <SafeAreaView style={s.container}>
+      <ScreenBackdrop topic="breeding" />
       <View style={s.header}>
         <Text style={s.title}>{'\�\�'} Хээлтүүлэг & Төллөлт</Text>
       </View>

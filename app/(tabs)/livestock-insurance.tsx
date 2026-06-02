@@ -10,6 +10,7 @@ import {
   ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { AppColors } from '@/constants/theme';
+import { ScreenBackdrop } from '@/components/screen-background';
 import { insuranceApi } from '@/services/api';
 
 const BRAND = {
@@ -402,6 +403,7 @@ export default function LivestockInsuranceScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      <ScreenBackdrop topic="livestock_insurance" />
       <ScrollView
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={BRAND.primary} />}
         showsVerticalScrollIndicator={false}

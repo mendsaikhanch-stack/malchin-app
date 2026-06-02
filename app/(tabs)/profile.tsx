@@ -11,6 +11,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useFocusEffect } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AppColors } from '@/constants/theme';
+import { ScreenBackdrop } from '@/components/screen-background';
 import { clearCache, getCacheSize } from '@/services/offline';
 import {
   parseOnboardingSnapshot,
@@ -106,6 +107,7 @@ export default function ProfileScreen() {
   if (!user) {
     return (
       <SafeAreaView style={styles.container}>
+      <ScreenBackdrop topic="profile" />
         <View style={styles.emptyContainer}>
           <Text style={styles.emptyEmoji}>{'🐎'}</Text>
           <Text style={styles.emptyTitle}>Онбординг дуусаагүй байна</Text>
@@ -157,6 +159,7 @@ export default function ProfileScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      <ScreenBackdrop topic="profile" />
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* Header */}
         <View style={styles.profileHeader}>
