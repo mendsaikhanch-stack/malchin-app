@@ -17,6 +17,8 @@ import {
   StyleSheet,
   ActivityIndicator,
   Platform,
+  TouchableOpacity,
+  TextInput,
 } from 'react-native';
 import { Stack } from 'expo-router';
 import { AppColors } from '@/constants/theme';
@@ -36,6 +38,15 @@ import {
   totalContentPipeline,
   type OwnerSnapshot,
 } from '@/services/owner-dashboard-data';
+import {
+  getAdminToken,
+  setAdminToken,
+  clearAdminToken,
+  isValidTokenFormat,
+  verifyAdminPasscode,
+} from '@/services/admin-auth';
+
+type AuthState = 'checking' | 'locked' | 'authorized';
 
 const ALARM_LABEL: Record<string, string> = {
   churn: 'Churn ≥ 10%',
@@ -67,16 +78,55 @@ const FEATURE_LABEL: Record<string, string> = {
 export default function OwnerDashboard() {
   const [snap, setSnap] = useState<OwnerSnapshot | null>(null);
   const [loading, setLoading] = useState(true);
+  const [authState, setAuthState] = useState<AuthState>('checking');
+  const [passcode, setPasscode] = useState('');
+  const [authError, setAuthError] = useState<string | null>(null);
+  const [verifying, setVerifying] = useState(false);
 
   useEffect(() => {
     if (Platform.OS !== 'web') {
       setLoading(false);
       return;
     }
+    (async () => {
+      const token = await getAdminToken();
+      if (isValidTokenFormat(token)) {
+        setAuthState('authorized');
+      } else {
+        setAuthState('locked');
+        setLoading(false);
+      }
+    })();
+  }, []);
+
+  useEffect(() => {
+    if (authState !== 'authorized') return;
+    setLoading(true);
     fetchOwnerSnapshot()
       .then(setSnap)
       .finally(() => setLoading(false));
-  }, []);
+  }, [authState]);
+
+  const handleLogin = async () => {
+    if (!passcode || verifying) return;
+    setVerifying(true);
+    setAuthError(null);
+    const result = await verifyAdminPasscode(passcode);
+    if (result.ok) {
+      await setAdminToken(result.token);
+      setPasscode('');
+      setAuthState('authorized');
+    } else {
+      setAuthError('Нэвтрэх кодын алдаа');
+    }
+    setVerifying(false);
+  };
+
+  const handleLogout = async () => {
+    await clearAdminToken();
+    setSnap(null);
+    setAuthState('locked');
+  };
 
   if (Platform.OS !== 'web') {
     return (
@@ -88,6 +138,53 @@ export default function OwnerDashboard() {
           Owner dashboard нь зөвхөн веб админ хэсгээс нэвтрэх боломжтой.
           Гар утсанд харагдахгүй.
         </Text>
+      </View>
+    );
+  }
+
+  if (authState === 'checking') {
+    return (
+      <View style={styles.loadingWrap}>
+        <Stack.Screen options={{ title: 'Owner dashboard' }} />
+        <ActivityIndicator color={AppColors.primary} size="large" />
+      </View>
+    );
+  }
+
+  if (authState === 'locked') {
+    return (
+      <View style={styles.loginWrap}>
+        <Stack.Screen options={{ title: 'Owner dashboard — Нэвтрэх' }} />
+        <View style={styles.loginCard}>
+          <Text style={styles.loginEmoji}>🔐</Text>
+          <Text style={styles.loginTitle}>Owner dashboard</Text>
+          <Text style={styles.loginSub}>
+            Зөвхөн админд зориулсан хэсэг. Нэвтрэх кодоо оруулна уу.
+          </Text>
+          <TextInput
+            style={styles.loginInput}
+            placeholder="Нэвтрэх код"
+            placeholderTextColor={AppColors.gray}
+            value={passcode}
+            onChangeText={setPasscode}
+            secureTextEntry
+            autoCapitalize="none"
+            autoCorrect={false}
+            onSubmitEditing={handleLogin}
+          />
+          {authError ? (
+            <Text style={styles.loginError}>{authError}</Text>
+          ) : null}
+          <TouchableOpacity
+            style={[styles.loginBtn, (!passcode || verifying) && styles.loginBtnDisabled]}
+            disabled={!passcode || verifying}
+            onPress={handleLogin}
+          >
+            <Text style={styles.loginBtnText}>
+              {verifying ? 'Шалгаж байна...' : 'Нэвтрэх'}
+            </Text>
+          </TouchableOpacity>
+        </View>
       </View>
     );
   }
@@ -120,10 +217,15 @@ export default function OwnerDashboard() {
       <Stack.Screen options={{ title: 'Owner dashboard' }} />
 
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Owner dashboard</Text>
-        <Text style={styles.headerSub}>
-          Snapshot: {snap.asOf.slice(0, 16).replace('T', ' ')}
-        </Text>
+        <View style={{ flex: 1 }}>
+          <Text style={styles.headerTitle}>Owner dashboard</Text>
+          <Text style={styles.headerSub}>
+            Snapshot: {snap.asOf.slice(0, 16).replace('T', ' ')}
+          </Text>
+        </View>
+        <TouchableOpacity style={styles.logoutBtn} onPress={handleLogout}>
+          <Text style={styles.logoutText}>Гарах</Text>
+        </TouchableOpacity>
       </View>
 
       {/* Single-glance ribbon — 6 locked асуултын хариу */}
@@ -326,9 +428,16 @@ function KpiSmall({ label, value }: { label: string; value: string }) {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F8F9FA' },
   content: { padding: 24, maxWidth: 1280, alignSelf: 'center', width: '100%' },
-  header: { marginBottom: 16 },
+  header: {
+    flexDirection: 'row', alignItems: 'center', marginBottom: 16, gap: 12,
+  },
   headerTitle: { fontSize: 26, fontWeight: '800', color: AppColors.black },
   headerSub: { fontSize: 13, color: AppColors.grayDark, marginTop: 4 },
+  logoutBtn: {
+    paddingHorizontal: 14, paddingVertical: 8, borderRadius: 8,
+    borderWidth: 1, borderColor: AppColors.grayMedium,
+  },
+  logoutText: { fontSize: 13, color: AppColors.grayDark, fontWeight: '600' },
   glanceRow: {
     flexDirection: 'row', flexWrap: 'wrap', gap: 12, marginBottom: 16,
   },
@@ -395,4 +504,36 @@ const styles = StyleSheet.create({
     fontSize: 14, color: AppColors.grayDark, textAlign: 'center',
     marginTop: 8, maxWidth: 320, lineHeight: 20,
   },
+  loginWrap: {
+    flex: 1, alignItems: 'center', justifyContent: 'center',
+    backgroundColor: '#F8F9FA', padding: 24,
+  },
+  loginCard: {
+    width: '100%', maxWidth: 380, padding: 28,
+    backgroundColor: AppColors.white, borderRadius: 16,
+    borderWidth: 1, borderColor: AppColors.borderColor,
+    alignItems: 'center',
+  },
+  loginEmoji: { fontSize: 48 },
+  loginTitle: {
+    fontSize: 22, fontWeight: '800', color: AppColors.black, marginTop: 8,
+  },
+  loginSub: {
+    fontSize: 13, color: AppColors.grayDark, marginTop: 6,
+    textAlign: 'center', marginBottom: 20,
+  },
+  loginInput: {
+    width: '100%', borderWidth: 1, borderColor: AppColors.grayMedium,
+    borderRadius: 10, paddingHorizontal: 14, paddingVertical: 12,
+    fontSize: 15, color: AppColors.black,
+  },
+  loginError: {
+    color: AppColors.danger, fontSize: 13, marginTop: 8, fontWeight: '600',
+  },
+  loginBtn: {
+    width: '100%', marginTop: 16, paddingVertical: 14, borderRadius: 10,
+    backgroundColor: AppColors.primary, alignItems: 'center',
+  },
+  loginBtnDisabled: { opacity: 0.5 },
+  loginBtnText: { color: AppColors.white, fontSize: 15, fontWeight: '700' },
 });

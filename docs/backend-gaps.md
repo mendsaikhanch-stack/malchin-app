@@ -258,6 +258,17 @@ Frontend:
   Layout: header + single-glance ribbon (6 locked асуулт) + alarm box +
   8 section grid (responsive flex-basis 320). `fetchOwnerSnapshot()`
   real→cache→mock fallback дуудна.
+- `services/admin-auth.ts` — admin token storage + verify.
+  - Phase 1: passcode (default `malchin-admin-2026`,
+    EXPO_PUBLIC_ADMIN_PASSCODE env-р override). Token = local opaque
+    string `admin:<ts>:<rand>`.
+  - Phase 2 (backend): `verifyAdminPasscode` нь `POST /admin/login`-руу
+    шилжинэ, server JWT буцаана. Storage layer (`getAdminToken` /
+    `setAdminToken` / `clearAdminToken`) хэвээр.
+  - Owner page нь mount хийгдмэгц `getAdminToken` шалгаж, token бай
+    эсэхийг үндэслэн locked / authorized state-г сонгоно. `isValid
+    TokenFormat` шалгуурыг Phase 2-д JWT structure check-ээр
+    солиход амар.
 
 **Шаардлагатай:**
 
@@ -309,9 +320,12 @@ Data-layer `fetch*()` функцүүд дээрх api method-ыг эхэнд д�
 
 ## 9. Status snapshot (2026-04-25)
 
-- Тест: **611/611**, 46 test suite.
+- Тест: **629/629**, 47 test suite.
 - Owner dashboard Expo Web route (`app/owner.tsx`) — web-only guard +
-  8 section UI + single-glance ribbon + alarm box. Mobile-аас тэг entry.
+  admin auth gate + 8 section UI + single-glance ribbon + alarm box.
+  Mobile-аас тэг entry.
+- `services/admin-auth.ts` — passcode-based token (Phase 1, env-р
+  configurable), 18 unit + screen test. Phase 2-д backend JWT солих.
 - Report flow queue wire — ReportButton kind='lost_found'|'market',
   6 регресс тест.
 - Backend-тэй 7 card бүгд SWR StaleBadge-тэй (weather, alerts, health,

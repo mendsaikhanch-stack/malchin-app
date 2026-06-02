@@ -1,8 +1,10 @@
 import React from 'react';
-import { render, waitFor } from '@testing-library/react-native';
+import { render, fireEvent, waitFor } from '@testing-library/react-native';
 import { Platform } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import OwnerDashboard from '../owner';
 import { getMockOwnerSnapshot } from '@/services/owner-dashboard-data';
+import { getConfiguredPasscodeForTest, setAdminToken } from '@/services/admin-auth';
 
 jest.mock('expo-router', () => ({
   Stack: { Screen: () => null },
@@ -24,9 +26,16 @@ function setPlatform(os: 'web' | 'ios' | 'android') {
   Object.defineProperty(Platform, 'OS', { value: os, configurable: true });
 }
 
+// Admin token-той seed хийнэ — дашбоард UI-руу шууд орох
+async function seedAdminAuth() {
+  await setAdminToken(`admin:${Date.now()}:test1234`);
+}
+
 describe('OwnerDashboard — web (full render)', () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     setPlatform('web');
+    await AsyncStorage.clear();
+    await seedAdminAuth();
     mockFetch.mockReset();
     mockFetch.mockResolvedValue(getMockOwnerSnapshot());
   });
@@ -84,8 +93,9 @@ describe('OwnerDashboard — web (full render)', () => {
 });
 
 describe('OwnerDashboard — native (placeholder fallback)', () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     setPlatform('ios');
+    await AsyncStorage.clear();
     mockFetch.mockReset();
   });
 
@@ -99,5 +109,60 @@ describe('OwnerDashboard — native (placeholder fallback)', () => {
   it('Native үед fetchOwnerSnapshot ДУУДАГДАХГҮЙ', () => {
     render(<OwnerDashboard />);
     expect(mockFetch).not.toHaveBeenCalled();
+  });
+});
+
+describe('OwnerDashboard — auth gate (web)', () => {
+  beforeEach(async () => {
+    setPlatform('web');
+    await AsyncStorage.clear();
+    mockFetch.mockReset();
+    mockFetch.mockResolvedValue(getMockOwnerSnapshot());
+  });
+
+  it('Token байхгүй үед locked screen — "Нэвтрэх код" form харагдана', async () => {
+    const { findByPlaceholderText, getByText } = render(<OwnerDashboard />);
+    expect(await findByPlaceholderText('Нэвтрэх код')).toBeTruthy();
+    expect(getByText(/Нэвтрэх$/)).toBeTruthy();
+  });
+
+  it('Locked үед fetchOwnerSnapshot ДУУДАГДАХГҮЙ', async () => {
+    const { findByPlaceholderText } = render(<OwnerDashboard />);
+    await findByPlaceholderText('Нэвтрэх код');
+    expect(mockFetch).not.toHaveBeenCalled();
+  });
+
+  it('Буруу passcode → "Нэвтрэх кодын алдаа" харагдана, locked хэвээр', async () => {
+    const { findByPlaceholderText, findByText, getByText } = render(<OwnerDashboard />);
+    const input = await findByPlaceholderText('Нэвтрэх код');
+    fireEvent.changeText(input, 'wrong-passcode');
+    fireEvent.press(getByText(/Нэвтрэх$/));
+    expect(await findByText('Нэвтрэх кодын алдаа')).toBeTruthy();
+    expect(mockFetch).not.toHaveBeenCalled();
+  });
+
+  it('Зөв passcode → token хадгалагдаж dashboard рендерлэгдэнэ', async () => {
+    const { findByPlaceholderText, findByText, getByText } = render(<OwnerDashboard />);
+    const input = await findByPlaceholderText('Нэвтрэх код');
+    fireEvent.changeText(input, getConfiguredPasscodeForTest());
+    fireEvent.press(getByText(/Нэвтрэх$/));
+    // "Хэн?" нь зөвхөн dashboard single-glance ribbon-д байна (login screen-д БАЙХГҮЙ)
+    expect(await findByText('Хэн?')).toBeTruthy();
+    await waitFor(() => expect(mockFetch).toHaveBeenCalledTimes(1));
+  });
+
+  it('Pre-seeded token → шууд dashboard (login screen алгасна)', async () => {
+    await seedAdminAuth();
+    const { findByText, queryByPlaceholderText } = render(<OwnerDashboard />);
+    expect(await findByText('Owner dashboard')).toBeTruthy();
+    expect(queryByPlaceholderText('Нэвтрэх код')).toBeNull();
+  });
+
+  it('"Гарах" товч → token clear, locked screen-руу буцна', async () => {
+    await seedAdminAuth();
+    const { findByText, getByText, findByPlaceholderText } = render(<OwnerDashboard />);
+    await findByText('Owner dashboard');
+    fireEvent.press(getByText('Гарах'));
+    expect(await findByPlaceholderText('Нэвтрэх код')).toBeTruthy();
   });
 });
