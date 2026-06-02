@@ -10,6 +10,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Image } from 'expo-image';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AppColors } from '@/constants/theme';
@@ -67,17 +68,19 @@ const animalEmojis: Record<string, string> = {
   sheep: '🐑', goat: '🐐', cattle: '🐂',
   horse: '🐎', camel: '🐪' };
 
-const quickActionItems = [
-  { emoji: '🐑', label: 'Мал бүртгэл', route: '/livestock' },
-  { emoji: '🔍', label: 'Алдсан/Олдсон', route: '/lost-found' },
-  { emoji: '🩺', label: 'Мал эмч', route: '/vet-booking' },
-  { emoji: '🐑', label: 'Мал хээлтүүлэг', route: '/breeding' },
-  { emoji: '🏥', label: 'Эрүүл мэнд', route: '/health' },
-  { emoji: '🌿', label: 'Бэлчээр', route: '/pasture' },
-  { emoji: '📰', label: 'Мэдээ', route: '/news' },
-  { emoji: '👨‍👩‍👧‍👦', label: 'Өрх бүл', route: '/household' },
-  { emoji: '📍', label: 'Газрын зураг', route: '/map-view' },
-  { emoji: '💰', label: 'Санхүү', route: '/finance' },
+// Бодит дүрст вектор icon (MaterialCommunityIcons) + сэдвийн өнгө
+type MCIName = React.ComponentProps<typeof MaterialCommunityIcons>['name'];
+const quickActionItems: { icon: MCIName; color: string; label: string; route: string }[] = [
+  { icon: 'sheep', color: '#2D7D3F', label: 'Мал бүртгэл', route: '/livestock' },
+  { icon: 'map-search-outline', color: '#5C6BC0', label: 'Алдсан/Олдсон', route: '/lost-found' },
+  { icon: 'medical-bag', color: '#E53935', label: 'Мал эмч', route: '/vet-booking' },
+  { icon: 'cow', color: '#8D6E63', label: 'Мал хээлтүүлэг', route: '/breeding' },
+  { icon: 'heart-pulse', color: '#E53935', label: 'Эрүүл мэнд', route: '/health' },
+  { icon: 'sprout', color: '#43A047', label: 'Бэлчээр', route: '/pasture' },
+  { icon: 'newspaper-variant-outline', color: '#3F51B5', label: 'Мэдээ', route: '/news' },
+  { icon: 'home-group', color: '#2D7D3F', label: 'Өрх бүл', route: '/household' },
+  { icon: 'map-marker-radius', color: '#5C6BC0', label: 'Газрын зураг', route: '/map-view' },
+  { icon: 'cash-multiple', color: '#FF8F00', label: 'Санхүү', route: '/finance' },
 ];
 
 export default function HomeScreen() {
@@ -606,19 +609,19 @@ export default function HomeScreen() {
           <Text style={styles.cardTitle}>🛡️ Даатгал & Халамж</Text>
           <View style={styles.insuranceGrid}>
             <View style={styles.insuranceItem}>
-              <Text style={styles.insuranceEmoji}>🏦</Text>
+              <MaterialCommunityIcons name="bank-outline" size={26} color="#5C6BC0" />
               <Text style={styles.insuranceLabel}>НД 11.5%</Text>
             </View>
             <View style={styles.insuranceItem}>
-              <Text style={styles.insuranceEmoji}>🏥</Text>
+              <MaterialCommunityIcons name="hospital-box-outline" size={26} color="#E53935" />
               <Text style={styles.insuranceLabel}>ЭМД</Text>
             </View>
             <TouchableOpacity style={styles.insuranceItem} onPress={() => router.push('/(tabs)/livestock-insurance')}>
-              <Text style={styles.insuranceEmoji}>🐑</Text>
+              <MaterialCommunityIcons name="shield-sun-outline" size={26} color="#2D7D3F" />
               <Text style={[styles.insuranceLabel, { color: '#2d5016', fontWeight: '700' }]}>Малын даатгал</Text>
             </TouchableOpacity>
             <View style={styles.insuranceItem}>
-              <Text style={styles.insuranceEmoji}>🤝</Text>
+              <MaterialCommunityIcons name="hand-heart-outline" size={26} color="#FF8F00" />
               <Text style={styles.insuranceLabel}>Халамж</Text>
             </View>
           </View>
@@ -639,7 +642,9 @@ export default function HomeScreen() {
                 style={styles.gridActionBtn}
                 onPress={() => router.push(item.route as any)}
               >
-                <Text style={styles.gridActionIcon}>{item.emoji}</Text>
+                <View style={[styles.gridIconTile, { backgroundColor: item.color + '1A' }]}>
+                  <MaterialCommunityIcons name={item.icon} size={26} color={item.color} />
+                </View>
                 <Text style={styles.gridActionLabel}>{item.label}</Text>
               </TouchableOpacity>
             ))}
@@ -648,20 +653,20 @@ export default function HomeScreen() {
 
         {/* Quick actions - existing 4 buttons */}
         <View style={styles.quickActions}>
-          <TouchableOpacity style={[styles.actionBtn, { backgroundColor: '#FFEBEE' }]} onPress={() => router.push('/(tabs)/diagnose')}>
-            <Text style={styles.actionIcon}>🩺</Text>
+          <TouchableOpacity style={styles.actionBtn} onPress={() => router.push('/(tabs)/diagnose')}>
+            <MaterialCommunityIcons name="stethoscope" size={28} color="#E53935" />
             <Text style={styles.actionLabel}>Оношлогч</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.actionBtn} onPress={() => router.push('/(tabs)/market')}>
-            <Text style={styles.actionIcon}>🏪</Text>
+            <MaterialCommunityIcons name="storefront-outline" size={28} color="#FF8F00" />
             <Text style={styles.actionLabel}>Зах зээл</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.actionBtn} onPress={() => router.push('/(tabs)/weather')}>
-            <Text style={styles.actionIcon}>🌡️</Text>
+            <MaterialCommunityIcons name="weather-partly-cloudy" size={28} color="#5C6BC0" />
             <Text style={styles.actionLabel}>Цаг агаар</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.actionBtn} onPress={() => router.push('/(tabs)/ai-advisor')}>
-            <Text style={styles.actionIcon}>🤖</Text>
+            <MaterialCommunityIcons name="robot-happy-outline" size={28} color="#3F51B5" />
             <Text style={styles.actionLabel}>Зөвлөгч</Text>
           </TouchableOpacity>
         </View>
@@ -674,7 +679,7 @@ export default function HomeScreen() {
               style={styles.moduleItem}
               onPress={() => router.push('/malchin-khun' as any)}
             >
-              <Text style={styles.moduleEmoji}>🩺</Text>
+              <MaterialCommunityIcons name="account-heart" size={28} color="#E53935" />
               <Text style={styles.moduleLabel}>Малчин хүн</Text>
               <Text style={styles.moduleDesc}>Эрүүл мэнд, ЭМД</Text>
             </TouchableOpacity>
@@ -682,7 +687,7 @@ export default function HomeScreen() {
               style={styles.moduleItem}
               onPress={() => router.push('/family-future' as any)}
             >
-              <Text style={styles.moduleEmoji}>🎓</Text>
+              <MaterialCommunityIcons name="school-outline" size={28} color="#3F51B5" />
               <Text style={styles.moduleLabel}>Өрх-ирээдүй</Text>
               <Text style={styles.moduleDesc}>Хүүхэд, тэтгэлэг</Text>
             </TouchableOpacity>
@@ -690,7 +695,7 @@ export default function HomeScreen() {
               style={styles.moduleItem}
               onPress={() => router.push('/extra-income' as any)}
             >
-              <Text style={styles.moduleEmoji}>💼</Text>
+              <MaterialCommunityIcons name="briefcase-outline" size={28} color="#FF8F00" />
               <Text style={styles.moduleLabel}>Нэмэлт орлого</Text>
               <Text style={styles.moduleDesc}>Гэр буудал, идээ</Text>
             </TouchableOpacity>
@@ -698,7 +703,7 @@ export default function HomeScreen() {
               style={styles.moduleItem}
               onPress={() => router.push('/chat' as any)}
             >
-              <Text style={styles.moduleEmoji}>💬</Text>
+              <MaterialCommunityIcons name="chat-outline" size={28} color="#2D7D3F" />
               <Text style={styles.moduleLabel}>Чат</Text>
               <Text style={styles.moduleDesc}>Сум, баг, хоршоо</Text>
             </TouchableOpacity>
@@ -706,7 +711,7 @@ export default function HomeScreen() {
               style={styles.moduleItem}
               onPress={() => router.push('/wisdom-feed' as any)}
             >
-              <Text style={styles.moduleEmoji}>👴</Text>
+              <MaterialCommunityIcons name="account-tie-outline" size={28} color="#8D6E63" />
               <Text style={styles.moduleLabel}>Малчны ухаан</Text>
               <Text style={styles.moduleDesc}>Ахмад, мэргэжилтэн</Text>
             </TouchableOpacity>
@@ -852,6 +857,9 @@ const styles = StyleSheet.create({
     width: '31%', backgroundColor: '#F0FFF4', borderRadius: 14, paddingVertical: 16,
     alignItems: 'center', borderWidth: 1, borderColor: '#C6F6D5' },
   gridActionIcon: { fontSize: 28 },
+  gridIconTile: {
+    width: 48, height: 48, borderRadius: 24,
+    alignItems: 'center', justifyContent: 'center', marginBottom: 2 },
   gridActionLabel: {
     fontSize: 12, fontWeight: '600', color: AppColors.primaryDark, marginTop: 8, textAlign: 'center' },
   // Existing quick actions row
